@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pocketmanga", "pocketmanga\pocketmanga.vcproj", "{4DE9AF2A-9987-4EB5-A726-FC3356BE8464}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcproj", "{516F190F-4E3B-4350-9BF8-C3348A2218EC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4DE9AF2A-9987-4EB5-A726-FC3356BE8464}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4DE9AF2A-9987-4EB5-A726-FC3356BE8464}.Debug|Win32.Build.0 = Debug|Win32
+		{4DE9AF2A-9987-4EB5-A726-FC3356BE8464}.Release|Win32.ActiveCfg = Release|Win32
+		{4DE9AF2A-9987-4EB5-A726-FC3356BE8464}.Release|Win32.Build.0 = Release|Win32
+		{516F190F-4E3B-4350-9BF8-C3348A2218EC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{516F190F-4E3B-4350-9BF8-C3348A2218EC}.Debug|Win32.Build.0 = Debug|Win32
+		{516F190F-4E3B-4350-9BF8-C3348A2218EC}.Release|Win32.ActiveCfg = Release|Win32
+		{516F190F-4E3B-4350-9BF8-C3348A2218EC}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
