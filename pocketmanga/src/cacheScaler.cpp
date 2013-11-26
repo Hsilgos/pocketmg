@@ -23,6 +23,11 @@ namespace manga
 		mScaled.swap(tOther->mScaled);
 	}
 
+	CacheScaler::Cache::Cache()
+	{
+		image.enableMinimumReallocations(true);
+	}
+
 	void CacheScaler::Cache::swap(Cache &aOther)
 	{
 		std::swap(orientation, aOther.orientation);
@@ -30,6 +35,49 @@ namespace manga
 		std::swap(bounds, aOther.bounds);
 		std::swap(currentShowing, aOther.currentShowing);
 		image.swap(aOther.image);
+	}
+
+	bool CacheScaler::Cache::nextBounds()
+	{
+		if( Parts3 == representation )
+		{
+			const int tSecondFrame = (image.width() - bounds.width) / 2;
+			if( bounds.x < tSecondFrame )
+			{
+				bounds.x = tSecondFrame;
+				return true;
+			}
+
+			const int tThirdFrame = image.width() - bounds.width;
+			if( bounds.x < tThirdFrame )
+			{
+				bounds.x = tThirdFrame;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	bool CacheScaler::Cache::previousBounds()
+	{
+		if( Parts3 == representation )
+		{
+			const int tSecondFrame = (image.width() - bounds.width) / 2;
+			if( bounds.x > tSecondFrame )
+			{
+				bounds.x = tSecondFrame;
+				return true;
+			}
+
+			if( bounds.x > 0 )
+			{
+				bounds.x = 0;
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	bool CacheScaler::onLoaded(img::Image &aImage)

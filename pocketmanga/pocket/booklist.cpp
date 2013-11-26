@@ -130,7 +130,7 @@ private:
 				if( aIndex <= mBooks.size() && mHandler.get())
 				{
 					std::auto_ptr<manga::Book> tNewBook(new manga::Book);
-					tNewBook->setRoot( mBooks[aIndex - 1].getPath() );
+					tNewBook->setRoot( mBooks[aIndex - 1] );
 					mHandler->startShow(tNewBook);
 				}
 			}

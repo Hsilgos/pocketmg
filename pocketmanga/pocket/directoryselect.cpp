@@ -133,10 +133,10 @@ namespace pocket
 				return mReturnBmp;
 			
 			//std::cout << "sd:" << SDPath.getPath() << ", usb:" << USBPath.getPath() << std::endl;
-			if( aCurEntry.startWith(SDPath) )
+			if( aCurEntry.startsWith(SDPath) )
 				return &folder_sd;
 
-			if( aCurEntry.startWith(USBPath) )
+			if( aCurEntry.startsWith(USBPath) )
 				return &folder_usb;
 
 			return &folder;
@@ -266,7 +266,7 @@ namespace pocket
 			{
 				std::vector<fs::FilePath>
 					tExt = mFileMgr->getFileList(
-						mRootPaths[i].getPath(), fs::IFileManager::FileAndDirectory, false);
+						mRootPaths[i], fs::IFileManager::FileAndDirectory, false);
 
 				for( size_t j = 0; j < tExt.size(); ++j )
 					tExt[j].setFirstLevel(mRootPaths[i].getLevel());
@@ -274,7 +274,7 @@ namespace pocket
 				mCurrentFiles.insert(mCurrentFiles.end(), tExt.begin(), tExt.end());
 			}
 
-			fs::sort(mCurrentFiles, fs::FirstWordThenNumbers);
+			std::sort(mCurrentFiles.begin(), mCurrentFiles.end(), fs::WordNumberOrder());
 
 			for( size_t i = 0; i < mCurrentFiles.size(); ++i )
 				mCurrentFiles[i].setFirstLevel(0);
@@ -302,9 +302,9 @@ namespace pocket
 			{
 				mCurrentDir = aPath;
 
-				mCurrentFiles = mFileMgr->getFileList(mCurrentDir.getPath(), fs::IFileManager::FileAndDirectory, false);
+				mCurrentFiles = mFileMgr->getFileList(mCurrentDir, fs::IFileManager::FileAndDirectory, false);
 
-				fs::sort(mCurrentFiles, fs::FirstWordThenNumbers);
+				std::sort(mCurrentFiles.begin(), mCurrentFiles.end(), fs::WordNumberOrder());
 
 				doOpenList(true);
 			}

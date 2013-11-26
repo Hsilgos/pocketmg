@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include "static_assert.h"
 
 namespace color
@@ -66,7 +67,6 @@ namespace color
 			color[0] = ch;
 		}
 	protected:
-		typedef GrayTmpl<ChannelType> BaseType;
 
 		GrayTmpl()
 		{
@@ -151,7 +151,6 @@ namespace color
 		typedef Int2Type<Alpha>		AlphaType;
 		typedef Int2Type<NoChannel>	NoType;
 
-		typedef ColorBase<Color1, Color2, Color3, Color4, ChannelsType> BaseType;
 		ChannelsType	colors;
 
 		enum ColorIndex
@@ -199,7 +198,7 @@ namespace color
 
 		void swap(ColorIndex aIndex1, ColorIndex aIndex2)
 		{
-			std::swap(colors[aIndex1], colors[aIndex2]);
+			std::swap<Channel>(colors[aIndex1], colors[aIndex2]);
 		}
 
 		Channel red() const
@@ -311,9 +310,10 @@ namespace color
 	template<int Color1, int Color2, int Color3>
 	struct Color3Tmpl: public ColorBase<Color1, Color2, Color3, NoChannel, Channel[3]>
 	{
+		typedef ColorBase<Color1, Color2, Color3, NoChannel, Channel[3]> BaseType;
 		typedef Color3Tmpl<Color1, Color2, Color3> ThisType;
 
-		STATIC_ASSERT( (AlphaIndex == -1), no_alpha_channel );
+		STATIC_ASSERT( (ThisType::AlphaIndex == -1), no_alpha_channel );
 
 		Color3Tmpl()
 		{
@@ -324,7 +324,7 @@ namespace color
 		{
 			STATIC_ASSERT( (sizeof(ThisType) == sizeof(Channel) * 3), size_should_be_3 );
 
-			apply(aCol1, aCol2, aCol3);
+			BaseType::apply(aCol1, aCol2, aCol3);
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
@@ -351,9 +351,10 @@ namespace color
 	template<int Color1, int Color2, int Color3, int Color4>
 	struct Color4Tmpl: public ColorBase<Color1, Color2, Color3, Color4, Channel[4]>
 	{
+		typedef ColorBase<Color1, Color2, Color3, Color4, Channel[4]> BaseType;
 		typedef Color4Tmpl<Color1, Color2, Color3, Color4> ThisType;
 
-		STATIC_ASSERT( (AlphaIndex != -1), no_alpha_channel );
+		STATIC_ASSERT( (ThisType::AlphaIndex != -1), no_alpha_channel );
 
 		Color4Tmpl()
 		{
@@ -364,7 +365,7 @@ namespace color
 		{
 			STATIC_ASSERT( (sizeof(ThisType) == sizeof(Channel) * 4), size_should_be_4 );
 
-			apply(aCol1, aCol2, aCol3, aCol4);
+			BaseType::apply(aCol1, aCol2, aCol3, aCol4);
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
@@ -392,6 +393,7 @@ namespace color
 	template<int Color1, int Color2, int Color3, class ChannelsType>
 	struct Color3RefTmpl: public ColorBase<Color1, Color2, Color3, NoChannel, ChannelsType>
 	{
+		typedef ColorBase<Color1, Color2, Color3, NoChannel, ChannelsType> BaseType;
 		typedef Color3RefTmpl<Color1, Color2, Color3, ChannelsType> ThisType;
 
 		Color3RefTmpl(ChannelsType aColors)
@@ -402,7 +404,7 @@ namespace color
 		Color3RefTmpl(ChannelsType aColors, Channel aCol1, Channel aCol2, Channel aCol3)
 			:BaseType(aColors)
 		{
-			apply(aCol1, aCol2, aCol3);
+			BaseType::apply(aCol1, aCol2, aCol3);
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
@@ -430,6 +432,7 @@ namespace color
 	template<int Color1, int Color2, int Color3, int Color4, class ChannelsType>
 	struct Color4RefTmpl: public ColorBase<Color1, Color2, Color3, Color4, ChannelsType>
 	{
+		typedef ColorBase<Color1, Color2, Color3, Color4, ChannelsType> BaseType;
 		typedef Color4RefTmpl<Color1, Color2, Color3, Color4, ChannelsType> ThisType;
 
 		Color4RefTmpl(ChannelsType aColors)
@@ -440,7 +443,7 @@ namespace color
 		Color4RefTmpl(ChannelsType aColors, Channel aCol1, Channel aCol2, Channel aCol3, Channel aCol4)
 			:BaseType(aColors)
 		{
-			apply(aCol1, aCol2, aCol3, aCol4);
+			BaseType::apply(aCol1, aCol2, aCol3, aCol4);
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
@@ -496,20 +499,21 @@ namespace color
 	template<class ChannelType>
 	struct GrayRefImpl: GrayTmpl<ChannelType>
 	{
+		typedef GrayTmpl<ChannelType> BaseType;
 		typedef GrayRefImpl<ChannelType> ThisType;
 	public:
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
 		GrayRefImpl( ChannelType aPtr, const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther )
 			:BaseType(aPtr)
 		{
-			set(coeff.get(aOther.red(), aOther.green(), aOther.blue()));
+			BaseType::set(BaseGray::coeff.get(aOther.red(), aOther.green(), aOther.blue()));
 		}
 
 		template<class OtherChannelsType>
 		GrayRefImpl( ChannelType aPtr, const GrayTmpl<OtherChannelsType> &aOther )
 			:BaseType(aPtr)
 		{
-			set( aOther.get() );
+			BaseType::set( aOther.get() );
 		}
 
 		GrayRefImpl( ChannelType aPtr )
@@ -521,7 +525,7 @@ namespace color
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
 		ThisType operator = ( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther )
 		{
-			set(coeff.get(aOther.red(), aOther.green(), aOther.blue()));
+			set(BaseGray::coeff.get(aOther.red(), aOther.green(), aOther.blue()));
 			return *this;
 		}
 

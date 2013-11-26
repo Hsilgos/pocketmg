@@ -2,128 +2,200 @@
 //
 
 #include <iostream>
+#include <sstream>
 
+#include "src/iArchive.h"
+#include "src/zipArchive.h"
 #include "src/filepath.h"
 #include "src/filemanager.h"
 #include "src/image.h"
 #include "src/book.h"
-#include "src/scale.h"
-#include "src/rotate.h"
-#include "src/defines.h"
-#include "src/cacheScaler.h"
 
-#include <opencv2/opencv.hpp>
+#include "pocket/directoryselect.h"
+#include "pocket/booklist.h"
+#include "pocket/config.h"
+#include "pocket/pictureview.h"
 
-cv::Mat to_cv(const img::Image &aImg)
+#include "inkview.h"
+
+namespace
 {
-	img::Image tRotated = img::rotate(aImg, img::Angle_90);
-	
-	cv::Mat tMat1;
-	tMat1.create(tRotated.height(), tRotated.width(), CV_MAKETYPE(CV_8U, tRotated.depth()));
-	memcpy(tMat1.data, tRotated.data(), tRotated.height() * tRotated.width() * tRotated.depth());
+#ifdef IVSAPP// emulator?
+static const fs::FilePath ConfigPath("/usr/local/pocketbook/config/pocketmanga.cfg", true);
+#else
+static const fs::FilePath ConfigPath(USERDATA"/config/fbreader.cfg", true);
+#endif
+}
+//#include <opencv2/opencv.hpp>
 
-	return tMat1;
+void mainscreen_repaint() {
+
+  ClearScreen();
+
+  DrawLine(5, 500, 595, 500, BLACK);
+  DrawLine(5, 502, 595, 502, DGRAY);
+  DrawLine(5, 504, 595, 504, LGRAY);
+  DrawLine(19, 516, 20, 517, BLACK);
+  DrawLine(22, 516, 23, 516, BLACK);
+
+  //DrawTextRect(25, 400, 510, 350, sometext, ALIGN_LEFT);
+
+  FullUpdate();
+
 }
 
-cv::Mat to_cv(manga::CacheScaler::Cache &aCache)
+std::string bookCfgName(int i)
 {
-	if( aCache.representation == manga::CacheScaler::Parts3 )
-	{
-		img::Image tDst;
-		utils::Rect bounds = aCache.bounds;
-
-		if(1 == aCache.currentShowing)
-			bounds.x = (aCache.image.width() - bounds.width) / 2;
-		else if(2 == aCache.currentShowing)
-			bounds.x = aCache.image.width() - bounds.width;
-		
-		copyRect(aCache.image, tDst, bounds);
-
-		aCache.currentShowing++;
-
-		return to_cv(tDst);
-	}
-	else
-	{
-		return to_cv(aCache.image);
-	}
+	std::stringstream tName;
+	tName << "book_" << i;
+	return tName.str();
 }
-/*
-INTER_NEAREST=CV_INTER_NN, //!< nearest neighbor interpolation
-INTER_LINEAR=CV_INTER_LINEAR, //!< bilinear interpolation
-INTER_CUBIC=CV_INTER_CUBIC, //!< bicubic interpolation
-INTER_AREA=CV_INTER_AREA, //!< area-based (or super) interpolation
-INTER_LANCZOS4=CV_INTER_LANCZOS4, //!< Lanczos interpolation over 8x8 neighborhood
-INTER_MAX=7,
-WARP_INVERSE_MAP=CV_WARP_INVERSE_MAP
-*/
+
+std::vector<fs::FilePath> loadBooks()
+{
+	std::vector<fs::FilePath> tResult;
+
+	pocket::Config tCfg(ConfigPath.getPath());
+	const int tCount = tCfg.readInt("bookcount");
+	for( int i = 0; i < tCount; ++i )
+	{
+		std::string tName = bookCfgName(i);
+		std::string tBookPath = tCfg.readString( tName );
+
+		if( !tBookPath.empty() )
+			tResult.push_back( fs::FilePath(tBookPath, false) );
+	}
+
+	return tResult;
+}
+
+void addBook(const fs::FilePath &aBook)
+{
+	pocket::Config tCfg(ConfigPath.getPath());
+	const int tCount = tCfg.readInt("bookcount");
+	tCfg.write("bookcount", tCount + 1);
+
+	tCfg.write(bookCfgName(tCount), aBook.getPath());
+}
+
+class TestSelector: public pocket::IDirectoryHandler
+{
+public:
+	virtual void selected(const fs::FilePath &aPath)
+	{
+		addBook(aPath);
+	}
+
+	virtual void onExit();
+};
+
+class TestBookListHandler: public pocket::IBookListHandler
+{
+	virtual void startShow( std::auto_ptr<manga::Book> aBook)
+	{
+		pocket::PictureView::getInstance().setBook(aBook);
+	}
+
+	virtual void addNewBook()
+	{
+		pocket::openDirectorySelector(new TestSelector);
+	}
+
+	virtual void onExit()
+	{
+		CloseApp();
+	}
+};
+
+class TestBooklistCfg: public pocket::IBooklistCfg
+{
+	virtual std::vector<fs::FilePath> getBooks()
+	{
+		return loadBooks();
+	}
+};
+
+void TestSelector::onExit()
+{
+	pocket::showBooklist(new TestBookListHandler, new TestBooklistCfg);
+}
+
+int main_handler(int type, int par1, int par2) {
+
+  std::cout << "type:"<< type << ",part1:"<<par1<<",part2:"<<par2 << std::endl;
+
+  if (type == EVT_INIT) {
+	  pocket::showBooklist(new TestBookListHandler, new TestBooklistCfg);
+  }
+
+  if (type == EVT_SHOW) {
+	  //pocket::PictureView::getInstance().draw();
+  }
+
+  if (type == EVT_KEYPRESS) {
+
+	  switch(par1)
+	  {
+	  case KEY_NEXT:
+		  //pocket::PictureView::getInstance().next();
+		  break;
+	  }
+
+    /*switch (par1) {
+
+      case KEY_OK:
+        OpenMenu(menu1, cindex, 20, 20, menu1_handler);
+        break;
+
+      case KEY_BACK:
+        CloseApp();
+        break;
+
+      case KEY_LEFT:
+        msg("KEY_LEFT");
+        break;
+
+      case KEY_RIGHT:
+        msg("KEY_RIGHT");
+        break;
+
+      case KEY_UP:
+        msg("KEY_UP");
+        break;
+
+      case KEY_DOWN:
+        msg("KEY_DOWN");
+        break;
+
+      case KEY_MUSIC:
+        msg("KEY_MUSIC");
+        break;
+
+      case KEY_MENU:
+        msg("KEY_MENU");
+        break;
+
+      case KEY_DELETE:
+        msg("KEY_DELETE");
+        break;
+
+    }*/
+  }
+
+  if (type == EVT_EXIT) {
+    // occurs only in main handler when exiting or when SIGINT received.
+    // save configuration here, if needed
+  }
+
+  return 0;
+
+}
+
 int main()
 {
-	manga::Book tBook;
-
-	tBook.setRoot(fs::FilePath("i:\\tmp", false));
-	manga::CacheScaler *tScaler = new manga::CacheScaler(600, 800);
-	tBook.setCachePrototype( tScaler );
-
-	img::Image tImg;
-	
-	img::Image tImg2;
-	tImg2.enableMinimumReallocations(true);
-
-	img::Image tImg3;
-	tImg3.enableMinimumReallocations(true);
-
-	while( tBook.incrementPosition() )
-	{
-		//tImg = tBook.currentImage();
-		//toBgr(tImg, tImg);
-		//tImg.copyTo(tImg2);
-		//cv::Mat tCv = to_cv(tImg);
-		//toGray(tImg, tImg);
-
-		//img::copyRect(tImg, tImg, utils::Rect(0, 0, 400, 400));
-
-		//tImg = img::scale(tImg, img::HighScaling, 600, 0);
-
-		//tImg = img::rotate(tImg, img::Angle_90);
-
-		//cv::imshow("ololo1", to_cv(tImg));
-		cv::imshow("ololo1", to_cv(tScaler->scaledGrey()));
-
-		tBook.preload();
-
-		if( tScaler->scaledGrey().representation == manga::CacheScaler::Parts3)
-		{
-			cv::waitKey(2000);
-			cv::imshow("ololo1", to_cv(tScaler->scaledGrey()));
-			cv::waitKey(3000);
-			cv::imshow("ololo1", to_cv(tScaler->scaledGrey()));
-		}
-		//cv::Mat to_cv(tImg2)
-		//cv::imshow("ololo2", tMat2);
-		//cv::imshow("ololo2", tMat2);
-		//cv::imshow("ololo2", tMat2);
-		
-		cv::waitKey(3000);
-
-		
-	}
-	
-
+	OpenScreen();
+  
+	InkViewMain(main_handler);
 	return 0;
-
-
-/*	fs::IFileManager *tMgr = fs::IFileManager::create();
-	std::vector<fs::FilePath> tList = tMgr->getFileList("i:\\books\\Prison School\\Том 01", fs::IFileManager::Directory, true);
-
-	fs::sort(tList, fs::FirstWordThenNumbers);
-	//fs::sort(tList, fs::JustNumbers);
-
-	std::vector<fs::FilePath>::iterator it = tList.begin(), itEnd = tList.end();
-	for ( ; it != itEnd; ++it )
-	{
-		std::cout << it->getPath() << std::endl;
-	}
-
-	return 0;*/
 }
+

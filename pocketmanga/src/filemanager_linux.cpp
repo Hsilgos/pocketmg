@@ -61,10 +61,10 @@ namespace fs
 				closedir(dir);
 			}
 
-			virtual std::vector<fs::FilePath> getFileList(const std::string &aRoot, EntryTypes aEntries, bool aRecursive)
+			virtual std::vector<fs::FilePath> getFileList(const fs::FilePath &aRoot, EntryTypes aEntries, bool aRecursive)
 			{
 				std::vector<fs::FilePath> tResult;
-				doGetFileList(tResult ,aRoot, aEntries, aRecursive);
+				doGetFileList(tResult ,aRoot.getPath(), aEntries, aRecursive);
 				return tResult;
 			}
 		};

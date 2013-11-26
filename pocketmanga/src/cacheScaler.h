@@ -29,7 +29,11 @@ namespace manga
 
 			int currentShowing;
 
+			Cache();
 			void swap(Cache &aOther);
+
+			bool nextBounds();
+			bool previousBounds();
 		};
 
 		CacheScaler(const size_t aScreenWidth, const size_t aScreenHeight);

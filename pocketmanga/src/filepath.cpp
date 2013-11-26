@@ -2,6 +2,8 @@
 
 #include "defines.h"
 
+#include <ostream>
+
 namespace
 {
 #ifdef WIN32

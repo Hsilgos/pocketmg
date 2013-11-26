@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <ostream>
 
 #include "filepath.h"
 #include "byteArray.h"

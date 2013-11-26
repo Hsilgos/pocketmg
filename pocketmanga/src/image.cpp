@@ -5,6 +5,8 @@
 #include "imgDecoderFactory.h"
 #include "defines.h"
 
+#include <stdexcept>
+
 namespace
 {
 	inline size_t dataSize(

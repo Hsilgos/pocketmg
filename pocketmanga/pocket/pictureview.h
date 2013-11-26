@@ -10,47 +10,16 @@
 namespace manga
 {
 	class Book;
+	class CacheScaler;
 }
-
-struct Drawable
-{
-	img::Image orig;
-	img::Image image;
-
-	enum Orientation
-	{
-		Horizontal,
-		Vertical
-	} orientation;
-
-	enum RepresentType
-	{
-		Whole,
-		Parts3,
-		Parts6
-	} representType;
-
-	utils::Rect currectBouds;
-
-	Drawable()
-	{
-		orig.enableMinimumReallocations(true);
-		image.enableMinimumReallocations(true);
-	}
-};
 
 namespace pocket
 {
 	class PictureView: public utils::SingletonStatic<PictureView>
 	{
 		std::auto_ptr<manga::Book> mBook;
-		img::Image mImage;
 
-		Drawable mPrevDrawable;
-		Drawable mDrawable;
-		Drawable mNextDrawable;
-
-		void prepareImageToDraw(const img::Image &aIn, Drawable &aDrawable);
+		manga::CacheScaler *mScaler;
 	public:
 		void setBook( std::auto_ptr<manga::Book> aBook);
 		bool next();
@@ -59,6 +28,6 @@ namespace pocket
 
 
 		void draw();
-		void draw(Drawable &aDrawable);
+		void draw(manga::CacheScaler *aScaler);
 	};
 }
