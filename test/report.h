@@ -12,10 +12,10 @@ namespace test
 	class Report;
 	class ReportOutput: public IBenchmarkOutput
 	{
-		const std::string mRow;
-		const std::string mColumn;
+		const std::string row_;
+		const std::string column_;
 
-		Report *const mReport;
+		Report *const report_;
 
 		ReportOutput(const std::string &aRow, const std::string &aColumn, Report *aReport);
 		friend class Report;
@@ -30,17 +30,17 @@ namespace test
 	{
 		typedef std::vector< std::string > StringList;
 		// column names
-		StringList mColumns;
+		StringList columns_;
 
 		// row name
-		StringList mRows;
+		StringList rows_;
 
 		// table content
 		typedef std::map<std::string, std::string> ColumnMap;
 		typedef std::map< std::string, ColumnMap > TableContent;
-		TableContent mTable;
+		TableContent table_;
 
-		std::string mDescription;
+		std::string description_;
 	public:
 		void setDescription(const std::string &aDesc);
 

@@ -45,7 +45,7 @@ namespace test
 		TestFileSystem::Dir* findDirByPath(const fs::FilePath &aPath);
 		//Dir *findDirByPath(const std::string &aPath) const;
 
-		Dir mRoot;
+		Dir root_;
 
 		Dir &findOrCreateDir(Dir &aParent, const std::string &aName);
 

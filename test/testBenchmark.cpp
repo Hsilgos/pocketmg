@@ -100,9 +100,9 @@ namespace test
 		std::stringstream tOut;
 
 		if( aCount > 1 )
-			tOut << "-->Start benchmark '" << mFormat.str() << "', repeate " << aCount << " times" << " ...";
+			tOut << "-->Start benchmark '" << format_.str() << "', repeate " << aCount << " times" << " ...";
 		else
-			tOut << "-->Start benchmark '" << mFormat.str() << "' ...";
+			tOut << "-->Start benchmark '" << format_.str() << "' ...";
 
 		BOOST_TEST_MESSAGE( tOut.str() );
 	}
@@ -112,7 +112,7 @@ namespace test
 
 		tOut 
 			<< "<--Benchmark '"
-			<< mFormat.str() 
+			<< format_.str() 
 			<<"' finished, total milliseconds: "
 			<< aMilliseconds;
 
@@ -120,7 +120,7 @@ namespace test
 	}
 
 	Printout::Printout(const char *aName)
-		:mFormat(aName)
+		:format_(aName)
 	{
 	}
 
@@ -139,15 +139,15 @@ namespace test
 
 	void TestBenchmark::init(IBenchmarkOutput &aOutput, int aCount)
 	{
-		mPrivate = new Private;
+		private_ = new Private;
 
-		mPrivate->hightTiming = initHighTiming();
+		private_->hightTiming = initHighTiming();
 
-		mPrivate->output.reset(aOutput.clone());
-		mPrivate->count		= aCount;
-		mPrivate->startTime	= tools::get_system_time();
+		private_->output.reset(aOutput.clone());
+		private_->count		= aCount;
+		private_->startTime	= tools::get_system_time();
 
-		mPrivate->output->started(aCount);
+		private_->output->started(aCount);
 	}
 
 	TestBenchmark::TestBenchmark(const char *aName, int aCount)
@@ -162,26 +162,26 @@ namespace test
 
 	TestBenchmark::~TestBenchmark()
 	{
-		mPrivate->finishTime = tools::get_system_time();
+		private_->finishTime = tools::get_system_time();
 
 		btime::time_duration tDuration 
-			= mPrivate->finishTime - mPrivate->startTime;
+			= private_->finishTime - private_->startTime;
 
 		btime::time_duration::tick_type tTicks 
 			= tDuration.total_milliseconds();
 
-		mPrivate->output->finished(tTicks);
+		private_->output->finished(tTicks);
 
-		delete mPrivate;
+		delete private_;
 	}
 
 	bool TestBenchmark::isDone()
 	{
-		return 0 == mPrivate->count;
+		return 0 == private_->count;
 	}
 
 	void TestBenchmark::next()
 	{
-		mPrivate->count -- ; 
+		private_->count -- ; 
 	}
 }

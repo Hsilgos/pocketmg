@@ -14,10 +14,10 @@ namespace test
 
 		const fs::FilePath tPath = aRoot;
 
-		if( mRoot.name != tPath.getName(0) )
+		if( root_.name != tPath.getName(0) )
 			return tResult;
 
-		Dir *tCurrDir = &mRoot;
+		Dir *tCurrDir = &root_;
 
 		fs::FilePath tPrefix;
 		tPrefix.addFolder(tCurrDir->name);
@@ -139,8 +139,8 @@ namespace test
 		if( 0 == tPath.getLevel() )
 			return;
 
-		mRoot.name = tPath.getName(0);
-		Dir &tLastParent = addEntry(mRoot, tPath, 1);
+		root_.name = tPath.getName(0);
+		Dir &tLastParent = addEntry(root_, tPath, 1);
 		tLastParent.files.push_back(TestFile(tPath.getName(), aData));
 	}
 
@@ -151,8 +151,8 @@ namespace test
 		if( 0 == tPath.getLevel() )
 			return;
 
-		mRoot.name = tPath.getName(0);
-		addEntry(mRoot, tPath, 1);
+		root_.name = tPath.getName(0);
+		addEntry(root_, tPath, 1);
 	}
 
 	void TestFileSystem::addArchive(const std::string &aPath, const TestArchive &aAcrh)
@@ -162,8 +162,8 @@ namespace test
 		if( 0 == tPath.getLevel() )
 			return;
 
-		mRoot.name = tPath.getName(0);
-		Dir &tLastParent = addEntry(mRoot, tPath, 1);
+		root_.name = tPath.getName(0);
+		Dir &tLastParent = addEntry(root_, tPath, 1);
 		tLastParent.archives.push_back(aAcrh);
 		tLastParent.files.push_back(TestFile(aAcrh.getName(), tools::ByteArray::empty));
 	}
@@ -183,7 +183,7 @@ namespace test
 		if( 0 == tPath.getLevel() )
 			return false;
 
-		Dir *tCurrDir = &mRoot;
+		Dir *tCurrDir = &root_;
 
 		for( size_t i = 1; i < tPath.getLevel(); ++i )
 		{

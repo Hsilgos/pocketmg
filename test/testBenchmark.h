@@ -22,7 +22,7 @@ namespace test
 	class Printout: public IBenchmarkOutput
 	{
 		//const std::string mName;
-		boost::format	mFormat;
+		boost::format	format_;
 
 		PATTERN_IMPL_CLONE(Printout);
 
@@ -34,7 +34,7 @@ namespace test
 		template <typename T>
 		Printout& operator %(const T &aValue) 
 		{
-			mFormat % aValue;
+			format_ % aValue;
 
 			return *this;
 		}
@@ -43,7 +43,7 @@ namespace test
 	class TestBenchmark
 	{
 		struct Private;
-		Private *mPrivate;
+		Private *private_;
 
 		TestBenchmark(const TestBenchmark &);
 		TestBenchmark &operator = (const TestBenchmark &);

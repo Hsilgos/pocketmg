@@ -41,8 +41,8 @@ namespace test
 
 	//////////////////////////////////////////////////////////////////////////
 	TestArchiver::TestArchiver(TestFileSystem *afs)
-		:mFileSystem(afs),
-		mCurrentArchive(0)
+		:file_system_(afs),
+		current_archive_(0)
 	{
 		instance = this;
 		archive::IArchive::registerArchiver(ArchExt, &TestArchiver::createProxy);
@@ -98,7 +98,7 @@ namespace test
 		if( tPath.getExtension() != ArchExt )
 			return false;
 
-		TestFileSystem::Dir *tDir = mFileSystem->findDirByPath(aFile, true);
+		TestFileSystem::Dir *tDir = file_system_->findDirByPath(aFile, true);
 		if( !tDir )
 			return false;
 
@@ -113,7 +113,7 @@ namespace test
 		{
 			if( it->getName() == tPath.getFileName() )
 			{
-				mCurrentArchive = &(*it);
+				current_archive_ = &(*it);
 				return true;
 			}
 		}
@@ -123,14 +123,14 @@ namespace test
 
 	void TestArchiver::close()
 	{
-		mCurrentArchive = 0;
+		current_archive_ = 0;
 	}
 
 	std::vector<fs::FilePath> TestArchiver::getFileList(bool aFilesOnly)
 	{
 		std::vector<fs::FilePath> tResult;
-		if(mCurrentArchive)
-			utils::collectKeys(mCurrentArchive->getContent(), std::back_inserter(tResult));
+		if(current_archive_)
+			utils::collectKeys(current_archive_->getContent(), std::back_inserter(tResult));
 		return tResult;
 	}
 
@@ -138,10 +138,10 @@ namespace test
 	{
 		tools::ByteArray tResult;
 
-		if( mCurrentArchive )
+		if( current_archive_ )
 		{
-			TestArchive::Content::iterator it = mCurrentArchive->getContent().find(aFileInArchive);
-			if( it != mCurrentArchive->getContent().end() )
+			TestArchive::Content::iterator it = current_archive_->getContent().find(aFileInArchive);
+			if( it != current_archive_->getContent().end() )
 				tResult = it->second;
 		}
 

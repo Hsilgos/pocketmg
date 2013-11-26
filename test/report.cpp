@@ -39,7 +39,7 @@ namespace
 namespace test
 {
 	ReportOutput::ReportOutput(const std::string &aRow, const std::string &aColumn, Report *aReport)
-		:mRow(aRow), mColumn(aColumn), mReport(aReport)
+		:row_(aRow), column_(aColumn), report_(aReport)
 	{
 	}
 
@@ -50,22 +50,22 @@ namespace test
 	void ReportOutput::finished(boost::int64_t aMilliseconds)
 	{
 		std::string tInfo = boost::lexical_cast<std::string>(aMilliseconds);
-		mReport->addInfo(mRow, mColumn, tInfo);
+		report_->addInfo(row_, column_, tInfo);
 
-		std::cout << "Finished: " << mRow << "/" << mColumn << " = " << tInfo << std::endl;
+		std::cout << "Finished: " << row_ << "/" << column_ << " = " << tInfo << std::endl;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 
 	void Report::addInfo(const std::string &aRow, const std::string &aColumn, const std::string &aInfo)
 	{
-		if( mRows.end() == std::find(mRows.begin(), mRows.end(), aRow) )
-			mRows.push_back(aRow);
+		if( rows_.end() == std::find(rows_.begin(), rows_.end(), aRow) )
+			rows_.push_back(aRow);
 
-		if( mColumns.end() == std::find(mColumns.begin(), mColumns.end(), aColumn) )
-			mColumns.push_back(aColumn);
+		if( columns_.end() == std::find(columns_.begin(), columns_.end(), aColumn) )
+			columns_.push_back(aColumn);
 
-		mTable[aRow][aColumn] = aInfo;
+		table_[aRow][aColumn] = aInfo;
 	}
 
 
@@ -85,12 +85,12 @@ namespace test
 	{
 		IntList tWidths;
 
-		for( StringList::const_iterator it = mColumns.begin(), itEnd = mColumns.end(); it != itEnd; ++it )
+		for( StringList::const_iterator it = columns_.begin(), itEnd = columns_.end(); it != itEnd; ++it )
 		{
 			const std::string &tTabName = *it;
 			tWidths.push_back( tTabName.size() );
 
-			for( TableContent::const_iterator itTab = mTable.begin(), itTbEnd = mTable.end(); itTab != itTbEnd; ++itTab )
+			for( TableContent::const_iterator itTab = table_.begin(), itTbEnd = table_.end(); itTab != itTbEnd; ++itTab )
 			{
 				const ColumnMap &tColumns = itTab->second;
 				ColumnMap::const_iterator itContent = tColumns.find( tTabName );
@@ -100,7 +100,7 @@ namespace test
 		}
 
 		size_t tFirstColumnSize = 0;
-		for( StringList::const_iterator it = mRows.begin(), itEnd = mRows.end(); it != itEnd; ++it )
+		for( StringList::const_iterator it = rows_.begin(), itEnd = rows_.end(); it != itEnd; ++it )
 			tFirstColumnSize = std::max(tFirstColumnSize, it->size());
 
 		
@@ -112,25 +112,25 @@ namespace test
 		const std::string tTableRowSep(tTableSepLen, '-');
 
 		// description
-		if( !mDescription.empty() )
+		if( !description_.empty() )
 		{
-			aOut << mDescription << std::endl;
+			aOut << description_ << std::endl;
 		}
 
 		// print header
 		aOut << tHeadIndent << tHeadRowSep << std::endl;
 		aOut << tHeadIndent;
-		printValueS(aOut, mColumns, tWidths);
+		printValueS(aOut, columns_, tWidths);
 		aOut << tTableRowSep << std::endl;
 
 		// print content
-		for( StringList::const_iterator it = mRows.begin(), itEnd = mRows.end(); it != itEnd; ++it )
+		for( StringList::const_iterator it = rows_.begin(), itEnd = rows_.end(); it != itEnd; ++it )
 		{
 			StringList tRowWithName;
 			tRowWithName.push_back(*it);
 
-			ColumnMap &tColumnMap = mTable[*it];
-			for( StringList::const_iterator itCol = mColumns.begin(), itColEnd = mColumns.end(); itCol != itColEnd; ++itCol )
+			ColumnMap &tColumnMap = table_[*it];
+			for( StringList::const_iterator itCol = columns_.begin(), itColEnd = columns_.end(); itCol != itColEnd; ++itCol )
 				tRowWithName.push_back(tColumnMap[*itCol]);
 
 			IntList tWidthsWithName = tWidths;
@@ -148,7 +148,7 @@ namespace test
 
 	void Report::setDescription(const std::string &aDesc)
 	{
-		mDescription = aDesc;
+		description_ = aDesc;
 	}
 }
 

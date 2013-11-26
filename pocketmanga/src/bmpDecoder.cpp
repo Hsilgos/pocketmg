@@ -46,7 +46,7 @@ namespace
 		BitFields		= 3  // BI_BITFIELDS
 	};
 
-	struct Palette 
+	struct Palette
 	{
 		const unsigned char *data;
 		const unsigned int size;

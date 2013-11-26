@@ -41,8 +41,8 @@ namespace test
 
 	class TestArchiver: public archive::IArchive
 	{
-		TestFileSystem *mFileSystem;
-		TestArchive *mCurrentArchive;
+		TestFileSystem *file_system_;
+		TestArchive *current_archive_;
 
 		static TestArchiver *instance;
 		static archive::IArchive *createProxy();
