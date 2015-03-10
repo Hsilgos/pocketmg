@@ -15,26 +15,26 @@ namespace test
 
 		virtual ~IBenchmarkOutput();
 
-		virtual void started(int aCount)			= 0;
-		virtual void finished(boost::int64_t aMilliseconds)	= 0;
+		virtual void started(int count)			= 0;
+		virtual void finished(boost::int64_t milliseconds)	= 0;
 	};
 
 	class Printout: public IBenchmarkOutput
 	{
-		//const std::string mName;
+		//const std::string name_;
 		boost::format	format_;
 
 		PATTERN_IMPL_CLONE(Printout);
 
-		virtual void started(int aCount);
-		virtual void finished(boost::int64_t aMilliseconds);
+		virtual void started(int count);
+		virtual void finished(boost::int64_t milliseconds);
 	public:
-		Printout(const char *aName);
+		Printout(const char *name);
 
 		template <typename T>
-		Printout& operator %(const T &aValue) 
+		Printout& operator %(const T &value) 
 		{
-			format_ % aValue;
+			format_ % value;
 
 			return *this;
 		}
@@ -48,10 +48,10 @@ namespace test
 		TestBenchmark(const TestBenchmark &);
 		TestBenchmark &operator = (const TestBenchmark &);
 
-		void init(IBenchmarkOutput &aOutput, int aCount);
+		void init(IBenchmarkOutput &output, int count);
 	public:
-		TestBenchmark(const char *aName, int aCount);
-		TestBenchmark(IBenchmarkOutput &aOutput, int aCount);
+		TestBenchmark(const char *name, int count);
+		TestBenchmark(IBenchmarkOutput &output, int count);
 		~TestBenchmark();
 		bool isDone();
 		void next();

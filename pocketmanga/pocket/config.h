@@ -11,17 +11,17 @@ namespace pocket
 {
 	class Config
 	{
-		iconfig *mConfig;
+		iconfig *config_;
 	public:
-		Config(const std::string &aPath);
+		Config(const std::string &path);
 
 		~Config();
 
-		int readInt(const std::string &aName, int aDef = 0);
-		std::string readString(const std::string &aName, const std::string &aDef = utils::EmptyString);
+		int readInt(const std::string &name, int def = 0);
+		std::string readString(const std::string &name, const std::string &def = utils::EmptyString);
 
-		void write(const std::string &aName, int aValue);
-		void write(const std::string &aName, const std::string &aValue);
+		void write(const std::string &name, int value);
+		void write(const std::string &name, const std::string &value);
 	};
 }
 

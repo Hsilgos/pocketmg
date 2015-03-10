@@ -4,33 +4,33 @@
 namespace pocket
 {
 
-Config::Config(const std::string &aPath)
-	:mConfig( OpenConfig(aPath.c_str(), 0) )
+Config::Config(const std::string &path)
+	:config_( OpenConfig(path.c_str(), 0) )
 {
 
 }
 
 Config::~Config()
 {
-	CloseConfig(mConfig);
+	CloseConfig(config_);
 }
 
-int Config::readInt(const std::string &aName, int aDef)
+int Config::readInt(const std::string &name, int def)
 {
-	return ReadInt(mConfig, aName.c_str(), aDef);
+	return ReadInt(config_, name.c_str(), def);
 }
-std::string Config::readString(const std::string &aName, const std::string &aDef)
+std::string Config::readString(const std::string &name, const std::string &def)
 {
-	return ReadString(mConfig, aName.c_str(), aDef.c_str());
+	return ReadString(config_, name.c_str(), def.c_str());
 }
 
-void Config::write(const std::string &aName, int aValue)
+void Config::write(const std::string &name, int value)
 {
-	WriteInt(mConfig, aName.c_str(), aValue);
+	WriteInt(config_, name.c_str(), value);
 }
-void Config::write(const std::string &aName, const std::string &aValue)
+void Config::write(const std::string &name, const std::string &value)
 {
-	WriteString(mConfig, aName.c_str(), aValue.c_str());
+	WriteString(config_, name.c_str(), value.c_str());
 }
 
 }

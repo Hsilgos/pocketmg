@@ -18,6 +18,6 @@ namespace boost
 
 typedef boost::unit_test::unit_test_log_formatter LogFormatter;
 
-int UNIT_TEST_EXTERN ExternalRunStr(const std::string &aArgs, LogFormatter *aForm = 0);
-int UNIT_TEST_EXTERN ExternalRunMain(int aArgc, char* aArgv[], LogFormatter *aForm = 0);
+int UNIT_TEST_EXTERN ExternalRunStr(const std::string &args, LogFormatter *form = 0);
+int UNIT_TEST_EXTERN ExternalRunMain(int argc, char* argv[], LogFormatter *form = 0);
 

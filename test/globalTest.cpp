@@ -28,14 +28,14 @@ namespace test
 	BOOST_GLOBAL_FIXTURE( TestGlobalFixture );
 }
 
-int ExternalRunStr(const std::string &aArgs, LogFormatter *aForm)
+int ExternalRunStr(const std::string &args, LogFormatter *form)
 {
-	return test::DoExternalRunStr(&init_unit_test_suite, aArgs, aForm);
+	return test::DoExternalRunStr(&init_unit_test_suite, args, form);
 }
 
-int ExternalRunMain(int aArgc, char* aArgv[], LogFormatter *aForm)
+int ExternalRunMain(int argc, char* argv[], LogFormatter *form)
 {
-	return test::DoExternalRunMain(&init_unit_test_suite, aArgc, aArgv, aForm);
+	return test::DoExternalRunMain(&init_unit_test_suite, argc, argv, form);
 }
 
 //#endif

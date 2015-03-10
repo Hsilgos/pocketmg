@@ -46,18 +46,18 @@ int picture_handler(int type, int par1, int par2)
 	return 0;
 }
 
-void PictureView::setBook( std::auto_ptr<manga::Book> aBook)
+void PictureView::setBook( std::auto_ptr<manga::Book> book)
 {
 	SetEventHandler(picture_handler);
 
-	//mImage.enableMinimumReallocations(true);
-	mBook = aBook;
-	mScaler = new manga::CacheScaler(ScreenWidth(), ScreenHeight());
-	mBook->setCachePrototype(mScaler);
-	if( mBook->toFirstFile() )
+	//image_.enableMinimumReallocations(true);
+	book_ = book;
+	scaler_ = new manga::CacheScaler(ScreenWidth(), ScreenHeight());
+	book_->setCachePrototype(scaler_);
+	if( book_->toFirstFile() )
 	{
-		draw(mScaler);
-		mBook->preload();
+		draw(scaler_);
+		book_->preload();
 	}
 
 	//next();
@@ -65,21 +65,21 @@ void PictureView::setBook( std::auto_ptr<manga::Book> aBook)
 
 bool PictureView::next()
 {
-	if( mBook.get() )
+	if( book_.get() )
 	{
-		assert(mScaler);
-		if(mScaler->scaledGrey().nextBounds())
+		assert(scaler_);
+		if(scaler_->scaledGrey().nextBounds())
 		{
-			draw(mScaler);
+			draw(scaler_);
 			return true;
 		}
 
-		if( mBook->incrementPosition() )
+		if( book_->incrementPosition() )
 		{
-			//prepareImageToDraw(mImage, mDrawable);
-			draw(mScaler);
+			//prepareImageToDraw(image_, drawable_);
+			draw(scaler_);
 
-			mBook->preload();
+			book_->preload();
 
 			return true;
 		}
@@ -90,21 +90,21 @@ bool PictureView::next()
 
 bool PictureView::previous()
 {
-	if( mBook.get() )
+	if( book_.get() )
 	{
-		assert(mScaler);
-		if(mScaler->scaledGrey().previousBounds())
+		assert(scaler_);
+		if(scaler_->scaledGrey().previousBounds())
 		{
-			draw(mScaler);
+			draw(scaler_);
 			return true;
 		}
 
-		if( mBook->decrementPosition() )
+		if( book_->decrementPosition() )
 		{
-			//prepareImageToDraw(mImage, mDrawable);
-			draw(mScaler);
+			//prepareImageToDraw(image_, drawable_);
+			draw(scaler_);
 
-			mBook->preload();
+			book_->preload();
 
 			return true;
 		}
@@ -154,13 +154,13 @@ void manDrawBitmap(const img::Image& bmp, int x, int y)
 
 			copy_size = line_size * pixel_depth;
 
-			const int tScanline = bmp.scanline();
+			const int scanline = bmp.scanline();
 
 			for (i = 0; i < line_count; i++)
 			{
 				memcpy(canvas_addr, bmp_addr, copy_size);
 				canvas_addr += current_canvas->scanline;
-				bmp_addr += tScanline;
+				bmp_addr += scanline;
 			}
 
 
@@ -172,28 +172,28 @@ void manDrawBitmap(const img::Image& bmp, int x, int y)
 
 void PictureView::draw()
 {
-	draw(mScaler);
+	draw(scaler_);
 }
 
-void PictureView::draw(manga::CacheScaler *aScaler)
+void PictureView::draw(manga::CacheScaler *scaler)
 {
-	if( !aScaler )
+	if( !scaler )
 		return;
 
 	ClearScreen();
 
-	if( manga::CacheScaler::Whole == aScaler->scaledGrey().representation )
+	if( manga::CacheScaler::Whole == scaler->scaledGrey().representation )
 	{
-		const int x = (ScreenWidth() - aScaler->scaledGrey().image.width())/2;
-		const int y = (ScreenHeight() - aScaler->scaledGrey().image.height())/2;
-		manDrawBitmap(aScaler->scaledGrey().image, -x, y);
+		const int x = (ScreenWidth() - scaler->scaledGrey().image.width())/2;
+		const int y = (ScreenHeight() - scaler->scaledGrey().image.height())/2;
+		manDrawBitmap(scaler->scaledGrey().image, -x, y);
 	}
-	else if( manga::CacheScaler::Parts3 == aScaler->scaledGrey().representation )
+	else if( manga::CacheScaler::Parts3 == scaler->scaledGrey().representation )
 	{
 		manDrawBitmap(
-				aScaler->scaledGrey().image,
-				-aScaler->scaledGrey().bounds.x,
-				aScaler->scaledGrey().bounds.y);
+				scaler->scaledGrey().image,
+				-scaler->scaledGrey().bounds.x,
+				scaler->scaledGrey().bounds.y);
 	}
 	//DrawBitmap(0, 0, t);
 	//FullUpdate();

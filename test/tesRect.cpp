@@ -9,14 +9,14 @@ namespace
 		int xrest, int yrest, int wrest, int hrest,
 		int xresult, int yresult, int wresult, int hresult)
 	{
-		utils::Rect tRect(x, y, w, h);
-		utils::Rect tRestrict(xrest, yrest, wrest, hrest);
+		utils::Rect rect(x, y, w, h);
+		utils::Rect restrict(xrest, yrest, wrest, hrest);
 
-		utils::Rect tResult = restrictBy(tRect, tRestrict);
-		BOOST_CHECK_EQUAL( tResult.x,		xresult);
-		BOOST_CHECK_EQUAL( tResult.y,		yresult);
-		BOOST_CHECK_EQUAL( tResult.width,	wresult);
-		BOOST_CHECK_EQUAL( tResult.height,	hresult);
+		utils::Rect result = restrictBy(rect, restrict);
+		BOOST_CHECK_EQUAL( result.x,		xresult);
+		BOOST_CHECK_EQUAL( result.y,		yresult);
+		BOOST_CHECK_EQUAL( result.width,	wresult);
+		BOOST_CHECK_EQUAL( result.height,	hresult);
 	}
 }
 

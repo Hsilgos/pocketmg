@@ -19,48 +19,48 @@ namespace test
 
 	class TestLogFormatter: public btest::unit_test_log_formatter
 	{
-		unsigned int mTestCount;
-		unsigned int mErrorCount;
-		unsigned int mFatalErrorCount;
-		unsigned int mWarningCount;
+		unsigned int test_count_;
+		unsigned int error_count_;
+		unsigned int fatal_error_count_;
+		unsigned int warning_count_;
 
-		unsigned int mCheckCount;
+		unsigned int check_count_;
 
-		unsigned int mColor;
-		bool mDoPrint;
-		bool mIsMessage;
-		bool mNoErrors;
+		unsigned int color_;
+		bool do_print_;
+		bool is_message_;
+		bool no_errors_;
 
-		boost::posix_time::ptime mUnitTime;
-		boost::posix_time::ptime mTotalTime;
+		boost::posix_time::ptime unit_time_;
+		boost::posix_time::ptime total_time_;
 
 		// Destructor
 		virtual ~TestLogFormatter() {}
 
 		class Output
 		{
-			unsigned int	mColor;
-			std::stringstream	mStream;
+			unsigned int	color_;
+			std::stringstream	stream_;
 		public:
-			Output(unsigned int aColor = utils::CCWhite)
-				:mColor(aColor)
+			Output(unsigned int color = utils::CCWhite)
+				:color_(color)
 			{
 			}
 
 			~Output()
 			{
-				utils::setConsoleColor(mColor);
-				utils::ideOutput(mStream.str().c_str(), false);
-				std::cout << mStream.str();
+				utils::setConsoleColor(color_);
+				utils::ideOutput(stream_.str().c_str(), false);
+				std::cout << stream_.str();
 				// return back
 				utils::setConsoleColor(utils::CCWhite);
 			}
 
 			template <typename T>
-			std::stringstream & operator << (const T &aValue) 
+			std::stringstream & operator << (const T &value) 
 			{
-				mStream << aValue;
-				return mStream;
+				stream_ << value;
+				return stream_;
 			}
 
 			// this is the type of std::cout
@@ -72,51 +72,51 @@ namespace test
 			// define an operator<< to take in std::endl
 			std::stringstream & operator<<(StandardEndLine manip)
 			{
-				mStream << manip;
-				return mStream;
+				stream_ << manip;
+				return stream_;
 			}
 		};
 
-		std::string duration2str(const boost::posix_time::time_duration &aDiffTime)
+		std::string duration2str(const boost::posix_time::time_duration &diff_time)
 		{
-			std::stringstream tStream;
+			std::stringstream stream;
 
-			if( aDiffTime.hours() > 0 )
-				tStream << " " << aDiffTime.hours() << "h";
-			if( aDiffTime.minutes() > 0 )
-				tStream << " " << aDiffTime.minutes() << "m";
-			if( aDiffTime.seconds() > 0 )
-				tStream << " " << aDiffTime.seconds() << "s";
+			if( diff_time.hours() > 0 )
+				stream << " " << diff_time.hours() << "h";
+			if( diff_time.minutes() > 0 )
+				stream << " " << diff_time.minutes() << "m";
+			if( diff_time.seconds() > 0 )
+				stream << " " << diff_time.seconds() << "s";
 
-			boost::posix_time::time_duration::tick_type tMillis = 
-				aDiffTime.total_milliseconds() - aDiffTime.total_seconds() * 1000;
+			boost::posix_time::time_duration::tick_type millis = 
+				diff_time.total_milliseconds() - diff_time.total_seconds() * 1000;
 
-			if( tMillis > 0 )
-				tStream << " " << tMillis << "ms";
+			if( millis > 0 )
+				stream << " " << millis << "ms";
 
-			return tStream.str();
+			return stream.str();
 		}
 
 		// Formatter interface
-		virtual void log_start( std::ostream&, btest::counter_t aTestCasesCount )
+		virtual void log_start( std::ostream&, btest::counter_t test_cases_count )
 		{
-			mTotalTime = boost::posix_time::microsec_clock::universal_time();
-			mTestCount = aTestCasesCount;
-			Output() << "Test started, "<< aTestCasesCount << " entries found" << std::endl;
+			total_time_ = boost::posix_time::microsec_clock::universal_time();
+			test_count_ = test_cases_count;
+			Output() << "Test started, "<< test_cases_count << " entries found" << std::endl;
 		}
 
 		virtual void log_finish( std::ostream&)
 		{
-			boost::posix_time::ptime tNow = boost::posix_time::microsec_clock::universal_time();
-			boost::posix_time::time_duration tDiffTime = tNow - mTotalTime;
+			boost::posix_time::ptime now = boost::posix_time::microsec_clock::universal_time();
+			boost::posix_time::time_duration diff_time = now - total_time_;
 
 			Output() << "***************************" << std::endl;
 			Output() << "Tests finished" << std::endl;
-			Output() << "Total checks:   "<< mCheckCount << std::endl;
-			Output() << "Total time:    " << duration2str(tDiffTime) << std::endl;
-			Output(mFatalErrorCount>0?utils::CCRed:utils::CCWhite)				<< "Fatal errors:   "<< mFatalErrorCount << std::endl;
-			Output(mErrorCount>0?utils::CCRed:utils::CCWhite)					<< "Errors:         "<< mErrorCount << std::endl;
-			Output(mWarningCount>0?(utils::CCGreen|utils::CCRed):utils::CCWhite)<< "Warnings:       "<< mWarningCount << std::endl;
+			Output() << "Total checks:   "<< check_count_ << std::endl;
+			Output() << "Total time:    " << duration2str(diff_time) << std::endl;
+			Output(fatal_error_count_>0?utils::CCRed:utils::CCWhite)				<< "Fatal errors:   "<< fatal_error_count_ << std::endl;
+			Output(error_count_>0?utils::CCRed:utils::CCWhite)					<< "Errors:         "<< error_count_ << std::endl;
+			Output(warning_count_>0?(utils::CCGreen|utils::CCRed):utils::CCWhite)<< "Warnings:       "<< warning_count_ << std::endl;
 			//Output(FindMemoryLeaks::getCount()>0?utils::CCRed:utils::CCWhite)	<< "Memory leaks:   "<< FindMemoryLeaks::getCount() << std::endl;
 			Output() << "***************************" << std::endl;
 		}
@@ -133,9 +133,9 @@ namespace test
 			}
 			if( btest::tut_case == tu.p_type )
 			{
-				mUnitTime = boost::posix_time::microsec_clock::universal_time();
+				unit_time_ = boost::posix_time::microsec_clock::universal_time();
 				Output() << "  Test \""<< tu.p_name << "\"...";// << std::endl;
-				mNoErrors = true;
+				no_errors_ = true;
 			}
 
 		}
@@ -146,11 +146,11 @@ namespace test
 			{
 				Output() << "Suit \""<< tu.p_name << "\"is finished." << std::endl;
 			}
-			if( btest::tut_case == tu.p_type && mNoErrors )
+			if( btest::tut_case == tu.p_type && no_errors_ )
 			{
-				boost::posix_time::ptime tNow = boost::posix_time::microsec_clock::universal_time();
-				boost::posix_time::time_duration tDiffTime = tNow - mUnitTime;
-				Output() << duration2str(tDiffTime) << std::endl;
+				boost::posix_time::ptime now = boost::posix_time::microsec_clock::universal_time();
+				boost::posix_time::time_duration diff_time = now - unit_time_;
+				Output() << duration2str(diff_time) << std::endl;
 			}
 		}
 
@@ -159,156 +159,156 @@ namespace test
 
 		}
 
-		virtual void log_exception( std::ostream&, btest::log_checkpoint_data const& aLogEntry, btest::const_string aExplanation )
+		virtual void log_exception( std::ostream&, btest::log_checkpoint_data const& log_entry, btest::const_string explanation )
 		{
-			mErrorCount++;
-			mCheckCount++;
-			Output(utils::CCRed) << aLogEntry.m_file_name <<"("<< aLogEntry.m_line_num<<") :" << aExplanation<< std::endl;
-			mColor = utils::CCWhite;
-			mDoPrint = false;
+			error_count_++;
+			check_count_++;
+			Output(utils::CCRed) << log_entry.m_file_name <<"("<< log_entry.m_line_num<<") :" << explanation<< std::endl;
+			color_ = utils::CCWhite;
+			do_print_ = false;
 		}
 
-		virtual void log_entry_start( std::ostream&, btest::log_entry_data const& aLogEntry, log_entry_types aType )
+		virtual void log_entry_start( std::ostream&, btest::log_entry_data const& log_entry, log_entry_types type )
 		{
-			switch(aType)
+			switch(type)
 			{
 			case BOOST_UTL_ET_ERROR:
-				mErrorCount++;
-				mCheckCount++;
-				mColor = utils::CCRed;
-				if( mNoErrors )
-					Output(mColor) << std::endl;
-				mNoErrors = false;
-				Output(mColor) << aLogEntry.m_file_name << "(" << aLogEntry.m_line_num<<") :";
-				mDoPrint = true;
+				error_count_++;
+				check_count_++;
+				color_ = utils::CCRed;
+				if( no_errors_ )
+					Output(color_) << std::endl;
+				no_errors_ = false;
+				Output(color_) << log_entry.m_file_name << "(" << log_entry.m_line_num<<") :";
+				do_print_ = true;
 				break;
 			case BOOST_UTL_ET_FATAL_ERROR:
-				mFatalErrorCount++;
-				mCheckCount++;
-				mColor = utils::CCRed;
-				if( mNoErrors )
-					Output(mColor) << std::endl;
-				mNoErrors = false;
-				Output(mColor) << aLogEntry.m_file_name << "(" << aLogEntry.m_line_num<<") :";
-				mDoPrint = true;
+				fatal_error_count_++;
+				check_count_++;
+				color_ = utils::CCRed;
+				if( no_errors_ )
+					Output(color_) << std::endl;
+				no_errors_ = false;
+				Output(color_) << log_entry.m_file_name << "(" << log_entry.m_line_num<<") :";
+				do_print_ = true;
 				break;
 			case BOOST_UTL_ET_WARNING:
-				mWarningCount++;
-				mCheckCount++;
-				mColor = utils::CCYellow;
-				if( mNoErrors )
-					Output(mColor) << std::endl;
-				mNoErrors = false;
-				Output(mColor) << aLogEntry.m_file_name << "(" << aLogEntry.m_line_num<<") :";
-				mDoPrint = true;
+				warning_count_++;
+				check_count_++;
+				color_ = utils::CCYellow;
+				if( no_errors_ )
+					Output(color_) << std::endl;
+				no_errors_ = false;
+				Output(color_) << log_entry.m_file_name << "(" << log_entry.m_line_num<<") :";
+				do_print_ = true;
 				break;
 			case BOOST_UTL_ET_MESSAGE:
-				mColor = utils::CCWhite;
-				mDoPrint = true;
-				mIsMessage = true;
+				color_ = utils::CCWhite;
+				do_print_ = true;
+				is_message_ = true;
 				break;
 			case BOOST_UTL_ET_INFO:
-				mCheckCount++;
-				mColor = utils::CCWhite;
-				mDoPrint = false;
+				check_count_++;
+				color_ = utils::CCWhite;
+				do_print_ = false;
 			default:
-				mColor = utils::CCWhite;
-				mDoPrint = false;
+				color_ = utils::CCWhite;
+				do_print_ = false;
 			}
 		}
 
-		virtual void log_entry_value( std::ostream&, btest::const_string aValue )
+		virtual void log_entry_value( std::ostream&, btest::const_string value )
 		{
-			if ( mDoPrint )
-				Output(mColor) << aValue;
+			if ( do_print_ )
+				Output(color_) << value;
 		}
 		//virtual void        log_entry_value( std::ostream&, lazy_ostream const& value ); // there is a default impl
 		virtual void log_entry_finish( std::ostream&)
 		{
-			if ( mDoPrint )
+			if ( do_print_ )
 			{
 				Output() << std::endl;
-				mDoPrint = false;
-				mIsMessage = false;
+				do_print_ = false;
+				is_message_ = false;
 			}
 		}
 	public:
 		TestLogFormatter()
-			:mTestCount(0),
-			mErrorCount(0),
-			mFatalErrorCount(0),
-			mWarningCount(0),
-			mCheckCount(0),
-			mColor(utils::CCWhite),
-			mDoPrint(false),
-			mIsMessage(false),
-			mNoErrors(true)
+			:test_count_(0),
+			error_count_(0),
+			fatal_error_count_(0),
+			warning_count_(0),
+			check_count_(0),
+			color_(utils::CCWhite),
+			do_print_(false),
+			is_message_(false),
+			no_errors_(true)
 		{
 		}
 	};
 
 	class TestConfigData: public utils::SingletonStatic<TestConfigData>
 	{
-		LogFormatter * mFormatter;
+		LogFormatter * formatter_;
 	public:
 		TestConfigData()
-			:mFormatter(0)
+			:formatter_(0)
 		{
 		}
 
-		void setFormatter(LogFormatter *aFormatter)
+		void setFormatter(LogFormatter *formatter)
 		{
-			mFormatter = aFormatter;
+			formatter_ = formatter;
 		}
 
 		LogFormatter *getFormatter()
 		{
-			if( mFormatter )
-				return mFormatter;
+			if( formatter_ )
+				return formatter_;
 
 			return new test::TestLogFormatter; 
 		}
 	};
 
-	void setDefTestFormatter(LogFormatter *aFormatter)
+	void setDefTestFormatter(LogFormatter *formatter)
 	{
-		test::TestConfigData::getInstance().setFormatter(aFormatter);
+		test::TestConfigData::getInstance().setFormatter(formatter);
 	}
 
-	int DoExternalRunStr(InitTestFunc aInitFunc, const std::string &aArgs, LogFormatter *aForm)
+	int DoExternalRunStr(InitTestFunc init_func, const std::string &args, LogFormatter *form)
 	{
-		std::vector<char> tBuff(aArgs.begin(), aArgs.end());
-		tBuff.push_back('\0');
-		char *tArgs[1000];
-		int tArgc = 0;
-		char tEmpty[] = "";
+		std::vector<char> buff(args.begin(), args.end());
+		buff.push_back('\0');
+		char *args_parsed[1000];
+		int argc_parsed = 0;
+		char empty[] = "";
 
-		tArgs[tArgc++] = tEmpty;
+        args_parsed[argc_parsed++] = empty;
 
-		bool tPrevSpace = true;
+		bool prev_space = true;
 
-		for ( size_t i = 0; i < tBuff.size(); ++i )
+		for ( size_t i = 0; i < buff.size(); ++i )
 		{
-			if(  tBuff[i] == ' ' )
+			if(  buff[i] == ' ' )
 			{
-				tBuff[i] = 0;
-				tPrevSpace = true;
+				buff[i] = 0;
+				prev_space = true;
 			}
-			else if( tBuff[i] != ' ' && tPrevSpace )
+			else if( buff[i] != ' ' && prev_space )
 			{
-				tArgs[tArgc++] = &tBuff[i];
-				tPrevSpace = false;
+                args_parsed[argc_parsed++] = &buff[i];
+				prev_space = false;
 			}
 		}
 
-		return DoExternalRunMain(aInitFunc, tArgc, tArgs, aForm);
+        return DoExternalRunMain(init_func, argc_parsed, args_parsed, form);
 	}
 
-	int DoExternalRunMain(InitTestFunc aInitFunc, int aArgc, char* aArgv[], LogFormatter *aForm)
+	int DoExternalRunMain(InitTestFunc init_func, int argc, char* argv[], LogFormatter *form)
 	{
-		//test::TestConfigData::getInstance().setFormatter(aForm);
-		test::setDefTestFormatter(aForm);
-		return boost::unit_test::unit_test_main(aInitFunc, aArgc, aArgv);
+		//test::TestConfigData::getInstance().setFormatter(form);
+		test::setDefTestFormatter(form);
+		return boost::unit_test::unit_test_main(init_func, argc, argv);
 	}
 }
 

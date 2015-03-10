@@ -72,8 +72,8 @@ namespace color
 		{
 		}
 
-		GrayTmpl(ChannelType aPtr)
-			:color(aPtr)
+		GrayTmpl(ChannelType ptr)
+			:color(ptr)
 		{
 		}
 	};
@@ -128,10 +128,10 @@ namespace color
 	template<>
 	struct HelpAlpha<true>
 	{
-		static Channel get(const Channel *aChannels, int aIndex)
-		{return aChannels[aIndex];}
-		static void set(Channel *aChannels, int aIndex, Channel aValue)
-		{aChannels[aIndex] = aValue;}
+		static Channel get(const Channel *channels, int index)
+		{return channels[index];}
+		static void set(Channel *channels, int index, Channel value)
+		{channels[index] = value;}
 	};
 
 	////
@@ -185,20 +185,20 @@ namespace color
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
-		ColorBase( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther )
+		ColorBase( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other )
 		{
-			apply(aOther);
+			apply(other);
 		}
 
 		template<class OtherChannelsType>
-		ColorBase( const GrayTmpl<OtherChannelsType> &aGray )
+		ColorBase( const GrayTmpl<OtherChannelsType> &gray )
 		{
-			apply(aGray);
+			apply(gray);
 		}
 
-		void swap(ColorIndex aIndex1, ColorIndex aIndex2)
+		void swap(ColorIndex index1, ColorIndex index2)
 		{
-			std::swap<Channel>(colors[aIndex1], colors[aIndex2]);
+			std::swap(colors[index1], colors[index2]);
 		}
 
 		Channel red() const
@@ -242,66 +242,66 @@ namespace color
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
-		bool operator == (const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther) const
+		bool operator == (const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other) const
 		{
 			return 
-				red()	== aOther.red() &&
-				green() == aOther.green() &&
-				blue()	== aOther.blue() &&
-				alpha() == aOther.alpha();
+				red()	== other.red() &&
+				green() == other.green() &&
+				blue()	== other.blue() &&
+				alpha() == other.alpha();
 		}
 
 	protected:
-		ColorBase(ChannelsType aPtr)
-			:colors(aPtr)
+		ColorBase(ChannelsType ptr)
+			:colors(ptr)
 		{
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
-		ColorBase(ChannelsType aPtr, const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther)
-			:colors(aPtr)
+		ColorBase(ChannelsType ptr, const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other)
+			:colors(ptr)
 		{
-			apply(aOther);
+			apply(other);
 		}
 
 		template<class OtherChannelsType>
-		ColorBase(ChannelsType aPtr, const GrayTmpl<OtherChannelsType> &aGray)
-			:colors(aPtr)
+		ColorBase(ChannelsType ptr, const GrayTmpl<OtherChannelsType> &gray)
+			:colors(ptr)
 		{
-			apply(aGray);
+			apply(gray);
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
-		void apply( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther )
+		void apply( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other )
 		{
-			setRed(aOther.red());
-			setGreen(aOther.green());
-			setBlue(aOther.blue());
-			setAlpha(aOther.alpha());
+			setRed(other.red());
+			setGreen(other.green());
+			setBlue(other.blue());
+			setAlpha(other.alpha());
 		}
 
 		template<class OtherChannelsType>
-		void apply( const GrayTmpl<OtherChannelsType> &aGray )
+		void apply( const GrayTmpl<OtherChannelsType> &gray )
 		{
-			setRed(aGray.get());
-			setGreen(aGray.get());
-			setBlue(aGray.get());
+			setRed(gray.get());
+			setGreen(gray.get());
+			setBlue(gray.get());
 			setAlpha(NotTransparent);
 		}
 
-		void apply( Channel aCol1, Channel aCol2, Channel aCol3, Channel aCol4 )
+		void apply( Channel col1, Channel col2, Channel col3, Channel col4 )
 		{
-			colors[0] = aCol1;
-			colors[1] = aCol2;
-			colors[2] = aCol3;
-			colors[3] = aCol4;
+			colors[0] = col1;
+			colors[1] = col2;
+			colors[2] = col3;
+			colors[3] = col4;
 		}
 
-		void apply( Channel aCol1, Channel aCol2, Channel aCol3 )
+		void apply( Channel col1, Channel col2, Channel col3 )
 		{
-			colors[0] = aCol1;
-			colors[1] = aCol2;
-			colors[2] = aCol3;
+			colors[0] = col1;
+			colors[1] = col2;
+			colors[2] = col3;
 		}
 	};
 
@@ -320,29 +320,29 @@ namespace color
 			STATIC_ASSERT( (sizeof(ThisType) == sizeof(Channel) * 3), size_should_be_3 );
 		}
 
-		Color3Tmpl(Channel aCol1, Channel aCol2, Channel aCol3)
+		Color3Tmpl(Channel col1, Channel col2, Channel col3)
 		{
 			STATIC_ASSERT( (sizeof(ThisType) == sizeof(Channel) * 3), size_should_be_3 );
 
-			BaseType::apply(aCol1, aCol2, aCol3);
+			BaseType::apply(col1, col2, col3);
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
-		Color3Tmpl( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther )
-			:BaseType(aOther)
+		Color3Tmpl( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other )
+			:BaseType(other)
 		{
 		}
 
 		template<class OtherChannelType>
-		Color3Tmpl(const GrayTmpl<OtherChannelType> &aGray)
-			:BaseType(aGray)
+		Color3Tmpl(const GrayTmpl<OtherChannelType> &gray)
+			:BaseType(gray)
 		{
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
-		ThisType operator = ( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther )
+		ThisType operator = ( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other )
 		{
-			apply(aOther);
+			apply(other);
 			return *this;
 		}
 	};
@@ -361,29 +361,29 @@ namespace color
 			STATIC_ASSERT( (sizeof(ThisType) == sizeof(Channel) * 4), size_should_be_4 );
 		}
 
-		Color4Tmpl(Channel aCol1, Channel aCol2, Channel aCol3, Channel aCol4)
+		Color4Tmpl(Channel col1, Channel col2, Channel col3, Channel col4)
 		{
 			STATIC_ASSERT( (sizeof(ThisType) == sizeof(Channel) * 4), size_should_be_4 );
 
-			BaseType::apply(aCol1, aCol2, aCol3, aCol4);
+			BaseType::apply(col1, col2, col3, col4);
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
-		Color4Tmpl( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther )
-			:BaseType(aOther)
+		Color4Tmpl( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other )
+			:BaseType(other)
 		{
 		}
 
 		template<class OtherChannelType>
-		Color4Tmpl(const GrayTmpl<OtherChannelType> &aGray)
-			:BaseType(aGray)
+		Color4Tmpl(const GrayTmpl<OtherChannelType> &gray)
+			:BaseType(gray)
 		{
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
-		ThisType operator = ( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther )
+		ThisType operator = ( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other )
 		{
-			apply(aOther);
+			apply(other);
 			return *this;
 		}
 	};
@@ -396,35 +396,35 @@ namespace color
 		typedef ColorBase<Color1, Color2, Color3, NoChannel, ChannelsType> BaseType;
 		typedef Color3RefTmpl<Color1, Color2, Color3, ChannelsType> ThisType;
 
-		Color3RefTmpl(ChannelsType aColors)
-			:BaseType(aColors)
+		Color3RefTmpl(ChannelsType colors)
+			:BaseType(colors)
 		{
 		}
 
-		Color3RefTmpl(ChannelsType aColors, Channel aCol1, Channel aCol2, Channel aCol3)
-			:BaseType(aColors)
+		Color3RefTmpl(ChannelsType colors, Channel col1, Channel col2, Channel col3)
+			:BaseType(colors)
 		{
-			BaseType::apply(aCol1, aCol2, aCol3);
+			BaseType::apply(col1, col2, col3);
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
-		ThisType operator = ( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther )
+		ThisType operator = ( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other )
 		{
-			Color3Tmpl<OtherColor1, OtherColor2, OtherColor3> tCopy = aOther;
-			apply(tCopy);
+			Color3Tmpl<OtherColor1, OtherColor2, OtherColor3> copy = other;
+			apply(copy);
 			
 			return *this;
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
-		Color3RefTmpl( ChannelsType aColors, const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther )
-			:BaseType(aColors, aOther)
+		Color3RefTmpl( ChannelsType colors, const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other )
+			:BaseType(colors, other)
 		{
 		}
 
 		template<class OtherChannelsType>
-		Color3RefTmpl( ChannelsType aColors, const GrayTmpl<OtherChannelsType> &aGray)
-			:BaseType(aColors, aGray)
+		Color3RefTmpl( ChannelsType colors, const GrayTmpl<OtherChannelsType> &gray)
+			:BaseType(colors, gray)
 		{
 		}
 	};
@@ -435,34 +435,34 @@ namespace color
 		typedef ColorBase<Color1, Color2, Color3, Color4, ChannelsType> BaseType;
 		typedef Color4RefTmpl<Color1, Color2, Color3, Color4, ChannelsType> ThisType;
 
-		Color4RefTmpl(ChannelsType aColors)
-			:BaseType(aColors)
+		Color4RefTmpl(ChannelsType colors)
+			:BaseType(colors)
 		{
 		}
 
-		Color4RefTmpl(ChannelsType aColors, Channel aCol1, Channel aCol2, Channel aCol3, Channel aCol4)
-			:BaseType(aColors)
+		Color4RefTmpl(ChannelsType colors, Channel col1, Channel col2, Channel col3, Channel col4)
+			:BaseType(colors)
 		{
-			BaseType::apply(aCol1, aCol2, aCol3, aCol4);
+			BaseType::apply(col1, col2, col3, col4);
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
-		ThisType operator = ( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther )
+		ThisType operator = ( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other )
 		{
-			apply(aOther);
+			apply(other);
 			return *this;
 		}
 
 	//private:
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
-		Color4RefTmpl( ChannelsType aColors, const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther )
-			:BaseType(aColors, aOther)
+		Color4RefTmpl( ChannelsType colors, const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other )
+			:BaseType(colors, other)
 		{
 		}
 
 		template<class OtherChannelsType>
-		Color4RefTmpl( ChannelsType aColors, const GrayTmpl<OtherChannelsType> &aGray)
-			:BaseType(aColors, aGray)
+		Color4RefTmpl( ChannelsType colors, const GrayTmpl<OtherChannelsType> &gray)
+			:BaseType(colors, gray)
 		{
 		}
 	};
@@ -477,21 +477,21 @@ namespace color
 
 		}
 
-		Gray(Channel aValue)
+		Gray(Channel value)
 		{
-			set(aValue);
+			set(value);
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
-		Gray( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther )
+		Gray( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other )
 		{
-			set(coeff.get(aOther.red(), aOther.green(), aOther.blue()));
+			set(coeff.get(other.red(), other.green(), other.blue()));
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
-		Gray operator = ( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther )
+		Gray operator = ( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other )
 		{
-			set(coeff.get(aOther.red(), aOther.green(), aOther.blue()));
+			set(coeff.get(other.red(), other.green(), other.blue()));
 			return *this;
 		}
 	};
@@ -503,36 +503,36 @@ namespace color
 		typedef GrayRefImpl<ChannelType> ThisType;
 	public:
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
-		GrayRefImpl( ChannelType aPtr, const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther )
-			:BaseType(aPtr)
+		GrayRefImpl( ChannelType ptr, const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other )
+			:BaseType(ptr)
 		{
-			BaseType::set(BaseGray::coeff.get(aOther.red(), aOther.green(), aOther.blue()));
+			BaseType::set(BaseGray::coeff.get(other.red(), other.green(), other.blue()));
 		}
 
 		template<class OtherChannelsType>
-		GrayRefImpl( ChannelType aPtr, const GrayTmpl<OtherChannelsType> &aOther )
-			:BaseType(aPtr)
+		GrayRefImpl( ChannelType ptr, const GrayTmpl<OtherChannelsType> &other )
+			:BaseType(ptr)
 		{
-			BaseType::set( aOther.get() );
+			BaseType::set( other.get() );
 		}
 
-		GrayRefImpl( ChannelType aPtr )
-			:BaseType(aPtr)
+		GrayRefImpl( ChannelType ptr )
+			:BaseType(ptr)
 		{
 
 		}
 
 		template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
-		ThisType operator = ( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &aOther )
+		ThisType operator = ( const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other )
 		{
-			set(BaseGray::coeff.get(aOther.red(), aOther.green(), aOther.blue()));
+			set(BaseGray::coeff.get(other.red(), other.green(), other.blue()));
 			return *this;
 		}
 
 		template<class OtherChannelsType>
-		ThisType operator = ( const GrayTmpl<OtherChannelsType> &aOther )
+		ThisType operator = ( const GrayTmpl<OtherChannelsType> &other )
 		{
-			set( aOther.get() );
+			set( other.get() );
 			return *this;
 		}
 	};

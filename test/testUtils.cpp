@@ -12,31 +12,31 @@
 namespace utils
 {
 #ifdef WIN32
-	void ideOutput(const char *aOutput, bool aEndLine)
+	void ideOutput(const char *output, bool end_line)
 	{
 		if( isDebugging() )
 		{
-			OutputDebugStringA(aOutput);
-			if( aEndLine )
+			OutputDebugStringA(output);
+			if( end_line )
 				OutputDebugStringA("\n");
 		}
 	}
 
-	void ideOutput(const wchar_t *aOutput, bool aEndLine)
+	void ideOutput(const wchar_t *output, bool end_line)
 	{
 		if( isDebugging() )
 		{
-			OutputDebugStringW(aOutput);
-			if( aEndLine )
+			OutputDebugStringW(output);
+			if( end_line )
 				OutputDebugStringW(L"\n");
 		}
 	}
 
-	void doBlockLeakDetect(bool aBlock)
+	void doBlockLeakDetect(bool block)
 	{
 		int flags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
 
-		if(aBlock)	// Disable allocation tracking
+		if(block)	// Disable allocation tracking
 			flags &= ~_CRTDBG_ALLOC_MEM_DF;
 		else		// Enable allocation tracking
 			flags |= _CRTDBG_ALLOC_MEM_DF;
@@ -44,52 +44,52 @@ namespace utils
 		_CrtSetDbgFlag(flags);
 	}
 
-	void setConsoleColor(unsigned int aColor)
+	void setConsoleColor(unsigned int console_color)
 	{
-		unsigned int tColor = aColor;
+        unsigned int color = console_color;
 
-		if( tColor != CCWhite )
-			tColor |= FOREGROUND_INTENSITY;// Bold
+		if( color != CCWhite )
+			color |= FOREGROUND_INTENSITY;// Bold
 
 		HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTextAttribute(hStdout, tColor);
+		SetConsoleTextAttribute(hStdout, color);
 	}
 
-	void lastErrorDescription(std::string &aResult, int aErrorCode)
+	void lastErrorDescription(std::string &result, int error_code)
 	{
-		std::stringstream tStream;
-		tStream << "(code:" << aErrorCode << ")";
+		std::stringstream stream;
+		stream << "(code:" << error_code << ")";
 
-		char *tBuffer = 0;
+		char *buffer = 0;
 		FormatMessageA(
 			FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_ALLOCATE_BUFFER,
 			0,
-			aErrorCode,
+			error_code,
 			MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
-			(LPSTR)&tBuffer,
+			(LPSTR)&buffer,
 			0 ,
 			0 );
-		if( tBuffer )
+		if( buffer )
 		{
-			tStream << " " << tBuffer;
-			LocalFree(tBuffer);
+			stream << " " << buffer;
+			LocalFree(buffer);
 		}
 
-		aResult = tStream.str();
+		result = stream.str();
 	}
 
 	std::string lastErrorDescription()
 	{
-		std::string tResult;
-		lastErrorDescription(tResult, GetLastError());
-		return tResult;
+		std::string result;
+		lastErrorDescription(result, GetLastError());
+		return result;
 	}
 
-	std::string lastErrorDescription(int aErrorCode)
+	std::string lastErrorDescription(int error_code)
 	{
-		std::string tResult;
-		lastErrorDescription(tResult, aErrorCode);
-		return tResult;
+		std::string result;
+		lastErrorDescription(result, error_code);
+		return result;
 	}
 
 #else
@@ -97,9 +97,9 @@ namespace utils
 	void ideOutput(const wchar_t *, bool){}
 	void doBlockLeakDetect(bool){}
 
-	int toColorCode(unsigned int aColor)
+	int toColorCode(unsigned int color)
 	{
-		switch(aColor)
+		switch(color)
 		{
 		case CCRed:
 			return 31;
@@ -120,22 +120,22 @@ namespace utils
 		return 0;
 	}
 
-	void setConsoleColor(unsigned int aColor)
+	void setConsoleColor(unsigned int color)
 	{
-		if( CCWhite == aColor )
+		if( CCWhite == color )
 		{
 			// Default console color, instead of white (it can be black, green, etc)
 			std::cout << "\033[0m";
 		}
 		else
 		{
-			const int tColorCode = toColorCode(aColor);
+			const int color_code = toColorCode(color);
 
 			// No bold
-			//std::cout <<  "\033[0;"<< tColorCode << "m";
+			//std::cout <<  "\033[0;"<< color_code << "m";
 
 			// Bold
-			std::cout <<  "\033[1;"<< tColorCode << "m";
+			std::cout <<  "\033[1;"<< color_code << "m";
 		}
 	}
 
@@ -144,7 +144,7 @@ namespace utils
 		return utils::EmptyString;
 	}
 
-	std::string lastErrorDescription(int aErrorCode)
+	std::string lastErrorDescription(int error_code)
 	{
 		return utils::EmptyString;
 	}

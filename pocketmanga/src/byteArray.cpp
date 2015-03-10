@@ -7,35 +7,35 @@
 
 namespace tools
 {
-	AtomicInt::AtomicInt(int aInitValue)
-		:mValue(aInitValue)
+	AtomicInt::AtomicInt(int init_value)
+		:value_(init_value)
 	{
 	}
 
-	AtomicInt::AtomicInt(const AtomicInt &aOther)
-		:mValue(aOther.mValue)
+	AtomicInt::AtomicInt(const AtomicInt &other)
+		:value_(other.value_)
 	{
 	}
 
-	AtomicInt &AtomicInt::operator = (const AtomicInt &aOther)
+	AtomicInt &AtomicInt::operator = (const AtomicInt &other)
 	{
-		mValue = aOther.mValue;
+		value_ = other.value_;
 		return *this;
 	}
 
 	int AtomicInt::getValue() const
 	{
-		return mValue;
+		return value_;
 	}
 
-	void AtomicInt::inc(int aStep)
+	void AtomicInt::inc(int step)
 	{
-		mValue += aStep;
+		value_ += step;
 	}
 
-	void AtomicInt::dec(int aStep)
+	void AtomicInt::dec(int step)
 	{
-		mValue -= aStep;
+		value_ -= step;
 	}
 
 	AtomicInt::operator int () const
@@ -72,80 +72,80 @@ namespace tools
 	//////////////////////////////////////////////////////////////////////////
 
 	ByteArray::ByteArray()
-		:mSharedData(0)
+		:shared_data_(0)
 	{
 	}
 
-	ByteArray::ByteArray(ByteArray::SizeType aLen)
-		:mSharedData(0)
+	ByteArray::ByteArray(ByteArray::SizeType len)
+		:shared_data_(0)
 	{
-		resize(aLen);
+		resize(len);
 	}
 
-	ByteArray::ByteArray(const void *aData, SizeType aLen)
-		:mSharedData(0)
+	ByteArray::ByteArray(const void *data, SizeType len)
+		:shared_data_(0)
 	{
-		implByteArray(aData, aLen);
+		implByteArray(data, len);
 	}
 
 	const ByteArray::SizeType ByteArray::npos = std::numeric_limits<ByteArray::SizeType>::max();
 
-	void ByteArray::implByteArray(const void *aData, SizeType aLen)
+	void ByteArray::implByteArray(const void *data, SizeType len)
 	{
-		if( aData && aLen > 0 )
+		if( data && len > 0 )
 		{
-			mSharedData = new SharedData;
+			shared_data_ = new SharedData;
 
-			const ByteType *tData = static_cast<const ByteType *>(aData);
-			mSharedData->buffer.assign(tData, tData + aLen);
-			mSharedData->ref.inc();
+			const ByteType *data = static_cast<const ByteType *>(data);
+			shared_data_->buffer.assign(data, data + len);
+			shared_data_->ref.inc();
 		}
 	}
 
-	ByteArray::ByteArray(const ByteArray &aOther)
-		:mSharedData(0)
+	ByteArray::ByteArray(const ByteArray &other)
+		:shared_data_(0)
 	{
-		changeTo(aOther.mSharedData);
+		changeTo(other.shared_data_);
 	}
 
-	ByteArray &ByteArray::operator = (const ByteArray &aOther)
+	ByteArray &ByteArray::operator = (const ByteArray &other)
 	{
-		changeTo(aOther.mSharedData);
+		changeTo(other.shared_data_);
 		return *this;
 	}
 
 	ByteArray::iterator ByteArray::begin()
 	{
-		if( mSharedData )
+		if( shared_data_ )
 		{
-			return mSharedData->buffer.begin();
+			return shared_data_->buffer.begin();
 		}
 		return iterator();
 	}
 
 	ByteArray::iterator ByteArray::end()
 	{
-		if( mSharedData )
+		if( shared_data_ )
 		{
-			return mSharedData->buffer.end();
+			return shared_data_->buffer.end();
 		}
 		return iterator();
 	}
 
 	ByteArray::const_iterator ByteArray::begin() const
 	{
-		if( mSharedData )
+		if( shared_data_ )
 		{
-			return mSharedData->buffer.begin();
+			return shared_data_->buffer.begin();
 		}
 		return iterator();
 	}
 
 	ByteArray::const_iterator ByteArray::end() const
 	{
-		if( mSharedData )
+		if( shared_data_ )
 		{
-			return mSharedData->buffer.end();
+			return shared_data_->buffer.end();
 		}
 		return iterator();
 	}
@@ -155,84 +155,84 @@ namespace tools
 		changeTo(0);
 	}
 
-	void ByteArray::changeTo(ByteArray::SharedData *aOther)
+	void ByteArray::changeTo(ByteArray::SharedData *other)
 	{
-		if( mSharedData == aOther )
+		if( shared_data_ == other )
 			return;
 
-		if( mSharedData )
+		if( shared_data_ )
 		{
-			if( 1 == mSharedData->ref.getValue() )
+			if( 1 == shared_data_->ref.getValue() )
 			{
-				delete mSharedData;
+				delete shared_data_;
 			}
 			else
 			{
-				mSharedData->ref.dec();
+				shared_data_->ref.dec();
 			}
 
-			mSharedData = 0;
+			shared_data_ = 0;
 		}
 
-		if( aOther )
+		if( other )
 		{
-			mSharedData = aOther;
-			mSharedData->ref.inc();
+			shared_data_ = other;
+			shared_data_->ref.inc();
 		}
 	}
 
 	ByteArray::SharedData *ByteArray::acquire()
 	{
-		if( mSharedData )
+		if( shared_data_ )
 		{
-			if( mSharedData->ref.getValue() > 1 )
+			if( shared_data_->ref.getValue() > 1 )
 			{
-				SharedData *tOther		= mSharedData;
+				SharedData *other		= shared_data_;
 
-				mSharedData				= new SharedData;
-				mSharedData->buffer		= tOther->buffer;
+				shared_data_				= new SharedData;
+				shared_data_->buffer		= other->buffer;
 
-				mSharedData->ref.inc();
-				tOther->ref.dec();
+				shared_data_->ref.inc();
+				other->ref.dec();
 			}
 		}
-		return mSharedData;
+		return shared_data_;
 	}
 
 	ByteArray::SizeType ByteArray::getLength() const
 	{
-		if( mSharedData )
+		if( shared_data_ )
 		{
-			return mSharedData->buffer.size();
+			return shared_data_->buffer.size();
 		}
 		return 0;
 	}
 
 	ByteArray::SizeType ByteArray::getReservedSize() const
 	{
-		if( mSharedData )
+		if( shared_data_ )
 		{
-			return mSharedData->buffer.capacity();
+			return shared_data_->buffer.capacity();
 		}
 		return 0;
 	}
 
 	const ByteArray::ByteType *ByteArray::getData() const
 	{
-		if( mSharedData )
+		if( shared_data_ )
 		{
-			if( !mSharedData->buffer.empty() )
-				return &mSharedData->buffer[0];
+			if( !shared_data_->buffer.empty() )
+				return &shared_data_->buffer[0];
 		}
 
 		return 0;
 	}
 
-	ByteArray::ByteType *ByteArray::askBuffer(SizeType aNewLen)
+	ByteArray::ByteType *ByteArray::askBuffer(SizeType new_len)
 	{
-		resize(aNewLen);
+		resize(new_len);
 
-		return &mSharedData->buffer[0];
+		return &shared_data_->buffer[0];
 	}
 
 	const void *ByteArray::getBuffer() const
@@ -242,25 +242,25 @@ namespace tools
 
 	bool ByteArray::isNull() const
 	{
-		return !mSharedData;
+		return !shared_data_;
 	}
 
 	bool ByteArray::isEmpty() const
 	{
-		return isNull() || mSharedData->buffer.empty();
+		return isNull() || shared_data_->buffer.empty();
 	}
 
-	bool ByteArray::setChar(ByteArray::SizeType aIndex, char aChar)
+    bool ByteArray::setChar(ByteArray::SizeType index, char character)
 	{
-		if( mSharedData )
+		if( shared_data_ )
 		{
 
-			if( aIndex < mSharedData->buffer.size() )
+			if( index < shared_data_->buffer.size() )
 			{
 				SharedData *t_myData = acquire();
 				if( t_myData )
 				{
-					t_myData->buffer[aIndex] = aChar;
+                    t_myData->buffer[index] = character;
 					return true;
 				}
 			}
@@ -269,32 +269,32 @@ namespace tools
 		return false;
 	}
 
-	bool ByteArray::insert(SizeType aIndex, const void *aPtr, SizeType aLength)
+	bool ByteArray::insert(SizeType index, const void *ptr, SizeType length)
 	{
 		// we already added data of length 0 :-)
-		if( 0 == aLength )
+		if( 0 == length )
 			return true;
 
-		if( 0 == aPtr )
+		if( 0 == ptr )
 			return false;
 
 		if( isNull() )
 		{
 			// Buffer may be not initialized. So, if we add data at the beginning, we can 
 			// init buffer
-			reserve(aLength);
+			reserve(length);
 		}
 
-		if( mSharedData )
+		if( shared_data_ )
 		{
-			if(aIndex <= mSharedData->buffer.size())
+			if(index <= shared_data_->buffer.size())
 			{
-				SharedData *tMyData = acquire();
+				SharedData *my_data = acquire();
 
-				if( tMyData )
+				if( my_data )
 				{
-					const char *tData = static_cast<const char *>(aPtr);
-					mSharedData->buffer.insert(tMyData->buffer.begin() + aIndex, tData, tData + aLength );
+					const char *data = static_cast<const char *>(ptr);
+					shared_data_->buffer.insert(my_data->buffer.begin() + index, data, data + length );
 
 					return true;
 				}
@@ -304,245 +304,245 @@ namespace tools
 		return false;
 	}
 
-	bool ByteArray::remove(SizeType aIndex, SizeType aCount)
+	bool ByteArray::remove(SizeType index, SizeType count)
 	{
-		if( mSharedData && aIndex <= mSharedData->buffer.size() )
+		if( shared_data_ && index <= shared_data_->buffer.size() )
 		{
-			SizeType tMyLen = getLength();
+			SizeType my_len = getLength();
 			// sum can me more than size_type.
-			if( (aCount > tMyLen) || (aIndex > (tMyLen - aCount)) )
+			if( (count > my_len) || (index > (my_len - count)) )
 			{
-				resize(aIndex);
+				resize(index);
 				return true;
 			}
 
-			SharedData *tMyData = acquire();
-			if( tMyData )
+			SharedData *my_data = acquire();
+			if( my_data )
 			{
-				Buffer::iterator it1 = tMyData->buffer.begin() + aIndex;
-				Buffer::iterator it2 = it1 + aCount;
+				Buffer::iterator it1 = my_data->buffer.begin() + index;
+				Buffer::iterator it2 = it1 + count;
 
-				tMyData->buffer.erase(it1, it2);
+				my_data->buffer.erase(it1, it2);
 				return true;
 			}
 		}
 		return false;
 	}
 
-	void ByteArray::resize(ByteArray::SizeType aNewLen)
+	void ByteArray::resize(ByteArray::SizeType new_len)
 	{
 		
-		if( !mSharedData )
+		if( !shared_data_ )
 		{
-			if( 0 == aNewLen )
+			if( 0 == new_len )
 				return;
 
-			mSharedData = new SharedData;
-			mSharedData->buffer.resize(aNewLen, 0);
-			mSharedData->ref.inc();
+			shared_data_ = new SharedData;
+			shared_data_->buffer.resize(new_len, 0);
+			shared_data_->ref.inc();
 		}
 		else
 		{
-			SharedData *tMyData = acquire();
-			if( tMyData )
-				tMyData->buffer.resize(aNewLen, 0);
+			SharedData *my_data = acquire();
+			if( my_data )
+				my_data->buffer.resize(new_len, 0);
 		}
 	}
 
-	void ByteArray::reserve(SizeType aNewLen)
+	void ByteArray::reserve(SizeType new_len)
 	{
 
-		if( !mSharedData )
+		if( !shared_data_ )
 		{
-			if( 0 == aNewLen )
+			if( 0 == new_len )
 				return;
 
-			mSharedData = new SharedData;
-			mSharedData->buffer.reserve(aNewLen);
-			mSharedData->ref.inc();
+			shared_data_ = new SharedData;
+			shared_data_->buffer.reserve(new_len);
+			shared_data_->ref.inc();
 		}
 		else
 		{
-			SharedData *tMyData = acquire();
-			if( tMyData )
-				tMyData->buffer.reserve(aNewLen);
+			SharedData *my_data = acquire();
+			if( my_data )
+				my_data->buffer.reserve(new_len);
 		}
 	}
 
-	ByteArray ByteArray::copyPart(SizeType aIndex, SizeType aCount) const
+	ByteArray ByteArray::copyPart(SizeType index, SizeType count) const
 	{
 
-		if( mSharedData )
+		if( shared_data_ )
 		{
 
-			SizeType tMyLen = getSize();
-			if( aIndex >= mSharedData->buffer.size() )
+			SizeType my_len = getSize();
+			if( index >= shared_data_->buffer.size() )
 				return ByteArray();
 
-			SizeType tCount = aCount;
-			if( (aCount > tMyLen) || (aIndex > (tMyLen - aCount)) )
-				tCount = tMyLen - aIndex;
+			SizeType count = count;
+			if( (count > my_len) || (index > (my_len - count)) )
+				count = my_len - index;
 
-			if( tCount > 0)
-				return ByteArray(&mSharedData->buffer[aIndex], tCount);
+			if( count > 0)
+				return ByteArray(&shared_data_->buffer[index], count);
 		}
 
 		return ByteArray();
 	}
 
-	void ByteArray::reset(const ByteArray &aOther)
+	void ByteArray::reset(const ByteArray &other)
 	{
-		changeTo(aOther.mSharedData);
+		changeTo(other.shared_data_);
 	}
 
-	const ByteArray::ByteType &ByteArray::operator [](ByteArray::SizeType aIndex) const
+	const ByteArray::ByteType &ByteArray::operator [](ByteArray::SizeType index) const
 	{
 
-		if( mSharedData )
+		if( shared_data_ )
 		{
 
-			if( aIndex < mSharedData->buffer.size() )
-				return mSharedData->buffer[aIndex];
+			if( index < shared_data_->buffer.size() )
+				return shared_data_->buffer[index];
 
 		}
 
-		static const ByteType tDummy = 0;
-		return tDummy;
+		static const ByteType dummy = 0;
+		return dummy;
 	}
 
-	ByteArray::ByteType &ByteArray::operator [](SizeType aIndex)
+	ByteArray::ByteType &ByteArray::operator [](SizeType index)
 	{
 
-		if( mSharedData )
+		if( shared_data_ )
 		{
 
-			if( aIndex < mSharedData->buffer.size() )
+			if( index < shared_data_->buffer.size() )
 			{
-				SharedData *tMyData = acquire();
-				return tMyData->buffer[aIndex];
+				SharedData *my_data = acquire();
+				return my_data->buffer[index];
 			}
 		}
 		
-		static ByteType tDummy = 0;
-		return tDummy;
+		static ByteType dummy = 0;
+		return dummy;
 	}
 
 	const ByteArray ByteArray::empty;
 
 	//////////////////////////////////////////////////////////////////////////
 
-	bool insert(ByteArray &aArray, ByteArray::SizeType aIndex, const void *aData, ByteArray::SizeType aLength)
+	bool insert(ByteArray &array, ByteArray::SizeType index, const void *data, ByteArray::SizeType length)
 	{
-		return aArray.insert(aIndex,  aData, aLength);
+		return array.insert(index,  data, length);
 	}
 
-	bool replace(ByteArray &aArray, ByteArray::SizeType aIndex, const void *aData, ByteArray::SizeType aLength)
+	bool replace(ByteArray &array, ByteArray::SizeType index, const void *data, ByteArray::SizeType length)
 	{
-		const char *tChData = static_cast<const char *>(aData);
-		ByteArray::SizeType tFrom	= aIndex;
-		ByteArray::SizeType tTo	= std::min(aIndex + aLength, aArray.getSize());
-		for ( ByteArray::SizeType i = tFrom; i < tTo; ++i )
-			aArray[i] = tChData[i - tFrom];
+		const char *ch_data = static_cast<const char *>(data);
+		ByteArray::SizeType from	= index;
+		ByteArray::SizeType to	= std::min(index + length, array.getSize());
+		for ( ByteArray::SizeType i = from; i < to; ++i )
+			array[i] = ch_data[i - from];
 
 		return true;
 	}
 
-	bool replace(ByteArray &aArray, ByteArray::SizeType aIndex, const ByteArray &aSrc)
+	bool replace(ByteArray &array, ByteArray::SizeType index, const ByteArray &src)
 	{
-		return replace(aArray, aIndex, aSrc.getData(), aSrc.getSize());
+		return replace(array, index, src.getData(), src.getSize());
 	}
 
-	bool append(ByteArray &aArray, const void *aData, ByteArray::SizeType aLength)
+	bool append(ByteArray &array, const void *data, ByteArray::SizeType length)
 	{
-		return insert(aArray, aArray.getLength(), aData, aLength );
+		return insert(array, array.getLength(), data, length );
 	}
 
-	bool append(ByteArray &aArray, const ByteArray &aOther)
+	bool append(ByteArray &array, const ByteArray &other)
 	{
-		if( 0 == aArray.getLength() )
+		if( 0 == array.getLength() )
 		{
-			aArray = aOther;
+			array = other;
 			return true;
 		}
 
-		return insert(aArray, aArray.getLength(), aOther.getData(), aOther.getLength() );
+		return insert(array, array.getLength(), other.getData(), other.getLength() );
 	}
 
-	bool prepend(ByteArray &aArray, const void *aData, ByteArray::SizeType aLength)
+	bool prepend(ByteArray &array, const void *data, ByteArray::SizeType length)
 	{
-		return insert(aArray, 0, aData, aLength );
+		return insert(array, 0, data, length );
 	}
 
-	bool prepend(ByteArray &aArray, const ByteArray &aOther)
+	bool prepend(ByteArray &array, const ByteArray &other)
 	{
-		if( 0 == aArray.getLength() )
+		if( 0 == array.getLength() )
 		{
-			aArray = aOther;
+			array = other;
 			return true;
 		}
 
-		return insert(aArray, 0, aOther.getData(), aOther.getLength());
+		return insert(array, 0, other.getData(), other.getLength());
 	}
 
-	void reset(ByteArray &aArray, const char *aData, ByteArray::SizeType aLen)
+	void reset(ByteArray &array, const char *data, ByteArray::SizeType len)
 	{
-		aArray.reset(ByteArray(aData, aLen));
+		array.reset(ByteArray(data, len));
 	}
 
-	bool append(ByteArray &aArray, const std::string &aStr)
+	bool append(ByteArray &array, const std::string &str)
 	{
-		return append(aArray, aStr.c_str(), aStr.size());
+		return append(array, str.c_str(), str.size());
 	}
 
-	bool append(ByteArray &aArray, const char *aStr)
+	bool append(ByteArray &array, const char *str)
 	{
-		return append(aArray, aStr, strlen(aStr));
+		return append(array, str, strlen(str));
 	}
 
-	bool prepend(ByteArray &aArray, const std::string &aStr)
+	bool prepend(ByteArray &array, const std::string &str)
 	{
-		return prepend(aArray, aStr.c_str(), aStr.size());
+		return prepend(array, str.c_str(), str.size());
 	}
 
-	bool prepend(ByteArray &aArray, const char *aStr)
+	bool prepend(ByteArray &array, const char *str)
 	{
-		return prepend(aArray, aStr, strlen(aStr));
+		return prepend(array, str, strlen(str));
 	}
 
 	bool compare(
-		const ByteArray &aArray1,
-		ByteArray::SizeType aFrom1,
-		const ByteArray &aArray2,
-		ByteArray::SizeType aFrom2,
-		ByteArray::SizeType aCount)
+		const ByteArray &array1,
+		ByteArray::SizeType from1,
+		const ByteArray &array2,
+		ByteArray::SizeType from2,
+		ByteArray::SizeType count)
 	{
-		if( (aArray1.getSize() < aFrom1 + aCount) || 
-			(aArray2.getSize() < aFrom2 + aCount))
+		if( (array1.getSize() < from1 + count) || 
+			(array2.getSize() < from2 + count))
 			return false;
 
-		if( aArray1.getData() == aArray2.getData() && aFrom1 == aFrom2 )
+		if( array1.getData() == array2.getData() && from1 == from2 )
 			return true;
 
-		for ( ByteArray::SizeType i = 0; i < aCount; ++i )
+		for ( ByteArray::SizeType i = 0; i < count; ++i )
 		{
-			if( aArray1[aFrom1 + i] != aArray2[aFrom2 + i] )
+			if( array1[from1 + i] != array2[from2 + i] )
 				return false;
 		}
 
 		return true;
 	}
 
-	bool compare(const ByteArray &aArray1, const ByteArray &aArray2)
+	bool compare(const ByteArray &array1, const ByteArray &array2)
 	{
-		if( aArray1.getSize() != aArray2.getSize() )
+		if( array1.getSize() != array2.getSize() )
 			return false;
 
-		if( aArray1.getData() == aArray2.getData() )
+		if( array1.getData() == array2.getData() )
 			return true;
 
-		for ( ByteArray::SizeType i = 0; i < aArray1.getSize(); ++i )
+		for ( ByteArray::SizeType i = 0; i < array1.getSize(); ++i )
 		{
-			if( aArray1[i] != aArray2[i] )
+			if( array1[i] != array2[i] )
 				return false;
 		}
 
@@ -550,85 +550,85 @@ namespace tools
 	}
 
 	bool chooseIterators(
-		const ByteArray &aArray,
-		ByteArray::SizeType aFrom, 
-		ByteArray::SizeType aMaxCount,
-		ByteArray::const_iterator &aIt,
-		ByteArray::const_iterator &aItEnd)
+		const ByteArray &array,
+		ByteArray::SizeType from, 
+		ByteArray::SizeType max_count,
+		ByteArray::const_iterator &it,
+		ByteArray::const_iterator &it_end)
 	{
-		if( aArray.isEmpty() )
+		if( array.isEmpty() )
 			return false;
 
-		aIt = aArray.begin() + aFrom;
-		aItEnd = aArray.end();
+		it = array.begin() + from;
+		it_end = array.end();
 
-		if( aItEnd - aIt < 0 )
+		if( it_end - it < 0 )
 			return false;
 
-		if( static_cast<ByteArray::SizeType>(aItEnd - aIt) > aMaxCount )
-			aItEnd = aIt + aMaxCount;
+		if( static_cast<ByteArray::SizeType>(it_end - it) > max_count )
+			it_end = it + max_count;
 
 		return true;
 	}
 
 	ByteArray::SizeType find(
-		const ByteArray &aArray, 
-		ByteArray::ByteType aCh, 
-		ByteArray::SizeType aFrom, 
-		ByteArray::SizeType aMaxCount)
+		const ByteArray &array, 
+		ByteArray::ByteType ch, 
+		ByteArray::SizeType from, 
+		ByteArray::SizeType max_count)
 	{
 		ByteArray::const_iterator it;
 		ByteArray::const_iterator itEnd;
-		if( !chooseIterators(aArray, aFrom, aMaxCount, it, itEnd) )
+		if( !chooseIterators(array, from, max_count, it, itEnd) )
 			return ByteArray::npos;
 
-		ByteArray::const_iterator itFound = std::find(it ,itEnd, aCh);
+		ByteArray::const_iterator itFound = std::find(it ,itEnd, ch);
 		if( itFound != itEnd )
-			return itFound - aArray.begin();
+			return itFound - array.begin();
 
 		return ByteArray::npos;
 	}
 
-	ByteArray toByteArray(const std::string &aStr)
+	ByteArray toByteArray(const std::string &str)
 	{
-		return ByteArray(aStr.c_str(), aStr.size());
+		return ByteArray(str.c_str(), str.size());
 	}
 
-	std::string byteArray2string(const ByteArray &aArray, ByteArray::SizeType aIndex, ByteArray::SizeType aCount, bool aUpto0)
+	std::string byteArray2string(const ByteArray &array, ByteArray::SizeType index, ByteArray::SizeType count, bool upto0)
 	{
-		if( aIndex > aArray.getSize() )
+		if( index > array.getSize() )
 			return std::string();
 
-		ByteArray::SizeType tFrom	= aIndex;
-		ByteArray::SizeType tTo	= std::min(aIndex + aCount, aArray.getSize());
+		ByteArray::SizeType from	= index;
+		ByteArray::SizeType to	= std::min(index + count, array.getSize());
 
-		if( aUpto0 )
+		if( upto0 )
 		{
-			ByteArray::SizeType tFound = find(aArray, '\0', aIndex, aCount);
-			if( tFound != std::string::npos )
-				tTo	= tFound;
+			ByteArray::SizeType found = find(array, '\0', index, count);
+			if( found != std::string::npos )
+				to	= found;
 		}
 
-		return std::string(aArray.getData() + tFrom, aArray.getData() + tTo);
+		return std::string(array.getData() + from, array.getData() + to);
 	}
 
-	std::ostream& operator<< (std::ostream& aStream, const ByteArray& aArray)
+	std::ostream& operator<< (std::ostream& stream, const ByteArray& array)
 	{
-		const void *t_ptr = aArray.getData();
-		aStream.write(static_cast<const char *>(t_ptr), aArray.getSize() );
-		return aStream;
+		const void *t_ptr = array.getData();
+		stream.write(static_cast<const char *>(t_ptr), array.getSize() );
+		return stream;
 	}
 
-	std::istream& operator>> (std::istream& aStream, ByteArray& aArray)
+	std::istream& operator>> (std::istream& stream, ByteArray& array)
 	{
-		const std::size_t tPos = static_cast<std::size_t>(aStream.tellg());
-		aStream.seekg (0, std::ios::end);
+		const std::size_t pos = static_cast<std::size_t>(stream.tellg());
+		stream.seekg (0, std::ios::end);
 
-		const std::size_t tSize = static_cast<std::size_t>(aStream.tellg());
-		aStream.seekg(tPos, std::ios::beg);
+		const std::size_t size = static_cast<std::size_t>(stream.tellg());
+		stream.seekg(pos, std::ios::beg);
 
-		aStream.read( reinterpret_cast<char *>(aArray.askBuffer(tSize)), tSize );
-		return aStream;
+		stream.read( reinterpret_cast<char *>(array.askBuffer(size)), size );
+		return stream;
 	}
 }
 

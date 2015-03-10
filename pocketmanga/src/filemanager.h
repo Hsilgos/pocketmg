@@ -15,20 +15,20 @@ namespace fs
 
 	class Comparator
 	{
-		virtual bool compareLevel(const std::string &aName1, const std::string &aName2, bool &aResult) const = 0;
+		virtual bool compareLevel(const std::string &name1, const std::string &name2, bool &result) const = 0;
 	public:
-		bool operator ()(const fs::FilePath &aFirst, const fs::FilePath &aSecond) const;
+		bool operator ()(const fs::FilePath &first, const fs::FilePath &second) const;
 		virtual ~Comparator();
 	};
 
 	class WordNumberOrder: public Comparator
 	{
-		virtual bool compareLevel(const std::string &aName1, const std::string &aName2, bool &aResult) const;
+		virtual bool compareLevel(const std::string &name1, const std::string &name2, bool &result) const;
 	};
 
 	class NumberOrder: public Comparator
 	{
-		virtual bool compareLevel(const std::string &aName1, const std::string &aName2, bool &aResult) const;
+		virtual bool compareLevel(const std::string &name1, const std::string &name2, bool &result) const;
 	};
 
 	class IFileManager
@@ -41,9 +41,9 @@ namespace fs
 		  FileAndDirectory	= File|Directory
 		};
 		
-		//virtual std::vector<fs::FilePath> getFileList(const std::string &aRoot, EntryTypes aEntries, bool aRecursive) = 0;
-		virtual std::vector<fs::FilePath> getFileList(const fs::FilePath &aRoot, EntryTypes aEntries, bool aRecursive) = 0;
-		virtual tools::ByteArray readFile(const fs::FilePath &aFile, size_t aMaxSize);
+		//virtual std::vector<fs::FilePath> getFileList(const std::string &root, EntryTypes entries, bool recursive) = 0;
+		virtual std::vector<fs::FilePath> getFileList(const fs::FilePath &root, EntryTypes entries, bool recursive) = 0;
+		virtual tools::ByteArray readFile(const fs::FilePath &file, size_t max_size);
 
 		virtual ~IFileManager();
 

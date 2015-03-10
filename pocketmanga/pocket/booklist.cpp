@@ -37,128 +37,128 @@ IBooklistCfg::~IBooklistCfg()
 
 class BookList: public utils::SingletonStatic<BookList>
 {
-	std::auto_ptr<IBookListHandler> mHandler;
-	std::auto_ptr<IBooklistCfg> mCfg;
+	std::auto_ptr<IBookListHandler> handler_;
+	std::auto_ptr<IBooklistCfg> cfg_;
 
-	std::vector<fs::FilePath> mBooks;
+	std::vector<fs::FilePath> books_;
 
 	typedef std::map<int, void(BookList::*)(const Position &, int /*index*/, int /*state*/)> MethodMap;
-	MethodMap mMethods;
+	MethodMap methods_;
 
-	ifont *mFont;
+	ifont *font_;
 
-	int mLastLine;
+	int last_line_;
 private:
 
-	void paintBook(const Position &aPos, const fs::FilePath &aCurEntry, bool aIsSelected)
+	void paintBook(const Position &pos, const fs::FilePath &cur_entry, bool is_selected)
 	{
-		int tTextXOffset 	= TextXOffset;
-		int tTextWidth 		= ScreenWidth();
+		int text_x_offset 	= TextXOffset;
+		int text_width 		= ScreenWidth();
 
-		SetFont(mFont, BLACK);
+		SetFont(font_, BLACK);
 
-		tTextWidth -= tTextXOffset;
+		text_width -= text_x_offset;
 
 		DrawTextRect(
-			aPos.x + tTextXOffset,
-			aPos.y,
-			tTextWidth,
+			pos.x + text_x_offset,
+			pos.y,
+			text_width,
 			RowHeight,
-			aCurEntry.getLastEntry().c_str(),
+			cur_entry.getLastEntry().c_str(),
 			ALIGN_LEFT | VALIGN_MIDDLE | DOTS | RTLAUTO);
 
-		DrawLine(0, aPos.y, aPos.x + ScreenWidth(), aPos.y, BLACK);
+		DrawLine(0, pos.y, pos.x + ScreenWidth(), pos.y, BLACK);
 
-		if( NeedDrawSelection && aIsSelected )
-			DrawSelection(aPos.x, aPos.y, ScreenWidth(), RowHeight, BLACK);
+		if( NeedDrawSelection && is_selected )
+			DrawSelection(pos.x, pos.y, ScreenWidth(), RowHeight, BLACK);
 	}
 
-	void paintAddBook(const Position &aPos, bool aIsSelected)
+	void paintAddBook(const Position &pos, bool is_selected)
 	{
-		int tTextWidth 		= ScreenWidth();
-		int tTextXOffset 	= TextXOffset;
+		int text_width 		= ScreenWidth();
+		int text_x_offset 	= TextXOffset;
 
-		DrawBitmap(aPos.x + TextXOffset, aPos.y + (RowHeight - add_folder.height)/2, &add_folder );
-		tTextXOffset += TextXOffset + add_folder.width;
+		DrawBitmap(pos.x + TextXOffset, pos.y + (RowHeight - add_folder.height)/2, &add_folder );
+		text_x_offset += TextXOffset + add_folder.width;
 
-		SetFont(mFont, BLACK);
+		SetFont(font_, BLACK);
 
 		DrawTextRect(
-					aPos.x + tTextXOffset,
-					aPos.y,
-					tTextWidth,
+					pos.x + text_x_offset,
+					pos.y,
+					text_width,
 					RowHeight,
 					"Add new book",
 					ALIGN_LEFT | VALIGN_MIDDLE | DOTS | RTLAUTO);
 	}
 
-	void onPaint(const Position &aPos, int aIndex, int state)
+	void onPaint(const Position &pos, int index, int state)
 	{
-		if( 0 == aIndex )
+		if( 0 == index )
 		{
-			paintAddBook(aPos, 0 != state);
+			paintAddBook(pos, 0 != state);
 		}
 		else
 		{
-			if( aIndex <= mBooks.size() )
-				paintBook(aPos, mBooks[aIndex - 1], 0 != state);
+			if( index <= books_.size() )
+				paintBook(pos, books_[index - 1], 0 != state);
 		}
 
-		mLastLine = aPos.y + RowHeight;
+		last_line_ = pos.y + RowHeight;
 	}
 
-	void onEndPaint(const Position &aPos, int aIndex, int state)
+	void onEndPaint(const Position &pos, int index, int state)
 	{
-		DrawLine(0, mLastLine, aPos.x + ScreenWidth(), mLastLine, BLACK);
+		DrawLine(0, last_line_, pos.x + ScreenWidth(), last_line_, BLACK);
 	}
 
-	void onExit(const Position &aPos, int aIndex, int state)
+	void onExit(const Position &pos, int index, int state)
 	{
-		if( mHandler.get() )
-			mHandler->onExit();
+		if( handler_.get() )
+			handler_->onExit();
 	}
 
-	void onOpen(const Position &aPos, int aIndex, int state)
+	void onOpen(const Position &pos, int index, int state)
 	{
-			if( 0 == aIndex )
+			if( 0 == index )
 			{
-				if( mHandler.get() )
-					mHandler->addNewBook();
+				if( handler_.get() )
+					handler_->addNewBook();
 			}
 			else
 			{
-				if( aIndex <= mBooks.size() && mHandler.get())
+				if( index <= books_.size() && handler_.get())
 				{
-					std::auto_ptr<manga::Book> tNewBook(new manga::Book);
-					tNewBook->setRoot( mBooks[aIndex - 1] );
-					mHandler->startShow(tNewBook);
+					std::auto_ptr<manga::Book> new_book(new manga::Book);
+					new_book->setRoot( books_[index - 1] );
+					handler_->startShow(new_book);
 				}
 			}
 	}
 public:
 	BookList()
-		:mLastLine(0)
+		:last_line_(0)
 	{
-		mFont = OpenFont(DEFAULTFONTB, FontHeight, 1);
+		font_ = OpenFont(DEFAULTFONTB, FontHeight, 1);
 
-		mMethods[LIST_PAINT] 	= &BookList::onPaint;
-		mMethods[LIST_ENDPAINT] = &BookList::onEndPaint;
-		mMethods[LIST_EXIT] 	= &BookList::onExit;
-		mMethods[LIST_OPEN] 	= &BookList::onOpen;
+		methods_[LIST_PAINT] 	= &BookList::onPaint;
+		methods_[LIST_ENDPAINT] = &BookList::onEndPaint;
+		methods_[LIST_EXIT] 	= &BookList::onExit;
+		methods_[LIST_OPEN] 	= &BookList::onOpen;
 	}
 
 	~BookList()
 	{
-		CloseFont(mFont);
+		CloseFont(font_);
 	}
 
-	int listHandler(int action, int x, int y, int aIdx, int state)
+	int listHandler(int action, int x, int y, int idx, int state)
 	{
-		MethodMap::const_iterator it = mMethods.find(action);
+		MethodMap::const_iterator it = methods_.find(action);
 
-		if( it != mMethods.end() )
+		if( it != methods_.end() )
 		{
-			(this->*(it->second))( Position(x, y), aIdx, state);
+			(this->*(it->second))( Position(x, y), idx, state);
 		}
 
 		return 0;
@@ -169,23 +169,23 @@ public:
 		return getInstance().listHandler(action, x, y, idx, state);
 	}
 
-	void show(IBookListHandler *aHandler, IBooklistCfg *aCfg)
+	void show(IBookListHandler *handler, IBooklistCfg *cfg)
 	{
-		mHandler.reset(aHandler);
-		mCfg.reset(aCfg);
+		handler_.reset(handler);
+		cfg_.reset(cfg);
 
-		if( mHandler.get() && mCfg.get() )
+		if( handler_.get() && cfg_.get() )
 		{
-			mBooks = mCfg->getBooks();
+			books_ = cfg_->getBooks();
 
-			OpenList("Book list", NULL, ScreenWidth(), RowHeight, mBooks.size() + 1, 0, listHandlerStat);
+			OpenList("Book list", NULL, ScreenWidth(), RowHeight, books_.size() + 1, 0, listHandlerStat);
 		}
 	}
 };
 
-void showBooklist(IBookListHandler *aHandler, IBooklistCfg *aCfg)
+void showBooklist(IBookListHandler *handler, IBooklistCfg *cfg)
 {
-	BookList::getInstance().show(aHandler, aCfg);
+	BookList::getInstance().show(handler, cfg);
 }
 
 

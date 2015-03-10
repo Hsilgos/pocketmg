@@ -25,8 +25,8 @@ Rect::Rect()
 {
 }
 
-Rect::Rect(int ax, int ay, int aWidth, int aHeight)
-	:x(ax), y(ay), width(aWidth), height(aHeight)
+Rect::Rect(int ax, int ay, int width, int height)
+	:x(ax), y(ay), width(width), height(height)
 {
 }
 

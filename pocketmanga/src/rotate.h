@@ -12,7 +12,7 @@ namespace img
 		Angle_270
 	};
 	// rotates clockwise
-	Image rotate(const Image &aSrc, Image &aCached, RotateAngle aAngle);
-	Image rotate(const Image &aSrc, RotateAngle aAngle);
+	Image rotate(const Image &src, Image &cached, RotateAngle angle);
+	Image rotate(const Image &src, RotateAngle angle);
 }
 

@@ -31,40 +31,40 @@ namespace test
 
 	std::vector<std::string> TestImageDecoder::getExts() const
 	{
-		std::vector<std::string> tResult;
-		tResult.push_back("testimg");
-		return tResult;
+		std::vector<std::string> result;
+		result.push_back("testimg");
+		return result;
 	}
 
 	// Format: 
 	// POSCKETMANGATESTIMAGE:some data
-	bool TestImageDecoder::decode(const tools::ByteArray &aEncoded, img::Image &aDecoded)
+	bool TestImageDecoder::decode(const tools::ByteArray &encoded, img::Image &decoded)
 	{
 		static const size_t header_size = TestImageHeader.size();
-		if( aEncoded.getSize() < header_size )
+		if( encoded.getSize() < header_size )
 			return false;
 
-		if( !compare(aEncoded, 0, tools::toByteArray(TestImageHeader), 0, header_size) )
+		if( !compare(encoded, 0, tools::toByteArray(TestImageHeader), 0, header_size) )
 			return false;
 
-		const size_t rest_len = aEncoded.getSize() - header_size;
+		const size_t rest_len = encoded.getSize() - header_size;
 		if( rest_len == 0 )
 			return false;
 
-		aDecoded.create(rest_len, 1, 1);
-		memcpy(aDecoded.data(), aEncoded.getData() + header_size, rest_len);
+		decoded.create(rest_len, 1, 1);
+		memcpy(decoded.data(), encoded.getData() + header_size, rest_len);
 
 		return true;
 	}
 
-	tools::ByteArray CreateTestImage(const std::string &aData)
+	tools::ByteArray CreateTestImage(const std::string &data)
 	{
 		return 
-			aData.empty() ?  tools::ByteArray::empty : tools::toByteArray(TestImageHeader + aData);
+			data.empty() ?  tools::ByteArray::empty : tools::toByteArray(TestImageHeader + data);
 	}
 
-	std::string DataFromTestImage(const img::Image &aImage)
+	std::string DataFromTestImage(const img::Image &image)
 	{
-		return std::string(aImage.data(), aImage.data() + aImage.width());
+		return std::string(image.data(), image.data() + image.width());
 	}
 }

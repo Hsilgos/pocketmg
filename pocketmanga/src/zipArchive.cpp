@@ -16,94 +16,94 @@ namespace archive
 {
 	class ZipArchive: public IArchive
 	{
-		unzFile mZipFile;
+		unzFile zip_file_;
 
-		bool open(const std::string &aFile )
+		bool open(const std::string &file )
 		{
 			close();
 
-			mZipFile = unzOpen(aFile.c_str());
+			zip_file_ = unzOpen(file.c_str());
 
-			return mZipFile != NULL;
+			return zip_file_ != NULL;
 		}
 
 		void close()
 		{
-			if( mZipFile )
+			if( zip_file_ )
 			{
-				unzClose(mZipFile);
-				mZipFile = 0;
+				unzClose(zip_file_);
+				zip_file_ = 0;
 			}
 		}
 
-		bool isDirectory(const std::string &aPath) const
+		bool isDirectory(const std::string &path) const
 		{
-			return !aPath.empty() && aPath[aPath.size() - 1] == '/';
+			return !path.empty() && path[path.size() - 1] == '/';
 		}
 
-		fs::FilePath createFilepath(const std::string &aPath)
+		fs::FilePath createFilepath(const std::string &path)
 		{
-			if( aPath.empty() )
+			if( path.empty() )
 				return fs::FilePath();
 
-			fs::FilePath tfpsth(aPath, !isDirectory(aPath) );
+			fs::FilePath tfpsth(path, !isDirectory(path) );
 
 			return tfpsth;
 		}
 
-		std::vector<fs::FilePath> getFileList(bool aFilesOnly)
+		std::vector<fs::FilePath> getFileList(bool files_only)
 		{
-			std::vector<fs::FilePath> tList;
-			int tResult = unzGoToFirstFile(mZipFile);
+			std::vector<fs::FilePath> list;
+			int result = unzGoToFirstFile(zip_file_);
 
 			const int MaxFileName = 1024;
-			char tBuffer[MaxFileName];
-			while( UNZ_OK == tResult )
+			char buffer[MaxFileName];
+			while( UNZ_OK == result )
 			{
-				unz_file_info tFileInfo = {0};
-				unzGetCurrentFileInfo(mZipFile, &tFileInfo, tBuffer, MaxFileName, NULL, 0, NULL, 0);
+				unz_file_info file_info = {0};
+				unzGetCurrentFileInfo(zip_file_, &file_info, buffer, MaxFileName, NULL, 0, NULL, 0);
 
-				fs::FilePath tPath = createFilepath(tBuffer);
+				fs::FilePath path = createFilepath(buffer);
 
-				if( !tPath.empty() && ( !tPath.isDirectory() || !aFilesOnly ) )
-					tList.push_back(tPath);
+				if( !path.empty() && ( !path.isDirectory() || !files_only ) )
+					list.push_back(path);
 
-				tResult = unzGoToNextFile(mZipFile);
+				result = unzGoToNextFile(zip_file_);
 			}
 
-			return tList;
+			return list;
 		}
 
-		tools::ByteArray getFile(const fs::FilePath &aFileInArchive, size_t aMaxSize)
+		tools::ByteArray getFile(const fs::FilePath &file_in_archive, size_t max_size)
 		{
-			tools::ByteArray tData;
-			if( UNZ_OK != unzLocateFile(mZipFile, aFileInArchive.getPath().c_str(), 1) )
-				return tData;
+			tools::ByteArray data;
+			if( UNZ_OK != unzLocateFile(zip_file_, file_in_archive.getPath().c_str(), 1) )
+				return data;
 
-			if( UNZ_OK != unzOpenCurrentFile(mZipFile) )
-				return tData;
+			if( UNZ_OK != unzOpenCurrentFile(zip_file_) )
+				return data;
 
 			// read length
-			unz_file_info tFileInfo = {0};
-			if( UNZ_OK != unzGetCurrentFileInfo(mZipFile, &tFileInfo, NULL, 0, NULL, 0, NULL, 0) )
+			unz_file_info file_info = {0};
+			if( UNZ_OK != unzGetCurrentFileInfo(zip_file_, &file_info, NULL, 0, NULL, 0, NULL, 0) )
 			{
-				unzCloseCurrentFile(mZipFile);
-				return tData;
+				unzCloseCurrentFile(zip_file_);
+				return data;
 			}
 
-			if( tFileInfo.uncompressed_size > aMaxSize )
+			if( file_info.uncompressed_size > max_size )
 			{
-				unzCloseCurrentFile(mZipFile);
-				return tData;
+				unzCloseCurrentFile(zip_file_);
+				return data;
 			}
 
-			void *tBuffPtr = tData.askBuffer(tFileInfo.uncompressed_size);
-			const int tTotalRead = unzReadCurrentFile(mZipFile, tBuffPtr, tData.getLength());
-			if( tTotalRead != tFileInfo.uncompressed_size )
-				tData.reset();
+			void *buff_ptr = data.askBuffer(file_info.uncompressed_size);
+			const int total_read = unzReadCurrentFile(zip_file_, buff_ptr, data.getLength());
+			if( total_read != file_info.uncompressed_size )
+				data.reset();
 
-			unzCloseCurrentFile(mZipFile);
-			return tData;
+			unzCloseCurrentFile(zip_file_);
+			return data;
 		}
 
 		~ZipArchive()
@@ -112,7 +112,7 @@ namespace archive
 		}
 	public:
 		ZipArchive()
-			:mZipFile(0)
+			:zip_file_(0)
 		{
 		}
 	};

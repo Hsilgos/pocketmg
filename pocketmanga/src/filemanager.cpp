@@ -11,24 +11,24 @@
 
 namespace
 {
-	inline int fetchNumber(const std::string &aName, size_t &aPos)
+	inline int fetchNumber(const std::string &name, size_t &pos)
 	{
-		if( !isdigit(aName[aPos]) )
+		if( !isdigit(name[pos]) )
 			return 0;
 
-		const std::string::size_type tNumEnd = aName.find_first_not_of("0123456789", aPos);
-		const std::string tNumStr = aName.substr(aPos, tNumEnd - aPos);
-		const int tNumber = atoi(tNumStr.c_str());
-		aPos = (std::string::npos == tNumEnd) ? aName.size() : tNumEnd;
+		const std::string::size_type num_end = name.find_first_not_of("0123456789", pos);
+		const std::string num_str = name.substr(pos, num_end - pos);
+		const int number = atoi(num_str.c_str());
+		pos = (std::string::npos == num_end) ? name.size() : num_end;
 
-		return tNumber;
+		return number;
 	}
 
-	inline std::string getFileNameCI(const fs::FilePath &aFirst, int aLevel)
+	inline std::string getFileNameCI(const fs::FilePath &first, int level)
 	{
-		std::string tName = aFirst.getName(aLevel);
-		std::transform(tName.begin(), tName.end(), tName.begin(), tolower);
-		return tName;
+		std::string name = first.getName(level);
+		std::transform(name.begin(), name.end(), name.begin(), tolower);
+		return name;
 	}
 }
 
@@ -36,28 +36,28 @@ namespace fs
 {	
 	// build correct list of entries in each sublevel
 
-	bool Comparator::operator ()(const fs::FilePath &aFirst, const fs::FilePath &aSecond) const
+	bool Comparator::operator ()(const fs::FilePath &first, const fs::FilePath &second) const
 	{
-		bool tResult = false;
+		bool result = false;
 
-		for( size_t tLevel = 0; tLevel < std::min(aFirst.getLevel(), aSecond.getLevel()); ++tLevel )
+		for( size_t level = 0; level < std::min(first.getLevel(), second.getLevel()); ++level )
 		{
-			if(aFirst.isDirectory(tLevel) != aSecond.isDirectory(tLevel))
-				return aFirst.isDirectory(tLevel);
+			if(first.isDirectory(level) != second.isDirectory(level))
+				return first.isDirectory(level);
 
-			std::string tName1 = getFileNameCI(aFirst, tLevel);
-			std::string tName2 = getFileNameCI(aSecond, tLevel);
+			std::string name1 = getFileNameCI(first, level);
+			std::string name2 = getFileNameCI(second, level);
 
-			if( compareLevel(tName1, tName2, tResult) )
-				return tResult;
+			if( compareLevel(name1, name2, result) )
+				return result;
 			// words are equal, go to the next level
 		}
 
-		if( aFirst.getLevel() != aSecond.getLevel() )
-			return aFirst.getLevel() < aSecond.getLevel();
+		if( first.getLevel() != second.getLevel() )
+			return first.getLevel() < second.getLevel();
 
-		if( aFirst.isDirectory() != aSecond.isDirectory() )
-			return aFirst.isDirectory();
+		if( first.isDirectory() != second.isDirectory() )
+			return first.isDirectory();
 
 		// both are equal
 		return false;
@@ -67,24 +67,24 @@ namespace fs
 	{
 	}
 	
-	bool WordNumberOrder::compareLevel(const std::string &aName1, const std::string &aName2, bool &aResult) const
+	bool WordNumberOrder::compareLevel(const std::string &name1, const std::string &name2, bool &result) const
 	{
 		size_t i = 0, j = 0;
-		while( i < aName1.size() && j < aName2.size() )
+		while( i < name1.size() && j < name2.size() )
 		{
-			const bool tNumIsStarted = isdigit(aName1[i]) && isdigit(aName2[j]);
-			if( tNumIsStarted || (aName1[i] != aName2[j]) )
+			const bool num_is_started = isdigit(name1[i]) && isdigit(name2[j]);
+			if( num_is_started || (name1[i] != name2[j]) )
 			{
-				if( tNumIsStarted )
+				if( num_is_started )
 				{
 					// we met two numbers.
 					// so now we have to compare numbers...
-					const int tNumber1 = fetchNumber(aName1, i);
-					const int tNumber2 = fetchNumber(aName2, j);
+					const int number1 = fetchNumber(name1, i);
+					const int number2 = fetchNumber(name2, j);
 
-					if( tNumber1 != tNumber2 )
+					if( number1 != number2 )
 					{
-						aResult = tNumber1 < tNumber2;
+						result = number1 < number2;
 						return true;
 					}
 
@@ -92,7 +92,7 @@ namespace fs
 				}
 				else
 				{
-					aResult = aName1[i] < aName2[j];
+					result = name1[i] < name2[j];
 					return true;
 				}
 			}
@@ -101,9 +101,9 @@ namespace fs
 			++j;
 		}
 
-		if( aName1.size() != i || aName2.size() != j )
+		if( name1.size() != i || name2.size() != j )
 		{
-			aResult = aName1.size() < aName2.size();
+			result = name1.size() < name2.size();
 			return true;
 		}
 
@@ -111,50 +111,50 @@ namespace fs
 	}
 
 	
-	bool NumberOrder::compareLevel(const std::string &aName1, const std::string &aName2, bool &aResult) const
+	bool NumberOrder::compareLevel(const std::string &name1, const std::string &name2, bool &result) const
 	{
-		static const char tNumbers[] = "1234567890";
-		std::string::size_type tNum1Begin = aName1.find_first_of(tNumbers);
-		std::string::size_type tNum2Begin = aName2.find_first_of(tNumbers);
+		static const char numbers[] = "1234567890";
+		std::string::size_type num1_begin = name1.find_first_of(numbers);
+		std::string::size_type num2_begin = name2.find_first_of(numbers);
 
-		while( std::string::npos != tNum1Begin && std::string::npos != tNum2Begin )
+		while( std::string::npos != num1_begin && std::string::npos != num2_begin )
 		{
-			const int tNumber1 = fetchNumber(aName1, tNum1Begin);
-			const int tNumber2 = fetchNumber(aName2, tNum2Begin);
+			const int number1 = fetchNumber(name1, num1_begin);
+			const int number2 = fetchNumber(name2, num2_begin);
 
-			if( tNumber1 != tNumber2 )
+			if( number1 != number2 )
 			{
-				aResult = tNumber1 < tNumber2;
+				result = number1 < number2;
 				return true;
 			}
 
-			if( std::string::npos != tNum1Begin )
-				tNum1Begin = aName1.find_first_of(tNumbers, tNum1Begin);
+			if( std::string::npos != num1_begin )
+				num1_begin = name1.find_first_of(numbers, num1_begin);
 
-			if( std::string::npos != tNum2Begin )
-				tNum2Begin = aName2.find_first_of(tNumbers, tNum2Begin);
+			if( std::string::npos != num2_begin )
+				num2_begin = name2.find_first_of(numbers, num2_begin);
 		}
 
-		if( aName1 != aName2 )
+		if( name1 != name2 )
 		{
-			aResult = aName1 < aName2;
+			result = name1 < name2;
 			return true;
 		}
 
 		return false;
 	}
 
-	tools::ByteArray IFileManager::readFile(const fs::FilePath &aFilePath, size_t aMaxSize)
+	tools::ByteArray IFileManager::readFile(const fs::FilePath &file_path, size_t max_size)
 	{
-		tools::ByteArray tData;
+		tools::ByteArray data;
 
-		std::ifstream tFile(aFilePath.getPath().c_str(), std::ios::binary);
-		const size_t tSize = utils::get_stream_size(tFile);
+		std::ifstream file(file_path.getPath().c_str(), std::ios::binary);
+		const size_t size = utils::get_stream_size(file);
 
-		if( tSize < aMaxSize )
-			tFile >> tData;
+		if( size < max_size )
+			file >> data;
 
-		return tData;
+		return data;
 	}
 
 	IFileManager::~IFileManager()

@@ -46,44 +46,44 @@ void mainscreen_repaint() {
 
 std::string bookCfgName(int i)
 {
-	std::stringstream tName;
-	tName << "book_" << i;
-	return tName.str();
+	std::stringstream name;
+	name << "book_" << i;
+	return name.str();
 }
 
 std::vector<fs::FilePath> loadBooks()
 {
-	std::vector<fs::FilePath> tResult;
+	std::vector<fs::FilePath> result;
 
-	pocket::Config tCfg(ConfigPath.getPath());
-	const int tCount = tCfg.readInt("bookcount");
-	for( int i = 0; i < tCount; ++i )
+	pocket::Config cfg(ConfigPath.getPath());
+	const int count = cfg.readInt("bookcount");
+	for( int i = 0; i < count; ++i )
 	{
-		std::string tName = bookCfgName(i);
-		std::string tBookPath = tCfg.readString( tName );
+		std::string name = bookCfgName(i);
+		std::string book_path = cfg.readString( name );
 
-		if( !tBookPath.empty() )
-			tResult.push_back( fs::FilePath(tBookPath, false) );
+		if( !book_path.empty() )
+			result.push_back( fs::FilePath(book_path, false) );
 	}
 
-	return tResult;
+	return result;
 }
 
-void addBook(const fs::FilePath &aBook)
+void addBook(const fs::FilePath &book)
 {
-	pocket::Config tCfg(ConfigPath.getPath());
-	const int tCount = tCfg.readInt("bookcount");
-	tCfg.write("bookcount", tCount + 1);
+	pocket::Config cfg(ConfigPath.getPath());
+	const int count = cfg.readInt("bookcount");
+	cfg.write("bookcount", count + 1);
 
-	tCfg.write(bookCfgName(tCount), aBook.getPath());
+	cfg.write(bookCfgName(count), book.getPath());
 }
 
 class TestSelector: public pocket::IDirectoryHandler
 {
 public:
-	virtual void selected(const fs::FilePath &aPath)
+	virtual void selected(const fs::FilePath &path)
 	{
-		addBook(aPath);
+		addBook(path);
 	}
 
 	virtual void onExit();
@@ -91,9 +91,9 @@ public:
 
 class TestBookListHandler: public pocket::IBookListHandler
 {
-	virtual void startShow( std::auto_ptr<manga::Book> aBook)
+	virtual void startShow( std::auto_ptr<manga::Book> book)
 	{
-		pocket::PictureView::getInstance().setBook(aBook);
+		pocket::PictureView::getInstance().setBook(book);
 	}
 
 	virtual void addNewBook()

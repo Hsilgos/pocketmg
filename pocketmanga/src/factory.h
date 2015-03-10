@@ -30,44 +30,44 @@ namespace pattern
 		typedef Factory<Signature, IdType> ThisFactory;
 
 		typedef std::map<IdType, ConcreteFactory> FactoryCollect;
-		FactoryCollect mCreators;
+		FactoryCollect creators_;
 
 	protected:
-		ConcreteFactory doGet(const IdType &aId)
+		ConcreteFactory doGet(const IdType &id)
 		{
-			typename FactoryCollect::const_iterator it = mCreators.find(aId);
-			if( it != mCreators.end() )
+			typename FactoryCollect::const_iterator it = creators_.find(id);
+			if( it != creators_.end() )
 				return it->second;
 
-			std::stringstream tErrorInfo;
+			std::stringstream error_info;
 
-			tErrorInfo << "Invalid concrete factory " << aId;
+			error_info << "Invalid concrete factory " << id;
 
-			throw std::invalid_argument(tErrorInfo.str());
+			throw std::invalid_argument(error_info.str());
 		}
 
-		void doGetKeylist(std::vector<IdType> &aList)
+		void doGetKeylist(std::vector<IdType> &list)
 		{
-			aList.reserve(mCreators.size());
-			utils::collectKeys(mCreators, std::back_inserter(aList));
+			list.reserve(creators_.size());
+			utils::collectKeys(creators_, std::back_inserter(list));
 		}
 	public:
 		// Returns concrete factory
-		ConcreteFactory get(const IdType &aId)
+		ConcreteFactory get(const IdType &id)
 		{
-			return doGet(aId);
+			return doGet(id);
 		}
 
 		std::vector<IdType> keyList()
 		{
-			std::vector<IdType> tList;
-			doGetKeylist(tList);
-			return tList;
+			std::vector<IdType> list;
+			doGetKeylist(list);
+			return list;
 		}
 
-		void regFactory(const IdType &aId, ConcreteFactory aFactory)
+		void regFactory(const IdType &id, ConcreteFactory factory)
 		{
-			mCreators[aId] = aFactory;
+			creators_[id] = factory;
 		}
 	};
 
@@ -82,16 +82,16 @@ namespace pattern
 		typedef typename BaseFactory::ConcreteFactory ConcreteFactory;
 		typedef SingletonFactory<Signature, IdType> ThisFactory;
 	public:
-		static ConcreteFactory get(const IdType &aId)
+		static ConcreteFactory get(const IdType &id)
 		{
-			return ThisFactory::getInstance().doGet(aId);
+			return ThisFactory::getInstance().doGet(id);
 		}
 
 		static std::vector<IdType> keyList()
 		{
-			std::vector<IdType> tList;
-			ThisFactory::getInstance().doGetKeylist(tList);
-			return tList;
+			std::vector<IdType> list;
+			ThisFactory::getInstance().doGetKeylist(list);
+			return list;
 		}
 	};
 

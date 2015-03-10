@@ -18,7 +18,7 @@ namespace img
 
 namespace manga
 {
-	void FixUpFileTreeForTest(std::vector<fs::FilePath> &aFiles, const fs::FilePath &aRoot);
+	void FixUpFileTreeForTest(std::vector<fs::FilePath> &files, const fs::FilePath &root);
 
 	struct PathToFile
 	{
@@ -28,16 +28,16 @@ namespace manga
 		fs::FilePath filePath;
 		fs::FilePath pathInArchive;
 
-		bool operator == (const PathToFile &aOther) const
+		bool operator == (const PathToFile &other) const
 		{
 			return 
-				filePath == aOther.filePath &&
-				pathInArchive == aOther.pathInArchive;
+				filePath == other.filePath &&
+				pathInArchive == other.pathInArchive;
 		}
 
-		bool operator != (const PathToFile &aOther) const
+		bool operator != (const PathToFile &other) const
 		{
-			return !(*this == aOther);
+			return !(*this == other);
 		}
 
 		bool empty() const
@@ -50,13 +50,13 @@ namespace manga
 
 		}
 
-		PathToFile(const fs::FilePath &aFilePath)
-			: filePath(aFilePath)
+		PathToFile(const fs::FilePath &file_path)
+			: filePath(file_path)
 		{
 		}
 
-		PathToFile(const fs::FilePath &aFilePath, const fs::FilePath &aFileInArch)
-			: filePath(aFilePath), pathInArchive(aFileInArch)
+		PathToFile(const fs::FilePath &file_path, const fs::FilePath &file_in_arch)
+			: filePath(file_path), pathInArchive(file_in_arch)
 		{
 		}
 
@@ -67,31 +67,31 @@ namespace manga
 		}
 	};
 
-	inline std::ostream& operator<< (std::ostream& aStream, const PathToFile& aPath)
+	inline std::ostream& operator<< (std::ostream& stream, const PathToFile& path)
 	{
-		aStream << aPath.filePath;
-		if(!aPath.pathInArchive.empty())
-			aStream <<" [" <<  aPath.pathInArchive << "]";
-		return aStream;
+		stream << path.filePath;
+		if(!path.pathInArchive.empty())
+			stream <<" [" <<  path.pathInArchive << "]";
+		return stream;
 	}
 
 	class BookExplorer
 	{
 	public:
 		BookExplorer(
-			fs::IFileManager *aFileMgr,
-			fs::IFileManager::EntryTypes aTypes = fs::IFileManager::FileAndDirectory);
+			fs::IFileManager *file_mgr,
+			fs::IFileManager::EntryTypes types = fs::IFileManager::FileAndDirectory);
 
 		typedef std::vector<fs::FilePath> FileList;
 
 		// Returns file list ascending sorted
 		std::vector<PathToFile> fileList() const;
 
-		bool setRoot(const fs::FilePath &aRoot);
+		bool setRoot(const fs::FilePath &root);
 		const fs::FilePath &getRoot() const;
 
 		// Enters to some directory or archive
-		bool enter(const PathToFile &aPath);
+		bool enter(const PathToFile &path);
 		bool back();
 
 		bool toNextFile();
@@ -106,19 +106,19 @@ namespace manga
 		BookExplorer(const BookExplorer &);
 		BookExplorer& operator = (const BookExplorer &);
 
-		bool openArchive(const fs::FilePath &aPath, bool aToBeginning);
+		bool openArchive(const fs::FilePath &path, bool to_beginning);
 		void closeArchive();
 		bool isCurrentInArchiveFile() const;
 		//bool FindFirstSuitable()
-		std::auto_ptr<fs::IFileManager> mFileMgr;
+		std::auto_ptr<fs::IFileManager> file_mgr_;
 
-		fs::IFileManager::EntryTypes mFindEntries;
+		fs::IFileManager::EntryTypes find_entries_;
 
-		fs::FilePath mRoot;
-		std::auto_ptr<archive::IArchive> mCurrentArchive;
+		fs::FilePath root_;
+		std::auto_ptr<archive::IArchive> current_archive_;
 
-		std::vector<fs::FilePath> mFiles;
-		std::vector<fs::FilePath> mFilesInArchive;
+		std::vector<fs::FilePath> files_;
+		std::vector<fs::FilePath> files_in_archive_;
 
 		struct FileIndex
 		{
@@ -129,8 +129,8 @@ namespace manga
 			}
 		};
 
-		FileIndex mFs;
-		FileIndex mArchive;
+		FileIndex fs_;
+		FileIndex archive_;
 	};
 
 	struct Bookmark
@@ -145,16 +145,16 @@ namespace manga
 		virtual ~IBookCache();
 
 		virtual IBookCache *clone() = 0;
-		virtual void swap(IBookCache *aOther) = 0;
-		virtual bool onLoaded(img::Image &aImage) = 0;
-		//virtual Cache getCached(size_t aId) const = 0;
+		virtual void swap(IBookCache *other) = 0;
+		virtual bool onLoaded(img::Image &image) = 0;
+		//virtual Cache getCached(size_t id) const = 0;
 	};
 
 	class Book 
 	{
 	public:
 		Book();
-		explicit Book(fs::IFileManager *aFileMgr);
+		explicit Book(fs::IFileManager *file_mgr);
 		// Looks for next image
 		bool incrementPosition();
 		// Looks for previous image
@@ -168,15 +168,15 @@ namespace manga
 		bool hasCurrentImage() const;
 		IBookCache *currentCache() const;
 
-		bool setRoot(const fs::FilePath &aRoot);
+		bool setRoot(const fs::FilePath &root);
 		bool toFirstFile();
 		bool toLastFile();
 
-		void setCachePrototype(IBookCache *aCache);
+		void setCachePrototype(IBookCache *cache);
 
 		// Set/Get bookmark
 		Bookmark bookmark() const;
-		bool goToBookmark(const Bookmark &aBookmark);
+		bool goToBookmark(const Bookmark &bookmark);
 	private:
 		Book(const Book &);
 		Book& operator = (const Book &);
@@ -186,7 +186,7 @@ namespace manga
 			std::auto_ptr<IBookCache> cache;
 			Bookmark bookmark;
 
-			void swap(ImageData &aOther);
+			void swap(ImageData &other);
 			bool empty() const;
 			void clear();
 		};
@@ -194,13 +194,13 @@ namespace manga
 		bool findAndLoadPrevious();
 		bool findAndLoadNext();
 
-		bool loadFromExplorerInto(ImageData &aData);		
+		bool loadFromExplorerInto(ImageData &data);		
 
-		ImageData mPrevious;
-		ImageData mCurrent;
-		ImageData mNext;
+		ImageData previous_;
+		ImageData current_;
+		ImageData next_;
 
-		BookExplorer mExplorer;
+		BookExplorer explorer_;
 	};
 }
 

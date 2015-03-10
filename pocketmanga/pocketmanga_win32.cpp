@@ -14,38 +14,38 @@
 
 #include <opencv2/opencv.hpp>
 
-cv::Mat to_cv(const img::Image &aImg)
+cv::Mat to_cv(const img::Image &img)
 {
-	img::Image tRotated = img::rotate(aImg, img::Angle_90);
+	img::Image rotated = img::rotate(img, img::Angle_90);
 	
-	cv::Mat tMat1;
-	tMat1.create(tRotated.height(), tRotated.width(), CV_MAKETYPE(CV_8U, tRotated.depth()));
-	memcpy(tMat1.data, tRotated.data(), tRotated.height() * tRotated.width() * tRotated.depth());
+	cv::Mat mat1;
+	mat1.create(rotated.height(), rotated.width(), CV_MAKETYPE(CV_8U, rotated.depth()));
+	memcpy(mat1.data, rotated.data(), rotated.height() * rotated.width() * rotated.depth());
 
-	return tMat1;
+	return mat1;
 }
 
-cv::Mat to_cv(manga::CacheScaler::Cache &aCache)
+cv::Mat to_cv(manga::CacheScaler::Cache &cache)
 {
-	if( aCache.representation == manga::CacheScaler::Parts3 )
+	if( cache.representation == manga::CacheScaler::Parts3 )
 	{
-		img::Image tDst;
-		utils::Rect bounds = aCache.bounds;
+		img::Image dst;
+		utils::Rect bounds = cache.bounds;
 
-		if(1 == aCache.currentShowing)
-			bounds.x = (aCache.image.width() - bounds.width) / 2;
-		else if(2 == aCache.currentShowing)
-			bounds.x = aCache.image.width() - bounds.width;
+		if(1 == cache.currentShowing)
+			bounds.x = (cache.image.width() - bounds.width) / 2;
+		else if(2 == cache.currentShowing)
+			bounds.x = cache.image.width() - bounds.width;
 		
-		copyRect(aCache.image, tDst, bounds);
+		copyRect(cache.image, dst, bounds);
 
-		aCache.currentShowing++;
+		cache.currentShowing++;
 
-		return to_cv(tDst);
+		return to_cv(dst);
 	}
 	else
 	{
-		return to_cv(aCache.image);
+		return to_cv(cache.image);
 	}
 }
 /*
@@ -59,50 +59,50 @@ WARP_INVERSE_MAP=CV_WARP_INVERSE_MAP
 */
 int main()
 {
-	manga::Book tBook;
+	manga::Book book;
 
-	tBook.setRoot(fs::FilePath("i:\\tmp", false));
-	manga::CacheScaler *tScaler = new manga::CacheScaler(600, 800);
-	tBook.setCachePrototype( tScaler );
+	book.setRoot(fs::FilePath("i:\\tmp", false));
+	manga::CacheScaler *scaler = new manga::CacheScaler(600, 800);
+	book.setCachePrototype( scaler );
 
-	img::Image tImg;
+	img::Image img;
 	
-	img::Image tImg2;
-	tImg2.enableMinimumReallocations(true);
+	img::Image img2;
+	img2.enableMinimumReallocations(true);
 
-	img::Image tImg3;
-	tImg3.enableMinimumReallocations(true);
+	img::Image img3;
+	img3.enableMinimumReallocations(true);
 
-	while( tBook.incrementPosition() )
+	while( book.incrementPosition() )
 	{
-		//tImg = tBook.currentImage();
-		//toBgr(tImg, tImg);
-		//tImg.copyTo(tImg2);
-		//cv::Mat tCv = to_cv(tImg);
-		//toGray(tImg, tImg);
+		//img = book.currentImage();
+		//toBgr(img, img);
+		//img.copyTo(img2);
+		//cv::Mat cv = to_cv(img);
+		//toGray(img, img);
 
-		//img::copyRect(tImg, tImg, utils::Rect(0, 0, 400, 400));
+		//img::copyRect(img, img, utils::Rect(0, 0, 400, 400));
 
-		//tImg = img::scale(tImg, img::HighScaling, 600, 0);
+		//img = img::scale(img, img::HighScaling, 600, 0);
 
-		//tImg = img::rotate(tImg, img::Angle_90);
+		//img = img::rotate(img, img::Angle_90);
 
-		//cv::imshow("ololo1", to_cv(tImg));
-		cv::imshow("ololo1", to_cv(tScaler->scaledGrey()));
+		//cv::imshow("ololo1", to_cv(img));
+		cv::imshow("ololo1", to_cv(scaler->scaledGrey()));
 
-		tBook.preload();
+		book.preload();
 
-		if( tScaler->scaledGrey().representation == manga::CacheScaler::Parts3)
+		if( scaler->scaledGrey().representation == manga::CacheScaler::Parts3)
 		{
 			cv::waitKey(2000);
-			cv::imshow("ololo1", to_cv(tScaler->scaledGrey()));
+			cv::imshow("ololo1", to_cv(scaler->scaledGrey()));
 			cv::waitKey(3000);
-			cv::imshow("ololo1", to_cv(tScaler->scaledGrey()));
+			cv::imshow("ololo1", to_cv(scaler->scaledGrey()));
 		}
-		//cv::Mat to_cv(tImg2)
-		//cv::imshow("ololo2", tMat2);
-		//cv::imshow("ololo2", tMat2);
-		//cv::imshow("ololo2", tMat2);
+		//cv::Mat to_cv(img2)
+		//cv::imshow("ololo2", mat2);
+		//cv::imshow("ololo2", mat2);
+		//cv::imshow("ololo2", mat2);
 		
 		cv::waitKey(3000);
 
@@ -113,13 +113,13 @@ int main()
 	return 0;
 
 
-/*	fs::IFileManager *tMgr = fs::IFileManager::create();
-	std::vector<fs::FilePath> tList = tMgr->getFileList("i:\\books\\Prison School\\Том 01", fs::IFileManager::Directory, true);
+/*	fs::IFileManager *mgr = fs::IFileManager::create();
+	std::vector<fs::FilePath> list = mgr->getFileList("i:\\books\\Prison School\\Том 01", fs::IFileManager::Directory, true);
 
-	fs::sort(tList, fs::FirstWordThenNumbers);
-	//fs::sort(tList, fs::JustNumbers);
+	fs::sort(list, fs::FirstWordThenNumbers);
+	//fs::sort(list, fs::JustNumbers);
 
-	std::vector<fs::FilePath>::iterator it = tList.begin(), itEnd = tList.end();
+	std::vector<fs::FilePath>::iterator it = list.begin(), itEnd = list.end();
 	for ( ; it != itEnd; ++it )
 	{
 		std::cout << it->getPath() << std::endl;

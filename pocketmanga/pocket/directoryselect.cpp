@@ -55,168 +55,168 @@ namespace pocket
 
 	class DirSelector: public utils::SingletonStatic<DirSelector>
 	{
-		std::auto_ptr<IDirectoryHandler> mSelector;
-		iv_handler mCurrentHanler;
+		std::auto_ptr<IDirectoryHandler> selector_;
+		iv_handler current_hanler_;
 
-		ifont *mFont;
+		ifont *font_;
 
-		//std::string mCurrentDir;
-		fs::FilePath mCurrentDir;
-		const fs::FilePath mEmpty;
+		//std::string current_dir_;
+		fs::FilePath current_dir_;
+		const fs::FilePath empty_;
 
-		std::auto_ptr<fs::IFileManager> mFileMgr;
-		std::vector<fs::FilePath> mCurrentFiles;
+		std::auto_ptr<fs::IFileManager> file_mgr_;
+		std::vector<fs::FilePath> current_files_;
 		
-		std::vector<fs::FilePath> mRootPaths;
+		std::vector<fs::FilePath> root_paths_;
 
-		//const ibitmap *mFolderBmp;
-		const ibitmap *mFileBmp;
-		const ibitmap *mReturnBmp;
-		const ibitmap *mAddBmp;
+		//const ibitmap *folder_bmp_;
+		const ibitmap *file_bmp_;
+		const ibitmap *return_bmp_;
+		const ibitmap *add_bmp_;
 		
-		Position mPointerPos;
+		Position pointer_pos_;
 		
-		int mLastLine;
+		int last_line_;
 		
 		typedef std::map<int, void(DirSelector::*)(const Position &, const fs::FilePath &, int)> MethodMap;
-		MethodMap mMethods;
+		MethodMap methods_;
 	public:
 		DirSelector()
-			:mCurrentHanler(0),
-			 mFileMgr(fs::IFileManager::create()),
-			 mLastLine(0)
+			:current_hanler_(0),
+			 file_mgr_(fs::IFileManager::create()),
+			 last_line_(0)
 		{
-			mFont 		= OpenFont(DEFAULTFONTB, FontHeight, 1);
+			font_ 		= OpenFont(DEFAULTFONTB, FontHeight, 1);
 
-			mFileBmp 	= &file;
-			mReturnBmp 	= &return_back;
-			mAddBmp 	= &add_folder;
+			file_bmp_ 	= &file;
+			return_bmp_ 	= &return_back;
+			add_bmp_ 	= &add_folder;
 			
-			mRootPaths.push_back(SDPath);
-			mRootPaths.push_back(USBPath);
-			mRootPaths.push_back(FlashPath);
+			root_paths_.push_back(SDPath);
+			root_paths_.push_back(USBPath);
+			root_paths_.push_back(FlashPath);
 
-			mMethods[LIST_PAINT] 	= &DirSelector::onPaint;
-			mMethods[LIST_ENDPAINT] = &DirSelector::onEndPaint;
-			mMethods[LIST_POINTER] 	= &DirSelector::onPointer;
-			mMethods[LIST_OPEN] 	= &DirSelector::onOpen;
-			mMethods[LIST_EXIT] 	= &DirSelector::onExit;
+			methods_[LIST_PAINT] 	= &DirSelector::onPaint;
+			methods_[LIST_ENDPAINT] = &DirSelector::onEndPaint;
+			methods_[LIST_POINTER] 	= &DirSelector::onPointer;
+			methods_[LIST_OPEN] 	= &DirSelector::onOpen;
+			methods_[LIST_EXIT] 	= &DirSelector::onExit;
 		}
 
 		~DirSelector()
 		{
-			CloseFont(mFont);
+			CloseFont(font_);
 		}
 
-		int listHandler(int action, int x, int y, int aIdx, int state)
+		int listHandler(int action, int x, int y, int idx, int state)
 		{
-			//std::cout << "action:"<< action << ",x:"<<x<<",y:"<<y<<",idx:"<<aIdx<<",state:"<<state << std::endl;
+			//std::cout << "action:"<< action << ",x:"<<x<<",y:"<<y<<",idx:"<<idx<<",state:"<<state << std::endl;
 			
-			MethodMap::const_iterator it = mMethods.find(action);
+			MethodMap::const_iterator it = methods_.find(action);
 			
-			if( it != mMethods.end() )
+			if( it != methods_.end() )
 			{
-				const fs::FilePath &tCurEntr = (aIdx >= 0 && aIdx < mCurrentFiles.size())?(mCurrentFiles[aIdx]):(mEmpty);
+				const fs::FilePath &cur_entr = (idx >= 0 && idx < current_files_.size())?(current_files_[idx]):(empty_);
 				
-				(this->*(it->second))( Position(x, y), tCurEntr, state);
+				(this->*(it->second))( Position(x, y), cur_entr, state);
 			}
 			
 			return 0;
 		}
 		
-		const ibitmap *chooseBmp(const fs::FilePath &aCurEntry) const
+		const ibitmap *chooseBmp(const fs::FilePath &cur_entry) const
 		{
-			if( !aCurEntry.isDirectory() )
-				return mFileBmp;
+			if( !cur_entry.isDirectory() )
+				return file_bmp_;
 			
-			if( aCurEntry.isBack() )
-				return mReturnBmp;
+			if( cur_entry.isBack() )
+				return return_bmp_;
 			
 			//std::cout << "sd:" << SDPath.getPath() << ", usb:" << USBPath.getPath() << std::endl;
-			if( aCurEntry.startsWith(SDPath) )
+			if( cur_entry.startsWith(SDPath) )
 				return &folder_sd;
 
-			if( aCurEntry.startsWith(USBPath) )
+			if( cur_entry.startsWith(USBPath) )
 				return &folder_usb;
 
 			return &folder;
 		}
 		
 		///////////////////////////////////////////////////////////////////////////////
-		void onPaint(const Position &aPos, const fs::FilePath &aCurEntry, int state)
+		void onPaint(const Position &pos, const fs::FilePath &cur_entry, int state)
 		{
-			int tTextXOffset 	= TextXOffset;
-			int tTextWidth 		= ScreenWidth();
+			int text_x_offset 	= TextXOffset;
+			int text_width 		= ScreenWidth();
 			
-			const ibitmap *tBmp = chooseBmp(aCurEntry);
-			if( tBmp )
+			const ibitmap *bmp = chooseBmp(cur_entry);
+			if( bmp )
 			{
-				DrawBitmap(aPos.x + TextXOffset, aPos.y + (RowHeight - tBmp->height)/2, tBmp );
-				tTextXOffset += TextXOffset + tBmp->width;
+				DrawBitmap(pos.x + TextXOffset, pos.y + (RowHeight - bmp->height)/2, bmp );
+				text_x_offset += TextXOffset + bmp->width;
 			}
 			
-			if( aCurEntry.isDirectory() && mAddBmp )
+			if( cur_entry.isDirectory() && add_bmp_ )
 			{
-				DrawBitmap(ScreenWidth() - mAddBmp->width, aPos.y, mAddBmp );
-				tTextWidth -= mAddBmp->width;
+				DrawBitmap(ScreenWidth() - add_bmp_->width, pos.y, add_bmp_ );
+				text_width -= add_bmp_->width;
 			}
 			
-			SetFont(mFont, BLACK);
+			SetFont(font_, BLACK);
 			
-			tTextWidth -= tTextXOffset;
+			text_width -= text_x_offset;
 
 			DrawTextRect(
-				aPos.x + tTextXOffset, 
-				aPos.y, 
-				tTextWidth,
+				pos.x + text_x_offset, 
+				pos.y, 
+				text_width,
 				RowHeight, 
-				aCurEntry.getLastEntry().c_str(), 
+				cur_entry.getLastEntry().c_str(), 
 				ALIGN_LEFT | VALIGN_MIDDLE | DOTS | RTLAUTO);
 			
-			DrawLine(0, aPos.y, aPos.x + ScreenWidth(), aPos.y, BLACK);
+			DrawLine(0, pos.y, pos.x + ScreenWidth(), pos.y, BLACK);
 
 			if( NeedDrawSelection && state )
-				DrawSelection(aPos.x, aPos.y, ScreenWidth(), RowHeight, BLACK);
+				DrawSelection(pos.x, pos.y, ScreenWidth(), RowHeight, BLACK);
 
-			mLastLine = aPos.y + RowHeight;
+			last_line_ = pos.y + RowHeight;
 		}
 		
-		void onEndPaint(const Position &aPos, const fs::FilePath &, int)
+		void onEndPaint(const Position &pos, const fs::FilePath &, int)
 		{
-			DrawLine(0, mLastLine, aPos.x + ScreenWidth(), mLastLine, BLACK);
+			DrawLine(0, last_line_, pos.x + ScreenWidth(), last_line_, BLACK);
 		}
 		
-		void onPointer(const Position &aPos, const fs::FilePath &, int )
+		void onPointer(const Position &pos, const fs::FilePath &, int )
 		{
-			mPointerPos = aPos;
+			pointer_pos_ = pos;
 		}
 		
 		bool isInSelection() const
 		{
-			return (mAddBmp && (mPointerPos.x > (ScreenWidth() - mAddBmp->width)) );
+			return (add_bmp_ && (pointer_pos_.x > (ScreenWidth() - add_bmp_->width)) );
 		}
 		
-		void onOpen(const Position &aPos, const fs::FilePath &aCurEntry, int /*state*/)
+		void onOpen(const Position &pos, const fs::FilePath &cur_entry, int /*state*/)
 		{
-			if( !aCurEntry.isDirectory() )
+			if( !cur_entry.isDirectory() )
 				return;
 
-			fs::FilePath tNewPath = mCurrentDir;
+			fs::FilePath new_path = current_dir_;
 			
-			if( aCurEntry.isBack() )
-				tNewPath.removeLastEntry();
+			if( cur_entry.isBack() )
+				new_path.removeLastEntry();
 			else
-				tNewPath = aCurEntry;
+				new_path = cur_entry;
 			
 			if( isInSelection() )
 			{
-				if( mSelector.get() )
-					mSelector->selected(tNewPath);
+				if( selector_.get() )
+					selector_->selected(new_path);
 				doExit();
 			}
 			else
 			{
-				openList(tNewPath);
+				openList(new_path);
 			}
 		}		
 		
@@ -228,12 +228,12 @@ namespace pocket
 		
 		void doExit()
 		{
-			if( mSelector.get() )
-				mSelector->onExit();
+			if( selector_.get() )
+				selector_->onExit();
 			else
-				SetEventHandler(mCurrentHanler);
+				SetEventHandler(current_hanler_);
 
-			mSelector.reset();
+			selector_.reset();
 		}
 		///////////////////////////////////////////////////////////////////////////////
 
@@ -242,49 +242,49 @@ namespace pocket
 			return getInstance().listHandler(action, x, y, idx, state);
 		}
 		
-		static bool isHidden(const fs::FilePath &aPath)
+		static bool isHidden(const fs::FilePath &path)
 		{
-			return aPath.isHidden();
+			return path.isHidden();
 		}
 
-		void doOpenList(bool aAddBack)
+		void doOpenList(bool add_back)
 		{
-			mCurrentFiles.erase(std::remove_if(mCurrentFiles.begin(), mCurrentFiles.end(), isHidden), mCurrentFiles.end());
+			current_files_.erase(std::remove_if(current_files_.begin(), current_files_.end(), isHidden), current_files_.end());
 
-			if( aAddBack )
-				mCurrentFiles.insert( mCurrentFiles.begin(), fs::FilePath("..", false) );
+			if( add_back )
+				current_files_.insert( current_files_.begin(), fs::FilePath("..", false) );
 
-			OpenList("Select directory", 0, ScreenWidth(), RowHeight, mCurrentFiles.size(), 0, listHandlerStat);
+			OpenList("Select directory", 0, ScreenWidth(), RowHeight, current_files_.size(), 0, listHandlerStat);
 
 		}
 
 		void openRoot()
 		{
-			mCurrentFiles.clear();
+			current_files_.clear();
 
-			for( size_t i = 0; i < mRootPaths.size(); ++i )
+			for( size_t i = 0; i < root_paths_.size(); ++i )
 			{
 				std::vector<fs::FilePath>
-					tExt = mFileMgr->getFileList(
-						mRootPaths[i], fs::IFileManager::FileAndDirectory, false);
+					ext = file_mgr_->getFileList(
+						root_paths_[i], fs::IFileManager::FileAndDirectory, false);
 
-				for( size_t j = 0; j < tExt.size(); ++j )
-					tExt[j].setFirstLevel(mRootPaths[i].getLevel());
+				for( size_t j = 0; j < ext.size(); ++j )
+					ext[j].setFirstLevel(root_paths_[i].getLevel());
 
-				mCurrentFiles.insert(mCurrentFiles.end(), tExt.begin(), tExt.end());
+				current_files_.insert(current_files_.end(), ext.begin(), ext.end());
 			}
 
-			std::sort(mCurrentFiles.begin(), mCurrentFiles.end(), fs::WordNumberOrder());
+			std::sort(current_files_.begin(), current_files_.end(), fs::WordNumberOrder());
 
-			for( size_t i = 0; i < mCurrentFiles.size(); ++i )
-				mCurrentFiles[i].setFirstLevel(0);
+			for( size_t i = 0; i < current_files_.size(); ++i )
+				current_files_[i].setFirstLevel(0);
 
 			doOpenList(false);
 		}
 
-		bool isSomeRoot(const fs::FilePath &aPath) const
+		bool isSomeRoot(const fs::FilePath &path) const
 		{
-			return std::find(mRootPaths.begin(), mRootPaths.end(), aPath) != mRootPaths.end();
+			return std::find(root_paths_.begin(), root_paths_.end(), path) != root_paths_.end();
 		}
 
 		static void menuhandler(int index)
@@ -292,37 +292,37 @@ namespace pocket
 
 		}
 
-		void openList(const fs::FilePath &aPath)
+		void openList(const fs::FilePath &path)
 		{
-			if( isSomeRoot(aPath) )
+			if( isSomeRoot(path) )
 			{
 				openRoot();
 			}
 			else
 			{
-				mCurrentDir = aPath;
+				current_dir_ = path;
 
-				mCurrentFiles = mFileMgr->getFileList(mCurrentDir, fs::IFileManager::FileAndDirectory, false);
+				current_files_ = file_mgr_->getFileList(current_dir_, fs::IFileManager::FileAndDirectory, false);
 
-				std::sort(mCurrentFiles.begin(), mCurrentFiles.end(), fs::WordNumberOrder());
+				std::sort(current_files_.begin(), current_files_.end(), fs::WordNumberOrder());
 
 				doOpenList(true);
 			}
 		}
 
-		void openDirectorySelector(IDirectoryHandler *aSelector)
+		void openDirectorySelector(IDirectoryHandler *selector)
 		{
-			mSelector.reset(aSelector);
+			selector_.reset(selector);
 
-			mCurrentHanler = GetEventHandler();
+			current_hanler_ = GetEventHandler();
 
 			openRoot();
 		}
 	};
 
-	void openDirectorySelector(IDirectoryHandler *aSelector)
+	void openDirectorySelector(IDirectoryHandler *selector)
 	{
-		DirSelector::getInstance().openDirectorySelector(aSelector);
+		DirSelector::getInstance().openDirectorySelector(selector);
 	}
 }
 

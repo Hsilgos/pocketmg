@@ -51,17 +51,17 @@ namespace
 		const unsigned char *data;
 		const unsigned int size;
 
-		const unsigned char *getColor(unsigned int aIndex) const
+		const unsigned char *getColor(unsigned int index) const
 		{
-			unsigned int tRealIdx = aIndex * 4;
-			if( tRealIdx < size )
-				return &data[tRealIdx];
+			unsigned int real_idx = index * 4;
+			if( real_idx < size )
+				return &data[real_idx];
 
 			return 0;
 		}
 
-		Palette(const unsigned char *aData, unsigned int aSize)
-			:data(aData), size(aSize)
+		Palette(const unsigned char *data, unsigned int size)
+			:data(data), size(size)
 		{
 		}
 	};
@@ -75,54 +75,54 @@ namespace img
 	public:
 		virtual std::vector<std::string> getExts() const
 		{
-			std::vector<std::string> tExts;
+			std::vector<std::string> exts;
 
-			tExts.push_back("bmp");
+			exts.push_back("bmp");
 
-			return tExts;
+			return exts;
 		}
 
-		unsigned int correctScanline(unsigned int aScanline)
+		unsigned int correctScanline(unsigned int scanline)
 		{
-			while( aScanline % 4 != 0 )
-				++aScanline;
+			while( scanline % 4 != 0 )
+				++scanline;
 
-			return aScanline;
+			return scanline;
 		}
 
 		bool loadMono(
-			unsigned int aWidth, 
-			unsigned int aHeight,
-			const unsigned char* aSrcBegin,
-			unsigned long aDataSize,
-			const Palette &aPallete,
-			img::Image &aDecoded)
+			unsigned int width, 
+			unsigned int height,
+			const unsigned char* src_begin,
+			unsigned long data_size,
+			const Palette &pallete,
+			img::Image &decoded)
 		{
-			aDecoded.create(aWidth, aHeight, 3);
+			decoded.create(width, height, 3);
 
-			const unsigned int tSrcScanline = correctScanline(aWidth/8 + ((aWidth%8 != 0)?1:0));
+			const unsigned int src_scanline = correctScanline(width/8 + ((width%8 != 0)?1:0));
 
-			if( tSrcScanline * aHeight > aDataSize )
+			if( src_scanline * height > data_size )
 				return false;
 
-			unsigned char* tDst = aDecoded.data();
+			unsigned char* dst = decoded.data();
 
-			for( unsigned short y = 0; y < aHeight; ++y)
+			for( unsigned short y = 0; y < height; ++y)
 			{
-				const unsigned char* tSrcLine = &aSrcBegin[( aHeight - y - 1 )*tSrcScanline];
+				const unsigned char* src_line = &src_begin[( height - y - 1 )*src_scanline];
 
-				for( unsigned short x = 0; x < aWidth; ++x)
+				for( unsigned short x = 0; x < width; ++x)
 				{
-					const unsigned char* tSrc = &tSrcLine[x/8];
-					const bool tBit = ( (*tSrc >> (7 - x % 8)) & 1 );
-					const unsigned char *tBgra = aPallete.getColor(tBit?1:0);
-					if( tBgra )
+					const unsigned char* src = &src_line[x/8];
+					const bool bit = ( (*src >> (7 - x % 8)) & 1 );
+					const unsigned char *bgra = pallete.getColor(bit?1:0);
+					if( bgra )
 					{
-						tDst[0] = tBgra[2];
-						tDst[1] = tBgra[1];
-						tDst[2] = tBgra[0];
+						dst[0] = bgra[2];
+						dst[1] = bgra[1];
+						dst[2] = bgra[0];
 
-						tDst += 3;
+						dst += 3;
 					}
 					else
 					{
@@ -135,41 +135,41 @@ namespace img
 		}
 
 		bool loadColor16(
-			unsigned int aWidth, 
-			unsigned int aHeight,
-			const unsigned char* aSrcBegin,
-			unsigned long aDataSize,
-			const Palette &aPallete,
-			img::Image &aDecoded)
+			unsigned int width, 
+			unsigned int height,
+			const unsigned char* src_begin,
+			unsigned long data_size,
+			const Palette &pallete,
+			img::Image &decoded)
 		{
-			aDecoded.create(aWidth, aHeight, 3);
+			decoded.create(width, height, 3);
 
-			const unsigned int tSrcScanline = correctScanline(aWidth/2 + ((aWidth % 2) !=  0 ? 1 : 0) );
+			const unsigned int src_scanline = correctScanline(width/2 + ((width % 2) !=  0 ? 1 : 0) );
 
-			if( tSrcScanline * aHeight > aDataSize )
+			if( src_scanline * height > data_size )
 				return false;
 
-			unsigned char* tDst = aDecoded.data();
+			unsigned char* dst = decoded.data();
 
-			for( unsigned short y = 0; y < aHeight; ++y)
+			for( unsigned short y = 0; y < height; ++y)
 			{
-				const unsigned char* tSrcLine = &aSrcBegin[( aHeight - y - 1 )*tSrcScanline];
+				const unsigned char* src_line = &src_begin[( height - y - 1 )*src_scanline];
 
-				for( unsigned short x = 0; x < aWidth; ++x)
+				for( unsigned short x = 0; x < width; ++x)
 				{
-					const unsigned char tPixPair = tSrcLine[x/2];
-					const unsigned char tIndex = (x&1)?(tPixPair&0xF):(tPixPair >> 4);
+					const unsigned char pix_pair = src_line[x/2];
+					const unsigned char index = (x&1)?(pix_pair&0xF):(pix_pair >> 4);
 
-					const unsigned char *tBgra = aPallete.getColor(tIndex);
+					const unsigned char *bgra = pallete.getColor(index);
 
-					if( tBgra )
+					if( bgra )
 					{
 						//bgr(a) ->rgb
-						tDst[0] = tBgra[2];
-						tDst[1] = tBgra[1];
-						tDst[2] = tBgra[0];
+						dst[0] = bgra[2];
+						dst[1] = bgra[1];
+						dst[2] = bgra[0];
 
-						tDst += 3;
+						dst += 3;
 					}
 					else
 					{
@@ -182,40 +182,40 @@ namespace img
 		}
 
 		bool loadColor256(
-			unsigned int aWidth, 
-			unsigned int aHeight,
-			const unsigned char* aSrcBegin,
-			unsigned long aDataSize,
-			const Palette &aPallete,
-			img::Image &aDecoded)
+			unsigned int width, 
+			unsigned int height,
+			const unsigned char* src_begin,
+			unsigned long data_size,
+			const Palette &pallete,
+			img::Image &decoded)
 		{
-			aDecoded.create(aWidth, aHeight, 3);
+			decoded.create(width, height, 3);
 
-			const unsigned int tSrcScanline = correctScanline(aWidth);
+			const unsigned int src_scanline = correctScanline(width);
 
-			if( tSrcScanline * aHeight > aDataSize )
+			if( src_scanline * height > data_size )
 				return false;
 
-			unsigned char* tDst = aDecoded.data();
+			unsigned char* dst = decoded.data();
 
-			for( unsigned short y = 0; y < aHeight; ++y)
+			for( unsigned short y = 0; y < height; ++y)
 			{
-				const unsigned char* tSrcLine = &aSrcBegin[( aHeight - y - 1 )*tSrcScanline];
+				const unsigned char* src_line = &src_begin[( height - y - 1 )*src_scanline];
 
-				for( unsigned short x = 0; x < aWidth; ++x)
+				for( unsigned short x = 0; x < width; ++x)
 				{
-					unsigned char tSrc = tSrcLine[x];
+					unsigned char src = src_line[x];
 
-					const unsigned char *tBgra = aPallete.getColor(tSrc);
+					const unsigned char *bgra = pallete.getColor(src);
 
-					if( tBgra )
+					if( bgra )
 					{
 						//bgr(a) ->rgb
-						tDst[0] = tBgra[2];
-						tDst[1] = tBgra[1];
-						tDst[2] = tBgra[0];
+						dst[0] = bgra[2];
+						dst[1] = bgra[1];
+						dst[2] = bgra[0];
 
-						tDst += 3;
+						dst += 3;
 					}
 					else
 					{
@@ -228,49 +228,49 @@ namespace img
 		}
 
 		bool loadColor16_XXX(
-			unsigned int aWidth, 
-			unsigned int aHeight,
-			const unsigned short* aSrcBegin,
-			unsigned long aDataSize,
-			img::Image &aDecoded,
-			unsigned short aMaskRed,
-			unsigned short aMaskGreen,
-			unsigned short aMaskBlue)
+			unsigned int width, 
+			unsigned int height,
+			const unsigned short* src_begin,
+			unsigned long data_size,
+			img::Image &decoded,
+			unsigned short mask_red,
+			unsigned short mask_green,
+			unsigned short mask_blue)
 		{
-			aDecoded.create(aWidth, aHeight, 3);
+			decoded.create(width, height, 3);
 
-			const unsigned int tSrcScanline = correctScanline(aWidth * 2);
+			const unsigned int src_scanline = correctScanline(width * 2);
 
-			if( tSrcScanline * aHeight > aDataSize )
+			if( src_scanline * height > data_size )
 				return false;
 
-			unsigned short tROff = 0, tGOff = 0, tBOff = 0;
-			while( !((aMaskRed >> tROff) & 1) )
-				++tROff;
-			while( !((aMaskGreen >> tGOff) & 1) )
-				++tGOff;
-			while( !((aMaskBlue >> tBOff) & 1) )
-				++tBOff;
+			unsigned short r_off = 0, g_off = 0, b_off = 0;
+			while( !((mask_red >> r_off) & 1) )
+				++r_off;
+			while( !((mask_green >> g_off) & 1) )
+				++g_off;
+			while( !((mask_blue >> b_off) & 1) )
+				++b_off;
 
-			const unsigned int tRMult = 256 / (aMaskRed >> tROff);
-			const unsigned int tGMult = 256 / (aMaskGreen >> tGOff);
-			const unsigned int tBMult = 256 / (aMaskBlue >> tBOff);
+			const unsigned int r_mult = 256 / (mask_red >> r_off);
+			const unsigned int g_mult = 256 / (mask_green >> g_off);
+			const unsigned int b_mult = 256 / (mask_blue >> b_off);
 
-			unsigned char* tDst = aDecoded.data();
+			unsigned char* dst = decoded.data();
 
-			for( unsigned short y = 0; y < aHeight; ++y)
+			for( unsigned short y = 0; y < height; ++y)
 			{
-				const unsigned short* tSrcLine = &aSrcBegin[( aHeight - y - 1 )*(tSrcScanline/2)];
+				const unsigned short* src_line = &src_begin[( height - y - 1 )*(src_scanline/2)];
 
-				for( unsigned short x = 0; x < aWidth; ++x)
+				for( unsigned short x = 0; x < width; ++x)
 				{
-					unsigned short tSrc = tSrcLine[x];
+					unsigned short src = src_line[x];
 
-					tDst[0] = ((tSrc & aMaskRed) >> tROff) * tRMult;
-					tDst[1] = ((tSrc & aMaskGreen) >> tGOff) * tGMult;
-					tDst[2] = ((tSrc & aMaskBlue) >> tBOff) * tBMult;
+					dst[0] = ((src & mask_red) >> r_off) * r_mult;
+					dst[1] = ((src & mask_green) >> g_off) * g_mult;
+					dst[2] = ((src & mask_blue) >> b_off) * b_mult;
 
-					tDst += 3;
+					dst += 3;
 				}
 			}
 
@@ -278,87 +278,87 @@ namespace img
 		}
 
 		bool loadColor16_555(
-			unsigned int aWidth, 
-			unsigned int aHeight,
-			const unsigned char* aSrcBegin,
-			unsigned long aDataSize,
-			const Palette &/*aPallete*/,
-			img::Image &aDecoded)
+			unsigned int width, 
+			unsigned int height,
+			const unsigned char* src_begin,
+			unsigned long data_size,
+			const Palette &/*pallete*/,
+			img::Image &decoded)
 		{
-			unsigned short tMaskBlue		= 0x1F;
-			unsigned short tMaskGreen	= tMaskBlue << 5;
-			unsigned short tMaskRed		= tMaskBlue << 10;
+			unsigned short mask_blue		= 0x1F;
+			unsigned short mask_green	= mask_blue << 5;
+			unsigned short mask_red		= mask_blue << 10;
 
 			return loadColor16_XXX(
-				aWidth, 
-				aHeight, 
-				reinterpret_cast<const unsigned short *>(aSrcBegin),
-				aDataSize,
-				aDecoded,
-				tMaskRed,
-				tMaskGreen,
-				tMaskBlue);
+				width, 
+				height, 
+				reinterpret_cast<const unsigned short *>(src_begin),
+				data_size,
+				decoded,
+				mask_red,
+				mask_green,
+				mask_blue);
 		}
 
 		bool loadColor16_XXX(
-			unsigned int aWidth, 
-			unsigned int aHeight,
-			const unsigned char* aSrcBegin,
-			unsigned long aDataSize,
-			const Palette &aPallete,
-			img::Image &aDecoded)
+			unsigned int width, 
+			unsigned int height,
+			const unsigned char* src_begin,
+			unsigned long data_size,
+			const Palette &pallete,
+			img::Image &decoded)
 		{
-			if( aPallete.size < 3 )
+			if( pallete.size < 3 )
 				return false;
 
-			unsigned short tMaskRed = *(reinterpret_cast<const unsigned short *>(aPallete.getColor(0)));
-			unsigned short tMaskGreen = *(reinterpret_cast<const unsigned short *>(aPallete.getColor(1)));
-			unsigned short tMaskBlue = *(reinterpret_cast<const unsigned short *>(aPallete.getColor(2)));
+			unsigned short mask_red = *(reinterpret_cast<const unsigned short *>(pallete.getColor(0)));
+			unsigned short mask_green = *(reinterpret_cast<const unsigned short *>(pallete.getColor(1)));
+			unsigned short mask_blue = *(reinterpret_cast<const unsigned short *>(pallete.getColor(2)));
 
 			
 			return loadColor16_XXX(
-				aWidth, 
-				aHeight, 
-				reinterpret_cast<const unsigned short *>(aSrcBegin),
-				aDataSize,
-				aDecoded,
-				tMaskRed,
-				tMaskGreen,
-				tMaskBlue);
+				width, 
+				height, 
+				reinterpret_cast<const unsigned short *>(src_begin),
+				data_size,
+				decoded,
+				mask_red,
+				mask_green,
+				mask_blue);
 		}
 
 		bool loadColorFull(
-			unsigned int aWidth, 
-			unsigned int aHeight,
-			const unsigned char* aSrcBegin,
-			unsigned long aDataSize,
-			unsigned short aBytePerPixel,
-			img::Image &aDecoded)
+			unsigned int width, 
+			unsigned int height,
+			const unsigned char* src_begin,
+			unsigned long data_size,
+			unsigned short byte_per_pixel,
+			img::Image &decoded)
 		{
-			aDecoded.create(aWidth, aHeight, aBytePerPixel );
+			decoded.create(width, height, byte_per_pixel );
 
-			const unsigned int tSrcScanline = correctScanline(aWidth * aBytePerPixel);
+			const unsigned int src_scanline = correctScanline(width * byte_per_pixel);
 
-			if( tSrcScanline * aHeight > aDataSize )
+			if( src_scanline * height > data_size )
 				return false;
 
-			unsigned char* tDst = aDecoded.data();
+			unsigned char* dst = decoded.data();
 
-			for( unsigned short y = 0; y < aHeight; ++y)
+			for( unsigned short y = 0; y < height; ++y)
 			{
-				const unsigned char* tSrc = &aSrcBegin[( aHeight - y - 1 ) * tSrcScanline];
+				const unsigned char* src = &src_begin[( height - y - 1 ) * src_scanline];
 
-				for( unsigned short x = 0; x < aWidth; ++x)
+				for( unsigned short x = 0; x < width; ++x)
 				{
-					tDst[0]	= tSrc[2];
-					tDst[1]	= tSrc[1];
-					tDst[2]	= tSrc[0];
+					dst[0]	= src[2];
+					dst[1]	= src[1];
+					dst[2]	= src[0];
 
-					if( 4 == aBytePerPixel )
-						tDst[3]	= tSrc[3];
+					if( 4 == byte_per_pixel )
+						dst[3]	= src[3];
 
-					tDst += aBytePerPixel;
-					tSrc += aBytePerPixel;
+					dst += byte_per_pixel;
+					src += byte_per_pixel;
 				}
 			}
 
@@ -366,87 +366,87 @@ namespace img
 		}
 
 		bool loadColorFull24(
-			unsigned int aWidth, 
-			unsigned int aHeight,
-			const unsigned char* aSrcBegin,
-			unsigned long aDataSize,
-			img::Image &aDecoded)
+			unsigned int width, 
+			unsigned int height,
+			const unsigned char* src_begin,
+			unsigned long data_size,
+			img::Image &decoded)
 		{
-			return loadColorFull(aWidth, aHeight, aSrcBegin, aDataSize, 3, aDecoded);
+			return loadColorFull(width, height, src_begin, data_size, 3, decoded);
 		}
 
 		bool loadColorFull32(
-			unsigned int aWidth, 
-			unsigned int aHeight,
-			const unsigned char* aSrcBegin,
-			unsigned long aDataSize,
-			img::Image &aDecoded)
+			unsigned int width, 
+			unsigned int height,
+			const unsigned char* src_begin,
+			unsigned long data_size,
+			img::Image &decoded)
 		{
-			return loadColorFull(aWidth, aHeight, aSrcBegin, aDataSize, 4, aDecoded);
+			return loadColorFull(width, height, src_begin, data_size, 4, decoded);
 		}
 
-		virtual bool decode(const tools::ByteArray &aEncoded, img::Image &aDecoded)
+		virtual bool decode(const tools::ByteArray &encoded, img::Image &decoded)
 		{
 			STATIC_ASSERT( (sizeof(BITMAPFILEHEADER) == 14), Header_size_mismatch );
 			STATIC_ASSERT( (sizeof(BITMAPINFOHEADER) == 40), Info_size_mismatch );
 
 			// TODO: check size
-			BITMAPFILEHEADER tHeader = {0};
-			if( !fromByteArray(aEncoded, tHeader) ||
-				tHeader.type != BmpType )
+			BITMAPFILEHEADER header = {0};
+			if( !fromByteArray(encoded, header) ||
+				header.type != BmpType )
 				return false;
 
-			BITMAPINFOHEADER tInfo = {0};
-			if( !fromByteArray(aEncoded, sizeof(BITMAPFILEHEADER), tInfo) )
+			BITMAPINFOHEADER info = {0};
+			if( !fromByteArray(encoded, sizeof(BITMAPFILEHEADER), info) )
 				return false;
 
-			if( tInfo.compression != NoCompression &&
-				!( tInfo.bitCount == 16 && tInfo.compression == BitFields ) 
+			if( info.compression != NoCompression &&
+				!( info.bitCount == 16 && info.compression == BitFields ) 
 				)
 				return false;
 
-			const unsigned int tWidth			= tInfo.width;
-			const unsigned int tHeight			= std::abs(tInfo.height);
+			const unsigned int width			= info.width;
+			const unsigned int height			= std::abs(info.height);
 
-			const unsigned int tPaletteBegin	= sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
-			const unsigned int tPaletteSize		= tHeader.offBits - tPaletteBegin;
+			const unsigned int palette_begin	= sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+			const unsigned int palette_size		= header.offBits - palette_begin;
 
-			if( aEncoded.getSize() < tPaletteBegin || 
-				aEncoded.getSize() < tHeader.offBits )
+			if( encoded.getSize() < palette_begin || 
+				encoded.getSize() < header.offBits )
 				return false;
 
-			const Palette tPalette(aEncoded.getData() + tPaletteBegin, tPaletteSize);
+			const Palette palette(encoded.getData() + palette_begin, palette_size);
 
-			const unsigned char *tDataBegin = aEncoded.getData() + tHeader.offBits;
-			const unsigned int tDataSize = aEncoded.getSize() - tHeader.offBits;
+			const unsigned char *data_begin = encoded.getData() + header.offBits;
+			const unsigned int data_size = encoded.getSize() - header.offBits;
 
-			if( tDataSize != tInfo.sizeImage ||
-				tWidth > tDataSize || 
-				tHeight > tDataSize )
+			if( data_size != info.sizeImage ||
+				width > data_size || 
+				height > data_size )
 				return false;
 
-			switch( tInfo.bitCount )
+			switch( info.bitCount )
 			{
 			case 1:
-				return loadMono(tWidth, tHeight, tDataBegin, tInfo.sizeImage, tPalette, aDecoded);
+				return loadMono(width, height, data_begin, info.sizeImage, palette, decoded);
 
 			case 4:
-				return loadColor16(tWidth, tHeight, tDataBegin, tInfo.sizeImage, tPalette, aDecoded);
+				return loadColor16(width, height, data_begin, info.sizeImage, palette, decoded);
 
 			case 8:
-				return loadColor256(tWidth, tHeight, tDataBegin, tInfo.sizeImage, tPalette, aDecoded);
+				return loadColor256(width, height, data_begin, info.sizeImage, palette, decoded);
 
 			case 16:
-				if( tInfo.compression == NoCompression )
-					return loadColor16_555(tWidth, tHeight, tDataBegin, tInfo.sizeImage, tPalette, aDecoded);
+				if( info.compression == NoCompression )
+					return loadColor16_555(width, height, data_begin, info.sizeImage, palette, decoded);
 				else
-					return loadColor16_XXX(tWidth, tHeight, tDataBegin, tInfo.sizeImage, tPalette, aDecoded);
+					return loadColor16_XXX(width, height, data_begin, info.sizeImage, palette, decoded);
 
 			case 24:
-				return loadColorFull24(tWidth, tHeight, tDataBegin, tInfo.sizeImage, aDecoded);
+				return loadColorFull24(width, height, data_begin, info.sizeImage, decoded);
 
 			case 32:
-				return loadColorFull32(tWidth, tHeight, tDataBegin, tInfo.sizeImage, aDecoded);
+				return loadColorFull32(width, height, data_begin, info.sizeImage, decoded);
 			}
 
 			return false;

@@ -23,72 +23,72 @@ namespace
 	class RotateFixture
 	{
 	public:
-		img::Image mImage;
+		img::Image image_;
 
 		virtual color::Rgba pixelFor(
 			unsigned int x, 
 			unsigned int y, 
 			unsigned int w) = 0;
 
-		void create(int aDepth)
+		void create(int depth)
 		{
-			mImage.create(Width, Height, 3);
+			image_.create(Width, Height, 3);
 
-			unsigned int h = mImage.height();
-			unsigned int w = mImage.width();
+			unsigned int h = image_.height();
+			unsigned int w = image_.width();
 			for( unsigned int y = 0; y < h; ++y )
 			{
 				for( unsigned int x = 0; x < w; ++x )
 				{
-					mImage.setPixel(x, y, pixelFor(x, y, w));
+					image_.setPixel(x, y, pixelFor(x, y, w));
 				}
 			}
 		}
 
 		void check90()
 		{
-			BOOST_CHECK_EQUAL(mImage.width(), Height);
-			BOOST_CHECK_EQUAL(mImage.height(), Width);
+			BOOST_CHECK_EQUAL(image_.width(), Height);
+			BOOST_CHECK_EQUAL(image_.height(), Width);
 
-			unsigned int h = mImage.height();
-			unsigned int w = mImage.width();
+			unsigned int h = image_.height();
+			unsigned int w = image_.width();
 			for( unsigned int y = 0; y < h; ++y )
 			{
 				for( unsigned int x = 0; x < w; ++x )
 				{
-					BOOST_CHECK(pixelFor(y, w - x - 1, h) == mImage.getPixel(x, y));
+					BOOST_CHECK(pixelFor(y, w - x - 1, h) == image_.getPixel(x, y));
 				}
 			}
 		}
 
 		void check180()
 		{
-			BOOST_CHECK_EQUAL(mImage.width(), Width);
-			BOOST_CHECK_EQUAL(mImage.height(), Height);
+			BOOST_CHECK_EQUAL(image_.width(), Width);
+			BOOST_CHECK_EQUAL(image_.height(), Height);
 
-			unsigned int h = mImage.height();
-			unsigned int w = mImage.width();
+			unsigned int h = image_.height();
+			unsigned int w = image_.width();
 			for( unsigned int y = 0; y < h; ++y )
 			{
 				for( unsigned int x = 0; x < w; ++x )
 				{
-					BOOST_CHECK(pixelFor(w - x - 1, h - y - 1, w) == mImage.getPixel(x, y));
+					BOOST_CHECK(pixelFor(w - x - 1, h - y - 1, w) == image_.getPixel(x, y));
 				}
 			}
 		}
 
 		void check270()
 		{
-			BOOST_CHECK_EQUAL(mImage.width(), Height);
-			BOOST_CHECK_EQUAL(mImage.height(), Width);
+			BOOST_CHECK_EQUAL(image_.width(), Height);
+			BOOST_CHECK_EQUAL(image_.height(), Width);
 
-			unsigned int h = mImage.height();
-			unsigned int w = mImage.width();
+			unsigned int h = image_.height();
+			unsigned int w = image_.width();
 			for( unsigned int y = 0; y < h; ++y )
 			{
 				for( unsigned int x = 0; x < w; ++x )
 				{
-					BOOST_CHECK(pixelFor(h - y - 1, x, h) == mImage.getPixel(x, y));
+					BOOST_CHECK(pixelFor(h - y - 1, x, h) == image_.getPixel(x, y));
 				}
 			}
 		}
@@ -101,15 +101,15 @@ namespace
 			unsigned int y, 
 			unsigned int w)
 		{
-			unsigned int tPos = y * w + x;
+			unsigned int pos = y * w + x;
 
-			color::Rgb tResult;
+			color::Rgb result;
 
-			tResult.setRed(tPos % 256);
-			tResult.setGreen((tPos / 256) % 256);
-			tResult.setBlue(tPos / (256 * 256));
+			result.setRed(pos % 256);
+			result.setGreen((pos / 256) % 256);
+			result.setBlue(pos / (256 * 256));
 
-			return tResult;
+			return result;
 			
 		}
 	};
@@ -123,13 +123,13 @@ namespace
 			unsigned int y, 
 			unsigned int w)
 		{
-			unsigned int tPos = y * w + x;
+			unsigned int pos = y * w + x;
 
-			color::Gray tResult;
+			color::Gray result;
 
-			tResult.set(tPos % 256);
+			result.set(pos % 256);
 
-			return tResult;
+			return result;
 
 		}
 	};
@@ -145,7 +145,7 @@ namespace test
 	{
 		create(3);
 
-		mImage = img::rotate(mImage, img::Angle_90);
+		image_ = img::rotate(image_, img::Angle_90);
 
 		check90();
 	}
@@ -154,7 +154,7 @@ namespace test
 	{
 		create(3);
 
-		mImage = img::rotate(mImage, img::Angle_180);
+		image_ = img::rotate(image_, img::Angle_180);
 
 		check180();
 	}
@@ -163,7 +163,7 @@ namespace test
 	{
 		create(3);
 
-		mImage = img::rotate(mImage, img::Angle_270);
+		image_ = img::rotate(image_, img::Angle_270);
 
 		check270();
 	}
@@ -174,7 +174,7 @@ namespace test
 	{
 		create(3);
 
-		img::rotate(mImage, mImage, img::Angle_90);
+		img::rotate(image_, image_, img::Angle_90);
 
 		check90();
 	}
@@ -183,7 +183,7 @@ namespace test
 	{
 		create(3);
 
-		img::rotate(mImage, mImage, img::Angle_180);
+		img::rotate(image_, image_, img::Angle_180);
 
 		check180();
 	}
@@ -192,7 +192,7 @@ namespace test
 	{
 		create(3);
 
-		img::rotate(mImage, mImage, img::Angle_270);
+		img::rotate(image_, image_, img::Angle_270);
 
 		check270();
 	}
@@ -203,7 +203,7 @@ namespace test
 	{
 		create(1);
 
-		mImage = img::rotate(mImage, img::Angle_90);
+		image_ = img::rotate(image_, img::Angle_90);
 
 		check90();
 	}
@@ -212,7 +212,7 @@ namespace test
 	{
 		create(1);
 
-		mImage = img::rotate(mImage, img::Angle_180);
+		image_ = img::rotate(image_, img::Angle_180);
 
 		check180();
 	}
@@ -221,7 +221,7 @@ namespace test
 	{
 		create(1);
 
-		mImage = img::rotate(mImage, img::Angle_270);
+		image_ = img::rotate(image_, img::Angle_270);
 
 		check270();
 	}
@@ -232,7 +232,7 @@ namespace test
 	{
 		create(1);
 
-		img::rotate(mImage, mImage, img::Angle_90);
+		img::rotate(image_, image_, img::Angle_90);
 
 		check90();
 	}
@@ -241,7 +241,7 @@ namespace test
 	{
 		create(1);
 
-		img::rotate(mImage, mImage, img::Angle_180);
+		img::rotate(image_, image_, img::Angle_180);
 
 		check180();
 	}
@@ -250,7 +250,7 @@ namespace test
 	{
 		create(1);
 
-		img::rotate(mImage, mImage, img::Angle_270);
+		img::rotate(image_, image_, img::Angle_270);
 
 		check270();
 	}

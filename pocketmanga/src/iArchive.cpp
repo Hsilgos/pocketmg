@@ -9,65 +9,65 @@ namespace archive
 	class ArchiveFactory
 	{
 		typedef std::map<std::string, IArchive::FactoryMethod> Archivers;
-		Archivers mArchivers;
+		Archivers archivers_;
 	public:
 		static ArchiveFactory &instance()
 		{
-			static ArchiveFactory tInst;
-			return tInst;
+			static ArchiveFactory inst;
+			return inst;
 		}
 
-		void registerArchiver(const std::string &aPrefExt, IArchive::FactoryMethod aMethod)
+		void registerArchiver(const std::string &pref_ext, IArchive::FactoryMethod method)
 		{
-			mArchivers[aPrefExt] = aMethod;
+			archivers_[pref_ext] = method;
 		}
 
-		void unregisterArchiver(const std::string &aPrefExt)
+		void unregisterArchiver(const std::string &pref_ext)
 		{
-			mArchivers.erase(aPrefExt);
+			archivers_.erase(pref_ext);
 		}
 
-		IArchive *recognize(const fs::FilePath &aPath) const
+		IArchive *recognize(const fs::FilePath &path) const
 		{
-			if( aPath.isDirectory() )
+			if( path.isDirectory() )
 				return 0;
 
-			const std::string tExt = aPath.getExtension();
+			const std::string ext = path.getExtension();
 
-			std::auto_ptr<IArchive> tConcArch;
+			std::auto_ptr<IArchive> conc_arch;
 
-			Archivers::const_iterator itExt = mArchivers.find(tExt);
-			if( itExt != mArchivers.end() )
+			Archivers::const_iterator itExt = archivers_.find(ext);
+			if( itExt != archivers_.end() )
 			{
-				tConcArch.reset( itExt->second() );
-				if( tConcArch->open(aPath.getPath()) )
-					return tConcArch.release();
+				conc_arch.reset( itExt->second() );
+				if( conc_arch->open(path.getPath()) )
+					return conc_arch.release();
 			}
 
 			for( 
-				Archivers::const_iterator it = mArchivers.begin(), itEnd = mArchivers.end(); it != itEnd; ++it )
+				Archivers::const_iterator it = archivers_.begin(), itEnd = archivers_.end(); it != itEnd; ++it )
 			{
-				tConcArch.reset( it->second() );
-				if( tConcArch->open(aPath.getPath()) )
-					return tConcArch.release();
+				conc_arch.reset( it->second() );
+				if( conc_arch->open(path.getPath()) )
+					return conc_arch.release();
 			}
 
 			return 0;
 		}
 	};
 
-	void IArchive::registerArchiver(const std::string &aPrefExt, IArchive::FactoryMethod aMethod)
+	void IArchive::registerArchiver(const std::string &pref_ext, IArchive::FactoryMethod method)
 	{
-		ArchiveFactory::instance().registerArchiver(aPrefExt, aMethod);
+		ArchiveFactory::instance().registerArchiver(pref_ext, method);
 	}
 
-	void IArchive::unregisterArchiver(const std::string &aPrefExt)
+	void IArchive::unregisterArchiver(const std::string &pref_ext)
 	{
-		ArchiveFactory::instance().unregisterArchiver(aPrefExt);
+		ArchiveFactory::instance().unregisterArchiver(pref_ext);
 	}
 
-	IArchive *recognize(const fs::FilePath &aPath)
+	IArchive *recognize(const fs::FilePath &path)
 	{
-		return ArchiveFactory::instance().recognize(aPath);
+		return ArchiveFactory::instance().recognize(path);
 	}
 }

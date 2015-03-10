@@ -16,56 +16,56 @@ namespace fs
 	{
 		class FileManagerLin: public IFileManager
 		{
-			void appendFileName(std::string &aParent, const std::string &aFile)
+			void appendFileName(std::string &parent, const std::string &file)
 			{
-				if( aParent.empty() )
-					aParent = aFile;
+				if( parent.empty() )
+					parent = file;
 
-				if( aParent[aParent.size() - 1] != '\\' && aParent[aParent.size() - 1] != '/' )
-					aParent.append("/");
+				if( parent[parent.size() - 1] != '\\' && parent[parent.size() - 1] != '/' )
+					parent.append("/");
 
-				aParent.append(aFile);
+				parent.append(file);
 			}
 
-			void doGetFileList(std::vector<fs::FilePath> &aResult , const std::string &aRoot, EntryTypes aEntries, bool aRecursive)
+			void doGetFileList(std::vector<fs::FilePath> &result , const std::string &root, EntryTypes entries, bool recursive)
 			{
 				struct dirent *dp;
-				DIR *dir = opendir(aRoot.c_str());
+				DIR *dir = opendir(root.c_str());
 				if( !dir )
 					return;
 
 				while ((dp=readdir(dir)) != NULL)
 				{
-					std::string tFullPath = aRoot;
-					const std::string tName = dp->d_name;
+					std::string full_path = root;
+					const std::string name = dp->d_name;
 
-					const bool tIsDir = (dp->d_type == DT_DIR);
+					const bool is_dir = (dp->d_type == DT_DIR);
 
-					if( !tName.empty() && tName != "." && tName != ".." )
+					if( !name.empty() && name != "." && name != ".." )
 					{
-						appendFileName(tFullPath, tName);
+						appendFileName(full_path, name);
 
-						fs::FilePath tPath(tFullPath, !tIsDir );
+						fs::FilePath path(full_path, !is_dir );
 
-						if( (aEntries & IFileManager::File) && !tIsDir )
-							aResult.push_back(tPath);
+						if( (entries & IFileManager::File) && !is_dir )
+							result.push_back(path);
 
-						if( (aEntries & IFileManager::Directory) && tIsDir )
-							aResult.push_back(tPath);
+						if( (entries & IFileManager::Directory) && is_dir )
+							result.push_back(path);
 
-						if( aRecursive && tIsDir )
-							doGetFileList(aResult, tFullPath, aEntries, aRecursive);
+						if( recursive && is_dir )
+							doGetFileList(result, full_path, entries, recursive);
 
 					};
 				}
 				closedir(dir);
 			}
 
-			virtual std::vector<fs::FilePath> getFileList(const fs::FilePath &aRoot, EntryTypes aEntries, bool aRecursive)
+			virtual std::vector<fs::FilePath> getFileList(const fs::FilePath &root, EntryTypes entries, bool recursive)
 			{
-				std::vector<fs::FilePath> tResult;
-				doGetFileList(tResult ,aRoot.getPath(), aEntries, aRecursive);
-				return tResult;
+				std::vector<fs::FilePath> result;
+				doGetFileList(result ,root.getPath(), entries, recursive);
+				return result;
 			}
 		};
 	}

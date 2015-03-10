@@ -20,35 +20,35 @@ namespace
 {
 	class HighTime
 	{
-		ULONG     mPrevious;
+		ULONG     previous_;
 
 		typedef LONG (__stdcall  *NtQueryTimerResolutionFun) (PULONG, PULONG, PULONG);
 		typedef LONG (__stdcall  *NtSetTimerResolutionFun) (ULONG,BOOLEAN,PULONG);
 
 		NtSetTimerResolutionFun SetFun;
 		NtQueryTimerResolutionFun QueryFun;
-		HMODULE mNtDll;
+		HMODULE nt_dll_;
 
 		static const ULONG DesiredDelay = 10000;//ns
 	public:
 		HighTime()
-			:SetFun(0), QueryFun(0), mNtDll(0)
+			:SetFun(0), QueryFun(0), nt_dll_(0)
 		{
-			mNtDll = LoadLibrary(L"ntdll.dll");
+			nt_dll_ = LoadLibrary(L"ntdll.dll");
 
-			if( mNtDll )
+			if( nt_dll_ )
 			{
-				QueryFun = (NtQueryTimerResolutionFun)GetProcAddress (mNtDll, "NtQueryTimerResolution");
-				SetFun = (NtSetTimerResolutionFun)GetProcAddress (mNtDll, "NtSetTimerResolution");
+				QueryFun = (NtQueryTimerResolutionFun)GetProcAddress (nt_dll_, "NtQueryTimerResolution");
+				SetFun = (NtSetTimerResolutionFun)GetProcAddress (nt_dll_, "NtSetTimerResolution");
 
 				if( QueryFun && SetFun )
 				{
-					ULONG tMaxDelay = 0, tMinDelay = 0, tCurrDelay = 0;
-					QueryFun(&tMaxDelay, &tMinDelay, &tCurrDelay);
+					ULONG max_delay = 0, min_delay = 0, curr_delay = 0;
+					QueryFun(&max_delay, &min_delay, &curr_delay);
 
-					tCurrDelay = std::min(std::max(DesiredDelay, tMinDelay), tMaxDelay);
+					curr_delay = std::min(std::max(DesiredDelay, min_delay), max_delay);
 
-					SetFun(tCurrDelay, TRUE, &mPrevious);
+					SetFun(curr_delay, TRUE, &previous_);
 				}
 			}
 		}
@@ -56,7 +56,7 @@ namespace
 		~HighTime()
 		{
 			if( QueryFun && SetFun )
-				SetFun(mPrevious, TRUE, &mPrevious);
+				SetFun(previous_, TRUE, &previous_);
 		}
 	};
 }
@@ -76,15 +76,15 @@ namespace
 {
 	boost::shared_ptr<HighTime> initHighTiming()
 	{
-		static boost::weak_ptr<HighTime> tTime;
-		boost::shared_ptr<HighTime> tResult = tTime.lock();
-		if( !tResult )
+		static boost::weak_ptr<HighTime> time;
+		boost::shared_ptr<HighTime> result = time.lock();
+		if( !result )
 		{
-			tResult.reset(new HighTime);
-			tTime = tResult;
+			result.reset(new HighTime);
+			time = result;
 		}
 
-		return tResult;
+		return result;
 	}
 }
 
@@ -95,32 +95,32 @@ namespace test
 	}
 
 		
-	void Printout::started(int aCount)
+	void Printout::started(int count)
 	{
-		std::stringstream tOut;
+		std::stringstream out;
 
-		if( aCount > 1 )
-			tOut << "-->Start benchmark '" << format_.str() << "', repeate " << aCount << " times" << " ...";
+		if( count > 1 )
+			out << "-->Start benchmark '" << format_.str() << "', repeate " << count << " times" << " ...";
 		else
-			tOut << "-->Start benchmark '" << format_.str() << "' ...";
+			out << "-->Start benchmark '" << format_.str() << "' ...";
 
-		BOOST_TEST_MESSAGE( tOut.str() );
+		BOOST_TEST_MESSAGE( out.str() );
 	}
-	void Printout::finished(boost::int64_t aMilliseconds)
+	void Printout::finished(boost::int64_t milliseconds)
 	{
-		std::stringstream tOut;
+		std::stringstream out;
 
-		tOut 
+		out 
 			<< "<--Benchmark '"
 			<< format_.str() 
 			<<"' finished, total milliseconds: "
-			<< aMilliseconds;
+			<< milliseconds;
 
-		BOOST_TEST_MESSAGE( tOut.str() );
+		BOOST_TEST_MESSAGE( out.str() );
 	}
 
-	Printout::Printout(const char *aName)
-		:format_(aName)
+	Printout::Printout(const char *name)
+		:format_(name)
 	{
 	}
 
@@ -137,40 +137,40 @@ namespace test
 		std::auto_ptr<IBenchmarkOutput> output;
 	};
 
-	void TestBenchmark::init(IBenchmarkOutput &aOutput, int aCount)
+	void TestBenchmark::init(IBenchmarkOutput &output, int count)
 	{
 		private_ = new Private;
 
 		private_->hightTiming = initHighTiming();
 
-		private_->output.reset(aOutput.clone());
-		private_->count		= aCount;
+		private_->output.reset(output.clone());
+		private_->count		= count;
 		private_->startTime	= tools::get_system_time();
 
-		private_->output->started(aCount);
+		private_->output->started(count);
 	}
 
-	TestBenchmark::TestBenchmark(const char *aName, int aCount)
+	TestBenchmark::TestBenchmark(const char *name, int count)
 	{
-		init(Printout(aName), aCount);
+		init(Printout(name), count);
 	}
 
-	TestBenchmark::TestBenchmark(IBenchmarkOutput &aOutput, int aCount)
+	TestBenchmark::TestBenchmark(IBenchmarkOutput &output, int count)
 	{
-		init(aOutput, aCount);
+		init(output, count);
 	}
 
 	TestBenchmark::~TestBenchmark()
 	{
 		private_->finishTime = tools::get_system_time();
 
-		btime::time_duration tDuration 
+		btime::time_duration duration 
 			= private_->finishTime - private_->startTime;
 
-		btime::time_duration::tick_type tTicks 
-			= tDuration.total_milliseconds();
+		btime::time_duration::tick_type ticks 
+			= duration.total_milliseconds();
 
-		private_->output->finished(tTicks);
+		private_->output->finished(ticks);
 
 		delete private_;
 	}

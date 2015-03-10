@@ -16,10 +16,10 @@ namespace test
 		tfs.addFolder("/abc/def");
 		tfs.addFile("/ghi/jkl/nmo.txt", tools::toByteArray("nmo file content"));
 
-		TestArchive tArch("archive.testarch");
-		tArch.addFile("test1.txt");
-		tArch.addFile("test2.txt");
-		tfs.addArchive("/path/to/archive", tArch);
+		TestArchive arch("archive.testarch");
+		arch.addFile("test1.txt");
+		arch.addFile("test2.txt");
+		tfs.addArchive("/path/to/archive", arch);
 
 		BOOST_CHECK( !tfs.findDirByPath("/not/existing/path", true) );
 		BOOST_CHECK( !tfs.findDirByPath("/not/existing/path", false) );
@@ -46,37 +46,37 @@ namespace test
 	BOOST_AUTO_TEST_CASE( TestsForTestArchive )
 	{
 		std::auto_ptr<TestFileSystem> tfs(new TestFileSystem);
-		TestArchiver tArchiver(tfs.get());
+		TestArchiver archiver(tfs.get());
 
-		TestArchive tArch("archive.testarch");
-		tArch.addFile("test1.txt");
-		tArch.addFile("test2.txt", tools::toByteArray("archive file 2 content"));
-		tArch.addFile("test3.txt");
+		TestArchive arch("archive.testarch");
+		arch.addFile("test1.txt");
+		arch.addFile("test2.txt", tools::toByteArray("archive file 2 content"));
+		arch.addFile("test3.txt");
 
-		tfs->addArchive("/path/to/archive", tArch);
+		tfs->addArchive("/path/to/archive", arch);
 
-		BOOST_CHECK( !tArchiver.open("/some/path/archive.rar") );
-		BOOST_CHECK( !tArchiver.open("/path/to/archive/archive.rar") );
-		BOOST_CHECK( tArchiver.open("/path/to/archive/archive.testarch") );
-		std::vector<fs::FilePath> tFilesInArch = tArchiver.getFileList(true);
-		BOOST_CHECK_EQUAL(tFilesInArch.size(), 3);
-		std::sort(tFilesInArch.begin(), tFilesInArch.end());
-		BOOST_CHECK_EQUAL(tFilesInArch[0].getPath(), "test1.txt");
-		BOOST_CHECK_EQUAL(tFilesInArch[1].getPath(), "test2.txt");
-		BOOST_CHECK_EQUAL(tFilesInArch[2].getPath(), "test3.txt");
+		BOOST_CHECK( !archiver.open("/some/path/archive.rar") );
+		BOOST_CHECK( !archiver.open("/path/to/archive/archive.rar") );
+		BOOST_CHECK( archiver.open("/path/to/archive/archive.testarch") );
+		std::vector<fs::FilePath> files_in_arch = archiver.getFileList(true);
+		BOOST_CHECK_EQUAL(files_in_arch.size(), 3);
+		std::sort(files_in_arch.begin(), files_in_arch.end());
+		BOOST_CHECK_EQUAL(files_in_arch[0].getPath(), "test1.txt");
+		BOOST_CHECK_EQUAL(files_in_arch[1].getPath(), "test2.txt");
+		BOOST_CHECK_EQUAL(files_in_arch[2].getPath(), "test3.txt");
 
 		BOOST_CHECK_EQUAL(
-			tools::byteArray2string(tArchiver.getFile(fs::FilePath("test2.txt", true), 1000)), 
+			tools::byteArray2string(archiver.getFile(fs::FilePath("test2.txt", true), 1000)), 
 			"archive file 2 content");
 	}
 
-	void checkPath3(const std::string &aPath )
+	void checkPath3(const std::string &path )
 	{
-		fs::FilePath tfn1(aPath, true);
+		fs::FilePath tfn1(path, true);
 
 		BOOST_CHECK( !tfn1.empty() );
 		BOOST_CHECK_EQUAL( tfn1.getLevel(), 3 );
-		BOOST_CHECK_EQUAL( tfn1.getPath(), aPath );
+		BOOST_CHECK_EQUAL( tfn1.getPath(), path );
 
 		BOOST_CHECK_EQUAL( tfn1.getName(0), "abc" );
 		BOOST_CHECK_EQUAL( tfn1.getName(1), "def" );
@@ -221,11 +221,11 @@ namespace test
 			fs::FilePath("/some/dir", false)));
 	}
 
-	bool CheckStartsWith(const char *aPath1, const char *aPath2, size_t aLevel, bool aFromBack)
+	bool CheckStartsWith(const char *path1, const char *path2, size_t level, bool from_back)
 	{
-		fs::FilePath tfpath1(aPath1, false);
-		fs::FilePath tfpath2(aPath2, false);
-		return tfpath1.startsWith(tfpath2, aLevel, aFromBack);
+		fs::FilePath tfpath1(path1, false);
+		fs::FilePath tfpath2(path2, false);
+		return tfpath1.startsWith(tfpath2, level, from_back);
 	}
 
 	BOOST_AUTO_TEST_CASE( StartsWith )
@@ -242,11 +242,11 @@ namespace test
 	}
 
 	fs::FilePath CheckCommonPath(
-		const char *aPath1, bool aIsFile1,
-		const char *aPath2, bool aIsFile2)
+		const char *path1, bool is_file1,
+		const char *path2, bool is_file2)
 	{
-		fs::FilePath tfpath1(aPath1, aIsFile1);
-		fs::FilePath tfpath2(aPath2, aIsFile2);
+		fs::FilePath tfpath1(path1, is_file1);
+		fs::FilePath tfpath2(path2, is_file2);
 
 		return FindCommonPath(tfpath1, tfpath2);
 	}

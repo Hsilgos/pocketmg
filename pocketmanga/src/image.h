@@ -42,28 +42,28 @@ namespace img
 
 	class Image
 	{
-		tools::ByteArray	mData;
+		tools::ByteArray	data_;
 
-		utils::Size			mSize;
-		unsigned short		mDepth;
+		utils::Size			size_;
+		unsigned short		depth_;
 
-		bool mEnableMinRealloc;
+		bool enable_min_realloc_;
 	public:
 		typedef utils::Size::SizeType SizeType;
 
 		Image();
 		~Image();
 
-		Image(SizeType aWidth, SizeType aHeight, unsigned short aDepth);
+		Image(SizeType width, SizeType height, unsigned short depth);
 
-		bool load(const tools::ByteArray &aBuffer);
-		bool load(const std::string &aFileExt, const tools::ByteArray &aBuffer);
+		bool load(const tools::ByteArray &buffer);
+		bool load(const std::string &file_ext, const tools::ByteArray &buffer);
 
-		static Image loadFrom(const tools::ByteArray &aBuffer);
-		static Image loadFrom(const std::string &aFileExt, const tools::ByteArray &aBuffer);
+		static Image loadFrom(const tools::ByteArray &buffer);
+		static Image loadFrom(const std::string &file_ext, const tools::ByteArray &buffer);
 
-		void create(SizeType aWidth, SizeType aHeight, unsigned short aDepth);
-		void createSame(const Image &aOther);
+		void create(SizeType width, SizeType height, unsigned short depth);
+		void createSame(const Image &other);
 		void destroy();
 		bool empty() const;
 
@@ -73,24 +73,24 @@ namespace img
 		unsigned short depth() const;
 		SizeType scanline() const;
 
-		void setDepth(unsigned short aDepth);
-		void setWidth(SizeType aWidth);
-		void setHeight(SizeType aHeight);
+		void setDepth(unsigned short depth);
+		void setWidth(SizeType width);
+		void setHeight(SizeType height);
 
-		void swap(Image &aOther);
+		void swap(Image &other);
 
 		color::Rgba getPixel(SizeType x, SizeType y) const;
-		void setPixel(SizeType x, SizeType y, const color::Rgba& aRgb);
-		void setPixel(SizeType x, SizeType y, const color::Gray& aGrey);
+		void setPixel(SizeType x, SizeType y, const color::Rgba& rgb);
+		void setPixel(SizeType x, SizeType y, const color::Gray& grey);
 
-		//void moveTo(Image &aOther);
-		//void copyTo(Image &aOther) const;
+		//void moveTo(Image &other);
+		//void copyTo(Image &other) const;
 
-		void enableMinimumReallocations(bool aEnable);
+		void enableMinimumReallocations(bool enable);
 
-		// aOffset in bytes
-		unsigned char *data(SizeType aOffset = 0);
-		const unsigned char *data(SizeType aOffset = 0) const;
+		// offset in bytes
+		unsigned char *data(SizeType offset = 0);
+		const unsigned char *data(SizeType offset = 0) const;
 
 		static const Image emptyImage;
 
@@ -98,14 +98,14 @@ namespace img
 //		const ibitmap *native() const;
 	};
 
-	utils::Rect getRect(const Image &aSrc);
+	utils::Rect getRect(const Image &src);
 
-	bool toGray(const Image &aSrc, Image &aDst);
+	bool toGray(const Image &src, Image &dst);
 
-	bool toBgr(const Image &aSrc, Image &aDst);
+	bool toBgr(const Image &src, Image &dst);
 
-	bool copyRect(const img::Image &aSrc, img::Image &aDst, const utils::Rect &aRect);
-	void copy(const img::Image &aSrc, img::Image &aDst);
-	Image::SizeType dataSize(const img::Image &aImg);
+    bool copyRect(const img::Image &src, img::Image &dst, const utils::Rect &rect_to_copy);
+	void copy(const img::Image &src, img::Image &dst);
+	Image::SizeType dataSize(const img::Image &img);
 }
 

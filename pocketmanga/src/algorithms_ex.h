@@ -10,54 +10,54 @@
 namespace utils
 {
 	template<class Collect, class Type>
-	bool exists(Collect &aCollect, const Type &aType)
+	bool exists(Collect &collect, const Type &type)
 	{
-		return std::find(aCollect.begin(), aCollect.end(), aType) != aCollect.end();
+		return std::find(collect.begin(), collect.end(), type) != collect.end();
 	}
 
 	template<class KeyType, class ValueType>
-	bool exists(std::map<KeyType, ValueType> &aCollect, const KeyType &aKey)
+	bool exists(std::map<KeyType, ValueType> &collect, const KeyType &key)
 	{
-		return aCollect.find(aKey) != aCollect.end();
+		return collect.find(key) != collect.end();
 	}
 
 	template<class ValueType>
-	bool exists(std::set<ValueType> &aCollect, const ValueType &aValue)
+	bool exists(std::set<ValueType> &collect, const ValueType &value)
 	{
-		return aCollect.find(aValue) != aCollect.end();
+		return collect.find(value) != collect.end();
 	}
 
 	template<class OutputIterator, class Map>
-	void collectKeys(const Map &aMap, OutputIterator aIter)
+	void collectKeys(const Map &map, OutputIterator iter)
 	{
 		typedef typename Map::const_iterator const_iterator;
-		for( const_iterator it = aMap.begin(), itEnd = aMap.end(); it != itEnd; ++it )
-			aIter++ = it->first;
+		for( const_iterator it = map.begin(), itEnd = map.end(); it != itEnd; ++it )
+			iter++ = it->first;
 	}
 
 	template<class OutputIterator, class Map>
-	void collectValues(const Map &aMap, OutputIterator aIter)
+	void collectValues(const Map &map, OutputIterator iter)
 	{
 		typedef typename Map::const_iterator const_iterator;
-		for( const_iterator it = aMap.begin(), itEnd = aMap.end(); it != itEnd; ++it )
-			aIter++ = it->second;
+		for( const_iterator it = map.begin(), itEnd = map.end(); it != itEnd; ++it )
+			iter++ = it->second;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 
 	template<class Collect, typename ValueType>
 	const ValueType &fetch_element_tmpl(
-		const Collect &aCollect, 
-		size_t aIndex, 
-		const ValueType &aDefValue = ValueType())
+		const Collect &collect, 
+		size_t index, 
+		const ValueType &def_value = ValueType())
 	{
-		if( aIndex >= aCollect.size() )
-			return aDefValue;
+		if( index >= collect.size() )
+			return def_value;
 
 		typedef typename Collect::const_iterator Iterator;
-		Iterator it = aCollect.begin();
+		Iterator it = collect.begin();
 
-		for ( size_t i = 0; i < aIndex; ++i, ++it )
+		for ( size_t i = 0; i < index; ++i, ++it )
 			;
 
 		return *it;		
@@ -65,72 +65,72 @@ namespace utils
 
 	template<class Collect, typename ValueType>
 	const ValueType &fetch_element(
-		const Collect &aCollect, 
-		size_t aIndex, 
-		const ValueType &aDefValue = ValueType())
+		const Collect &collect, 
+		size_t index, 
+		const ValueType &def_value = ValueType())
 	{
-		return fetch_element_tmpl(aCollect, aIndex, aDefValue);
+		return fetch_element_tmpl(collect, index, def_value);
 	}
 
 	template<typename ValueType>
 	const ValueType &fetch_element(
-		const std::set<ValueType> &aCollect, 
-		size_t aIndex, 
-		const ValueType &aDefValue = ValueType())
+		const std::set<ValueType> &collect, 
+		size_t index, 
+		const ValueType &def_value = ValueType())
 	{
-		return fetch_element_tmpl(aCollect, aIndex, aDefValue);
+		return fetch_element_tmpl(collect, index, def_value);
 	}
 
 	template<typename ValueType>
 	const ValueType &fetch_element(
-		const std::vector<ValueType> &aCollect, 
-		size_t aIndex, 
-		const ValueType &aDefValue = ValueType())
+		const std::vector<ValueType> &collect, 
+		size_t index, 
+		const ValueType &def_value = ValueType())
 	{
-		if( aIndex > aCollect.size() )
-			return aDefValue;
+		if( index > collect.size() )
+			return def_value;
 
-		return aCollect[aIndex];
+		return collect[index];
 	}
 
 	template<typename ValueType>
 	const ValueType &fetch_element(
-		const std::list<ValueType> &aCollect, 
-		size_t aIndex, 
-		const ValueType &aDefValue = ValueType())
+		const std::list<ValueType> &collect, 
+		size_t index, 
+		const ValueType &def_value = ValueType())
 	{
-		return fetch_element_tmpl(aCollect, aIndex, aDefValue);
+		return fetch_element_tmpl(collect, index, def_value);
 	}
 
 	template<typename ValueType>
 	const ValueType &fetch_element(
-		const std::deque<ValueType> &aCollect, 
-		size_t aIndex, 
-		const ValueType &aDefValue = ValueType())
+		const std::deque<ValueType> &collect, 
+		size_t index, 
+		const ValueType &def_value = ValueType())
 	{
-		if( aIndex > aCollect.size() )
-			return aDefValue;
+		if( index > collect.size() )
+			return def_value;
 
-		return aCollect[aIndex];
+		return collect[index];
 	}
 
-	inline std::size_t get_stream_size(std::istream &aStream)
+	inline std::size_t get_stream_size(std::istream &stream)
 	{
-		const std::size_t tPos = static_cast<std::size_t>(aStream.tellg());
-		aStream.seekg (0, std::ios::end);
+		const std::size_t pos = static_cast<std::size_t>(stream.tellg());
+		stream.seekg (0, std::ios::end);
 
-		const std::size_t tSize = static_cast<std::size_t>(aStream.tellg());
-		aStream.seekg(tPos, std::ios::beg);
+		const std::size_t size = static_cast<std::size_t>(stream.tellg());
+		stream.seekg(pos, std::ios::beg);
 
-		return tSize;
+		return size;
 	}
 
 // 	template<class KeyType, class ValueType>
 // 	const std::pair<KeyType, ValueType> &fetch_element(
-// 		const std::map<KeyType, ValueType> &aCollect, 
-// 		size_t aIndex, 
-// 		const ValueType &aDefValue = ValueType())
+// 		const std::map<KeyType, ValueType> &collect, 
+// 		size_t index, 
+// 		const ValueType &def_value = ValueType())
 // 	{
-// 		return fetch_element_tmpl(aCollect, aIndex, aDefValue);
+// 		return fetch_element_tmpl(collect, index, def_value);
 // 	}
 }

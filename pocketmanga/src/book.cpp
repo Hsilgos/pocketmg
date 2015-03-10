@@ -27,20 +27,20 @@ namespace
 	{
 		const fs::FilePath &entry;
 		const size_t level;
-		CmpForLevel(const fs::FilePath &aEntry, size_t aLevel)
-			:entry(aEntry), level(aLevel)
+		CmpForLevel(const fs::FilePath &entry, size_t level)
+			:entry(entry), level(level)
 		{
 		}
 
-		CmpForLevel(const CmpForLevel &aOther)
-			:entry(aOther.entry), level(aOther.level)
+		CmpForLevel(const CmpForLevel &other)
+			:entry(other.entry), level(other.level)
 		{
 
 		}
 
-		bool operator ()(const fs::FilePath &aFirst)
+		bool operator ()(const fs::FilePath &first)
 		{
-			return aFirst.startsWith(entry, level, true);
+			return first.startsWith(entry, level, true);
 		}
 	private:
 		
@@ -48,51 +48,51 @@ namespace
 	};
 
 	bool FindEntryInList(
-		const std::vector<fs::FilePath> &aFiles,
-		const fs::FilePath &aEntry,
-		//size_t &aFirstFileInDir,
-		size_t &aFilePosition) 
+		const std::vector<fs::FilePath> &files,
+		const fs::FilePath &entry,
+		//size_t &first_file_inDir,
+		size_t &file_position) 
 	{
-		const size_t tMaxLevel = aEntry.getDirLevel();
+		const size_t max_level = entry.getDirLevel();
 		std::vector<fs::FilePath>::const_iterator itFirst =
-			std::find_if(aFiles.begin(), aFiles.end(), CmpForLevel(aEntry, tMaxLevel));
+			std::find_if(files.begin(), files.end(), CmpForLevel(entry, max_level));
 
-		if( aFiles.end() == itFirst )
+		if( files.end() == itFirst )
 			return false;
 
-		if(aEntry.isDirectory())
+		if(entry.isDirectory())
 		{
-			aFilePosition = itFirst - aFiles.begin();
+			file_position = itFirst - files.begin();
 		}
 		else
 		{
 			std::vector<fs::FilePath>::const_iterator itCurrent =
 				std::find_if(
 					itFirst,
-					aFiles.end(),
-					CmpForLevel(aEntry, aEntry.getLevel()));
+					files.end(),
+					CmpForLevel(entry, entry.getLevel()));
 
-			if(aFiles.end() == itCurrent)
+			if(files.end() == itCurrent)
 				return false;
 
-			aFilePosition = itCurrent - aFiles.begin();
+			file_position = itCurrent - files.begin();
 		}
 
-		//aFirstFileInDir = itFirst - aFiles.begin();
+		//first_file_inDir = itFirst - files.begin();
 		return true;
 	}
 
-	size_t FindFirstFileFrom(const std::vector<fs::FilePath> &aFiles, size_t aCurrentFile)
+	size_t FindFirstFileFrom(const std::vector<fs::FilePath> &files, size_t current_file)
 	{
-		assert(aCurrentFile < aFiles.size());
-		const fs::FilePath &tCurrent = aFiles[aCurrentFile];
-		for( size_t i = aCurrentFile; i > 0; --i )
+		assert(current_file < files.size());
+		const fs::FilePath &current = files[current_file];
+		for( size_t i = current_file; i > 0; --i )
 		{
-			if( !HaveSameDirectory(aFiles[i], tCurrent) )
+			if( !HaveSameDirectory(files[i], current) )
 				return i + 1;
 		}
 
-		return HaveSameDirectory(aFiles[0], tCurrent) ? 0 : 1;
+		return HaveSameDirectory(files[0], current) ? 0 : 1;
 	}
 
 	/*
@@ -113,71 +113,71 @@ namespace
 	*/
 
 	template<class Cmp>
-	void FixUpFileTree(std::vector<fs::FilePath> &aFiles, const fs::FilePath &aRoot, Cmp aSortWay, bool aFilesOnly)
+	void FixUpFileTree(std::vector<fs::FilePath> &files, const fs::FilePath &root, Cmp sort_way, bool files_only)
 	{
-		if( aFiles.empty() )
+		if( files.empty() )
 			return;
 
-		std::sort(aFiles.begin(), aFiles.end(), aSortWay);
+		std::sort(files.begin(), files.end(), sort_way);
 
-		if(aFilesOnly)
+		if(files_only)
 		{
 
 		}
 		else
 		{
-			fs::FilePath tPrevDir = CopyDirectory(aRoot);
-			std::vector<fs::FilePath> tExtras;
+			fs::FilePath prev_dir = CopyDirectory(root);
+			std::vector<fs::FilePath> extras;
 
-			if(aFiles[0] != aRoot)
-				tExtras.push_back(aRoot);
+			if(files[0] != root)
+				extras.push_back(root);
 
-			for( size_t i = 0; i < aFiles.size(); ++i )
+			for( size_t i = 0; i < files.size(); ++i )
 			{
-				fs::FilePath tCurrentDir = CopyDirectory(aFiles[i]);
-				if( tPrevDir.equals(tCurrentDir, true) )
+				fs::FilePath current_dir = CopyDirectory(files[i]);
+				if( prev_dir.equals(current_dir, true) )
 					continue;
 
-				if( tCurrentDir.getLevel() < tPrevDir.getLevel() &&
-					tPrevDir.startsWith(tCurrentDir, true))
+				if( current_dir.getLevel() < prev_dir.getLevel() &&
+					prev_dir.startsWith(current_dir, true))
 				{
 					// /folder1/folder2/folder3/folder4
 					// /folder1/folder2
-					tPrevDir = tCurrentDir;
+					prev_dir = current_dir;
 					continue;
 				}
 
-				if( (tCurrentDir.getLevel() == tPrevDir.getLevel() + 1) &&
-					tCurrentDir.startsWith(tPrevDir, true) && 
-					aFiles[i].isDirectory())
+				if( (current_dir.getLevel() == prev_dir.getLevel() + 1) &&
+					current_dir.startsWith(prev_dir, true) && 
+					files[i].isDirectory())
 				{
 					// /folder1/
 					// /folder1/folder2
-					tPrevDir = tCurrentDir;
+					prev_dir = current_dir;
 					continue;
 				}
 
-				fs::FilePath tCommon = FindCommonPath(tPrevDir, tCurrentDir);
-				const size_t tCommonLevel = tCommon.getLevel();
-				const size_t tCopyTill = tCurrentDir.getLevel() -  1;
-				for( size_t i = tCommonLevel; i < tCopyTill; ++i )
+				fs::FilePath common = FindCommonPath(prev_dir, current_dir);
+				const size_t common_level = common.getLevel();
+				const size_t copy_till = current_dir.getLevel() -  1;
+				for( size_t i = common_level; i < copy_till; ++i )
 				{
-					tExtras.push_back(tCurrentDir.copy(i));
+					extras.push_back(current_dir.copy(i));
 				}
-				tPrevDir = tCurrentDir;
+				prev_dir = current_dir;
 			}
 
-			if( !tExtras.empty() )
+			if( !extras.empty() )
 			{
-				std::vector<fs::FilePath> tResult;
-				tResult.reserve(aFiles.size() + tExtras.size());
+				std::vector<fs::FilePath> result;
+				result.reserve(files.size() + extras.size());
 				std::merge(
-					aFiles.begin(), aFiles.end(),
-					tExtras.begin(), tExtras.end(),
-					std::back_inserter(tResult),
-					aSortWay);
+					files.begin(), files.end(),
+					extras.begin(), extras.end(),
+					std::back_inserter(result),
+					sort_way);
 
-				aFiles.swap(tResult);
+				files.swap(result);
 			}
 		}
 	}
@@ -185,102 +185,102 @@ namespace
 
 namespace manga
 {
-	void FixUpFileTreeForTest(std::vector<fs::FilePath> &aFiles, const fs::FilePath &aRoot)
+	void FixUpFileTreeForTest(std::vector<fs::FilePath> &files, const fs::FilePath &root)
 	{
-		FixUpFileTree(aFiles, aRoot, fs::WordNumberOrder(), false);
+		FixUpFileTree(files, root, fs::WordNumberOrder(), false);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 
-	BookExplorer::BookExplorer(fs::IFileManager *aFileMgr, fs::IFileManager::EntryTypes aTypes)
-		:mFileMgr(aFileMgr), mFindEntries(aTypes)
+	BookExplorer::BookExplorer(fs::IFileManager *file_mgr, fs::IFileManager::EntryTypes types)
+		:file_mgr_(file_mgr), find_entries_(types)
 	{
 	}
 
 	// Returns filelist ascending sorted
 	std::vector<PathToFile> BookExplorer::fileList() const
 	{
-		std::vector<PathToFile> tResult;
-		PathToFile tCurrPos = getCurrentPos();
-		if( tCurrPos.empty() )
-			return tResult;
+		std::vector<PathToFile> result;
+		PathToFile curr_pos = getCurrentPos();
+		if( curr_pos.empty() )
+			return result;
 
-		if( mCurrentArchive.get() )
+		if( current_archive_.get() )
 		{
-			const size_t tDirLevel = tCurrPos.pathInArchive.getDirLevel();
+			const size_t dir_level = curr_pos.pathInArchive.getDirLevel();
 
-			const size_t tFirst = FindFirstFileFrom(mFilesInArchive, mArchive.currentFile);
+			const size_t first = FindFirstFileFrom(files_in_archive_, archive_.currentFile);
 
-			for( size_t i = tFirst; i < mFilesInArchive.size(); ++i )
+			for( size_t i = first; i < files_in_archive_.size(); ++i )
 			{
-				if( !mFilesInArchive[i].startsWith(tCurrPos.pathInArchive, tDirLevel, true) )
+				if( !files_in_archive_[i].startsWith(curr_pos.pathInArchive, dir_level, true) )
 					break;
 
-				if( mFilesInArchive[i].getLevel() > tDirLevel )
+				if( files_in_archive_[i].getLevel() > dir_level )
 				{
-					if( tResult.empty() || !mFilesInArchive[i].startsWith(tResult.back().pathInArchive, true) )
+					if( result.empty() || !files_in_archive_[i].startsWith(result.back().pathInArchive, true) )
 					{
-						tResult.push_back(PathToFile(mFiles[mFs.currentFile], mFilesInArchive[i].copy(tDirLevel)));
+						result.push_back(PathToFile(files_[fs_.currentFile], files_in_archive_[i].copy(dir_level)));
 					}
 				}
 			}
 		}
 		else
 		{
-			const size_t tDirLevel = tCurrPos.filePath.getDirLevel();
+			const size_t dir_level = curr_pos.filePath.getDirLevel();
 
-			const size_t tFirst = FindFirstFileFrom(mFiles, mFs.currentFile);
+			const size_t first = FindFirstFileFrom(files_, fs_.currentFile);
 
-			for( size_t i = tFirst; i < mFiles.size(); ++i )
+			for( size_t i = first; i < files_.size(); ++i )
 			{
-				if( !mFiles[i].startsWith(tCurrPos.filePath, tDirLevel, true) )
+				if( !files_[i].startsWith(curr_pos.filePath, dir_level, true) )
 					break;
 
-				if( mFiles[i].getLevel() > tDirLevel )
+				if( files_[i].getLevel() > dir_level )
 				{
-					if( tResult.empty() || !mFiles[i].startsWith(tResult.back().filePath, true) )
+					if( result.empty() || !files_[i].startsWith(result.back().filePath, true) )
 					{
-						tResult.push_back(PathToFile(mFiles[i].copy(tDirLevel)));
+						result.push_back(PathToFile(files_[i].copy(dir_level)));
 					}
 				}
 			}
 
 		}
-		return tResult;
+		return result;
 	}
 
-	bool BookExplorer::setRoot(const fs::FilePath &aRoot)
+	bool BookExplorer::setRoot(const fs::FilePath &root)
 	{
-		mRoot = aRoot;
-		mFiles = mFileMgr->getFileList(aRoot, mFindEntries, true);
+		root_ = root;
+		files_ = file_mgr_->getFileList(root, find_entries_, true);
 
-		const bool tFilesOnly = (fs::IFileManager::Directory != (mFindEntries & fs::IFileManager::Directory));
-		FixUpFileTree(mFiles, aRoot, fs::WordNumberOrder(), tFilesOnly);
-		//if( std::find(mFiles.begin(), mFiles.end(), aRoot) == mFiles.end() )
-		//	mFiles.push_back(aRoot);
+		const bool files_only = (fs::IFileManager::Directory != (find_entries_ & fs::IFileManager::Directory));
+		FixUpFileTree(files_, root, fs::WordNumberOrder(), files_only);
+		//if( std::find(files_.begin(), files_.end(), root) == files_.end() )
+		//	files_.push_back(root);
 
 		
-		return enter(PathToFile(aRoot));
+		return enter(PathToFile(root));
 	}
 
 	const fs::FilePath &BookExplorer::getRoot() const
 	{
-		return mRoot;
+		return root_;
 	}
 
-	bool BookExplorer::openArchive(const fs::FilePath &aPath, bool aToBeginning)
+	bool BookExplorer::openArchive(const fs::FilePath &path, bool to_beginning)
 	{
-		mCurrentArchive.reset(archive::recognize(aPath));
+		current_archive_.reset(archive::recognize(path));
 
-		if (!mCurrentArchive.get())
+		if (!current_archive_.get())
 			return false;
 
-		const bool tFilesOnly = (fs::IFileManager::Directory != (mFindEntries & fs::IFileManager::Directory));
-		mFilesInArchive = mCurrentArchive->getFileList(tFilesOnly);
+		const bool files_only = (fs::IFileManager::Directory != (find_entries_ & fs::IFileManager::Directory));
+		files_in_archive_ = current_archive_->getFileList(files_only);
 
-		FixUpFileTree(mFilesInArchive, fs::FilePath(), fs::WordNumberOrder(), tFilesOnly);
+		FixUpFileTree(files_in_archive_, fs::FilePath(), fs::WordNumberOrder(), files_only);
 
-		mArchive.currentFile = aToBeginning ? 0 : mFilesInArchive.size() - 1;
+		archive_.currentFile = to_beginning ? 0 : files_in_archive_.size() - 1;
 
 		return true;
 	}
@@ -288,38 +288,38 @@ namespace manga
 	bool BookExplorer::isCurrentInArchiveFile() const
 	{
 		return 
-			mArchive.currentFile < mFilesInArchive.size() &&
-			!mFilesInArchive[mArchive.currentFile].isDirectory();
+			archive_.currentFile < files_in_archive_.size() &&
+			!files_in_archive_[archive_.currentFile].isDirectory();
 	}
 
 	void BookExplorer::closeArchive()
 	{
-		mCurrentArchive.reset();
-		mFilesInArchive.clear();
-		mArchive.currentFile = 0;
+		current_archive_.reset();
+		files_in_archive_.clear();
+		archive_.currentFile = 0;
 	}
 
 	// Enters to some directory or archive
-	bool BookExplorer::enter(const PathToFile &aPath)
+	bool BookExplorer::enter(const PathToFile &path)
 	{
-		if( mRoot.empty() || aPath.empty() )
+		if( root_.empty() || path.empty() )
 			return false;
 
 		// Already on the place?
-		PathToFile tCurrentPos = getCurrentPos();
-		if( tCurrentPos == aPath )
+		PathToFile current_pos = getCurrentPos();
+		if( current_pos == path )
 			return true;
 
-		if( aPath.filePath.isDirectory() )
+		if( path.filePath.isDirectory() )
 		{
 			// it's directory...
-			if( tCurrentPos.filePath != aPath.filePath )
+			if( current_pos.filePath != path.filePath )
 			{
 				if( !FindEntryInList(
-						mFiles,
-						aPath.filePath,
-						//mFs.firstInCurrDir,
-						mFs.currentFile) )
+						files_,
+						path.filePath,
+						//fs_.firstInCurrDir,
+						fs_.currentFile) )
 				{
 					return false;
 				}
@@ -332,20 +332,20 @@ namespace manga
 		else
 		{
 			// probably archive?
-			if( tCurrentPos.filePath != aPath.filePath || !mCurrentArchive.get() )
+			if( current_pos.filePath != path.filePath || !current_archive_.get() )
 			{
 				if( !FindEntryInList(
-						mFiles,
-						aPath.filePath,
-						mFs.currentFile) )
+						files_,
+						path.filePath,
+						fs_.currentFile) )
 				{
 					return false;
 				}
 
-				if( !openArchive(aPath.filePath, true) )
+				if( !openArchive(path.filePath, true) )
 				{
 					// Not an archive
-					if( !aPath.pathInArchive.empty() )
+					if( !path.pathInArchive.empty() )
 						return false;
 
 					// close previous archive
@@ -353,29 +353,29 @@ namespace manga
 					return true;
 				}
 			}
-			else if( aPath.pathInArchive.empty() )
+			else if( path.pathInArchive.empty() )
 			{
-				if( mCurrentArchive.get() )
+				if( current_archive_.get() )
 				{
 					if(!FindEntryInList(
-						mFilesInArchive,
-						aPath.pathInArchive,
-						mArchive.currentFile))
+						files_in_archive_,
+						path.pathInArchive,
+						archive_.currentFile))
 					{
 						return false;
 					}
 				}
 				return true;
 			}
-			else if ( !mCurrentArchive.get() )
+			else if ( !current_archive_.get() )
 			{
 				return false;
 			}
 
 			if(!FindEntryInList(
-					mFilesInArchive,
-					aPath.pathInArchive,
-					mArchive.currentFile))
+					files_in_archive_,
+					path.pathInArchive,
+					archive_.currentFile))
 			{
 				return false;
 			}
@@ -388,13 +388,13 @@ namespace manga
 
 	bool BookExplorer::back()
 	{
-		PathToFile tNewPath = getCurrentPos();
-		if(!tNewPath.pathInArchive.empty())
-			tNewPath.pathInArchive.removeLastEntry();
+		PathToFile new_path = getCurrentPos();
+		if(!new_path.pathInArchive.empty())
+			new_path.pathInArchive.removeLastEntry();
 		else 
-			tNewPath.filePath.removeLastEntry();
+			new_path.filePath.removeLastEntry();
 
-		return enter(tNewPath);
+		return enter(new_path);
 		//return false;
 	}
 
@@ -402,44 +402,44 @@ namespace manga
 	{
 		for(;;)
 		{
-			if( mCurrentArchive.get() ) 
+			if( current_archive_.get() ) 
 			{
-				if(mFilesInArchive.empty())
+				if(files_in_archive_.empty())
 				{
 					closeArchive();
 					continue;
 				}
 				
-				//assert(mArchive.firstInCurrDir < mFilesInArchive.size());
-				if( ++mArchive.currentFile >= mFilesInArchive.size() )
+				//assert(archive_.firstInCurrDir < files_in_archive_.size());
+				if( ++archive_.currentFile >= files_in_archive_.size() )
 				{
 					closeArchive();
 					continue;
 				}
 
-				const fs::FilePath &tCurrEntry = mFilesInArchive[mArchive.currentFile];
+				const fs::FilePath &curr_entry = files_in_archive_[archive_.currentFile];
 
-				if( tCurrEntry.isDirectory() )
+				if( curr_entry.isDirectory() )
 					continue;
 
 				return true;
 			}
 			else
 			{
-				if( mFiles.empty() )
+				if( files_.empty() )
 					return false;
 
-				if( mFs.currentFile + 1 >= mFiles.size() )
+				if( fs_.currentFile + 1 >= files_.size() )
 					return false;
 				
-				++mFs.currentFile;
-				const fs::FilePath &tCurrEntry = mFiles[mFs.currentFile];
+				++fs_.currentFile;
+				const fs::FilePath &curr_entry = files_[fs_.currentFile];
 
-				if( tCurrEntry.isDirectory() )
+				if( curr_entry.isDirectory() )
 					continue;
 
 				// archive?
-				if( openArchive(tCurrEntry, true) )
+				if( openArchive(curr_entry, true) )
 				{
 					if( isCurrentInArchiveFile() )
 						return true;
@@ -454,53 +454,53 @@ namespace manga
 
 	bool BookExplorer::toPreviousFile()
 	{
-		if( mFiles.empty() )
+		if( files_.empty() )
 			return false;
 
 		// store position
 
 		for(;;)
 		{
-			if( mCurrentArchive.get() ) 
+			if( current_archive_.get() ) 
 			{
-				if( mFilesInArchive.empty() )
+				if( files_in_archive_.empty() )
 				{
 					closeArchive();
 					continue;
 				}
 
-				//assert(mArchive.firstInCurrDir < mFilesInArchive.size());
-				if( 0 == mArchive.currentFile )
+				//assert(archive_.firstInCurrDir < files_in_archive_.size());
+				if( 0 == archive_.currentFile )
 				{
 					closeArchive();
 					continue;
 				}
 
-				--mArchive.currentFile;
+				--archive_.currentFile;
 
-				const fs::FilePath &tCurrEntry = mFilesInArchive[mArchive.currentFile];
+				const fs::FilePath &curr_entry = files_in_archive_[archive_.currentFile];
 
-				if( tCurrEntry.isDirectory() )
+				if( curr_entry.isDirectory() )
 					continue;
 
 				return true;
 			}
 			else
 			{
-				if( 0 == mFs.currentFile )
+				if( 0 == fs_.currentFile )
 				{
 					//restore position
 					return false;
 				}
 
-				--mFs.currentFile;
-				const fs::FilePath &tCurrEntry = mFiles[mFs.currentFile];
+				--fs_.currentFile;
+				const fs::FilePath &curr_entry = files_[fs_.currentFile];
 
-				if( tCurrEntry.isDirectory() )
+				if( curr_entry.isDirectory() )
 					continue;
 
 				// archive?
-				if( openArchive(tCurrEntry, false) )
+				if( openArchive(curr_entry, false) )
 				{
 					if( isCurrentInArchiveFile() )
 						return true;
@@ -516,17 +516,17 @@ namespace manga
 	bool BookExplorer::toFirstFile()
 	{
 		closeArchive();
-		mFs.currentFile = 0;
-		//mFs.firstInCurrDir = 0;
-		if( mFiles.empty() )
+		fs_.currentFile = 0;
+		//fs_.firstInCurrDir = 0;
+		if( files_.empty() )
 			return false;
 
-		const fs::FilePath &tCurrEntry = mFiles[mFs.currentFile];
+		const fs::FilePath &curr_entry = files_[fs_.currentFile];
 
-		if( tCurrEntry.isDirectory() )
+		if( curr_entry.isDirectory() )
 			return toNextFile();
 
-		if( openArchive(tCurrEntry, true)  && 
+		if( openArchive(curr_entry, true)  && 
 			!isCurrentInArchiveFile() )
 			return toNextFile();
 
@@ -536,16 +536,16 @@ namespace manga
 	bool BookExplorer::toLastFile()
 	{
 		closeArchive();
-		if( mFiles.empty() )
+		if( files_.empty() )
 			return false;
 
-		mFs.currentFile = mFiles.size() - 1;
+		fs_.currentFile = files_.size() - 1;
 
-		const fs::FilePath &tCurrEntry = mFiles[mFs.currentFile];
-		if( tCurrEntry.isDirectory() )
+		const fs::FilePath &curr_entry = files_[fs_.currentFile];
+		if( curr_entry.isDirectory() )
 			return toPreviousFile();
 
-		if( openArchive(tCurrEntry, false)  && 
+		if( openArchive(curr_entry, false)  && 
 			!isCurrentInArchiveFile() )
 			return toPreviousFile();
 
@@ -554,42 +554,42 @@ namespace manga
 
 	PathToFile BookExplorer::getCurrentPos() const
 	{
-		PathToFile tResult;
+		PathToFile result;
 
-		if( !mFiles.empty() )
+		if( !files_.empty() )
 		{
-			assert(mFs.currentFile < mFiles.size());
-			tResult.filePath = mFiles[mFs.currentFile];
+			assert(fs_.currentFile < files_.size());
+			result.filePath = files_[fs_.currentFile];
 		}
 
-		if( mCurrentArchive.get() && !mFilesInArchive.empty() )
+		if( current_archive_.get() && !files_in_archive_.empty() )
 		{
-			assert(mArchive.currentFile < mFilesInArchive.size());
-			tResult.pathInArchive = mFilesInArchive[mArchive.currentFile];
+			assert(archive_.currentFile < files_in_archive_.size());
+			result.pathInArchive = files_in_archive_[archive_.currentFile];
 		}
 
-		return tResult;
+		return result;
 	}
 
 	tools::ByteArray BookExplorer::readCurrentFile() const
 	{
-		if( mCurrentArchive.get() )
+		if( current_archive_.get() )
 		{
-			if( !mFilesInArchive.empty() &&
-				mArchive.currentFile < mFilesInArchive.size() &&
-				!mFilesInArchive[mArchive.currentFile].isDirectory() )
+			if( !files_in_archive_.empty() &&
+				archive_.currentFile < files_in_archive_.size() &&
+				!files_in_archive_[archive_.currentFile].isDirectory() )
 			{
-				return mCurrentArchive->getFile(mFilesInArchive[mArchive.currentFile], MaxFilesize);
+				return current_archive_->getFile(files_in_archive_[archive_.currentFile], MaxFilesize);
 			}
 
 			return tools::ByteArray::empty;
 		}
 
-		if( !mFiles.empty() &&
-			mFs.currentFile < mFiles.size() &&
-			!mFiles[mFs.currentFile].isDirectory() )
+		if( !files_.empty() &&
+			fs_.currentFile < files_.size() &&
+			!files_[fs_.currentFile].isDirectory() )
 		{
-			return mFileMgr->readFile(mFiles[mFs.currentFile], MaxFilesize);
+			return file_mgr_->readFile(files_[fs_.currentFile], MaxFilesize);
 		}
 
 		return tools::ByteArray::empty;
@@ -601,26 +601,26 @@ namespace manga
 	}
 
 	Book::Book()
-		:mExplorer(fs::IFileManager::create(), fs::IFileManager::File)
+		:explorer_(fs::IFileManager::create(), fs::IFileManager::File)
 	{
 	}
 
-	Book::Book(fs::IFileManager *aFileMgr)
-		:mExplorer(aFileMgr, fs::IFileManager::File)
+	Book::Book(fs::IFileManager *file_mgr)
+		:explorer_(file_mgr, fs::IFileManager::File)
 	{
 	}
 
-	bool Book::setRoot(const fs::FilePath &aRoot)
+	bool Book::setRoot(const fs::FilePath &root)
 	{
-		return mExplorer.setRoot(aRoot);
+		return explorer_.setRoot(root);
 	}
 
 	bool Book::toFirstFile()
 	{
-		if( !mExplorer.toFirstFile() )
+		if( !explorer_.toFirstFile() )
 			return false;
 
-		if( loadFromExplorerInto(mCurrent) )
+		if( loadFromExplorerInto(current_) )
 			return true;
 
 		return findAndLoadNext();
@@ -628,41 +628,41 @@ namespace manga
 
 	bool Book::toLastFile()
 	{
-		if( !mExplorer.toLastFile() )
+		if( !explorer_.toLastFile() )
 			return false;
 
-		if( loadFromExplorerInto(mPrevious) )
+		if( loadFromExplorerInto(previous_) )
 			return true;
 
 		return findAndLoadPrevious();
 	}
 
-	bool Book::goToBookmark(const Bookmark &aBookmark)
+	bool Book::goToBookmark(const Bookmark &bookmark)
 	{
 		return
-			mExplorer.setRoot(aBookmark.rootDir) &&
-			mExplorer.enter(aBookmark.currentFile);
+			explorer_.setRoot(bookmark.rootDir) &&
+			explorer_.enter(bookmark.currentFile);
 	}
 
 	Bookmark Book::bookmark() const
 	{
-		Bookmark tResult;
+		Bookmark result;
 
-		tResult.rootDir = mExplorer.getRoot();
-		tResult.currentFile = mExplorer.getCurrentPos();
+		result.rootDir = explorer_.getRoot();
+		result.currentFile = explorer_.getCurrentPos();
 
-		return tResult;
+		return result;
 	}
 
-	void Book::ImageData::swap(ImageData &aOther)
+	void Book::ImageData::swap(ImageData &other)
 	{
-		image.swap(aOther.image);
-		std::swap(bookmark.currentFile, aOther.bookmark.currentFile);
-		std::swap(bookmark.rootDir, aOther.bookmark.rootDir);
+		image.swap(other.image);
+		std::swap(bookmark.currentFile, other.bookmark.currentFile);
+		std::swap(bookmark.rootDir, other.bookmark.rootDir);
 
-		if( cache.get() && aOther.cache.get() )
+		if( cache.get() && other.cache.get() )
 		{
-			cache->swap(aOther.cache.get());
+			cache->swap(other.cache.get());
 		}
 	}
 
@@ -680,22 +680,22 @@ namespace manga
 
 	bool Book::incrementPosition()
 	{
-		if( mCurrent.empty() )
+		if( current_.empty() )
 			return toFirstFile();
 
-		if( mNext.empty() )
+		if( next_.empty() )
 		{
-			if( !mExplorer.enter(mCurrent.bookmark.currentFile) ||
+			if( !explorer_.enter(current_.bookmark.currentFile) ||
 				!findAndLoadNext() )
 				return false;
 		}
 
-		if( !mNext.empty() )
+		if( !next_.empty() )
 		{
-			mPrevious.swap(mCurrent);
-			mCurrent.swap(mNext);
+			previous_.swap(current_);
+			current_.swap(next_);
 
-			mNext.clear();
+			next_.clear();
 			return true;
 		}
 
@@ -704,22 +704,22 @@ namespace manga
 
 	bool Book::decrementPosition()
 	{
-		if( mCurrent.empty() )
+		if( current_.empty() )
 			return toLastFile();
 
-		if( mPrevious.empty() )
+		if( previous_.empty() )
 		{
-			if( !mExplorer.enter(mCurrent.bookmark.currentFile) ||
+			if( !explorer_.enter(current_.bookmark.currentFile) ||
 				!findAndLoadPrevious())
 				return false;
 		}
 
-		if( !mPrevious.empty() )
+		if( !previous_.empty() )
 		{
-			mNext.swap(mCurrent);
-			mCurrent.swap(mPrevious);
+			next_.swap(current_);
+			current_.swap(previous_);
 
-			mPrevious.clear();
+			previous_.clear();
 			return true;
 		}
 
@@ -728,9 +728,9 @@ namespace manga
 
 	bool Book::findAndLoadPrevious()
 	{
-		while( mExplorer.toPreviousFile() )
+		while( explorer_.toPreviousFile() )
 		{
-			if(loadFromExplorerInto(mPrevious))
+			if(loadFromExplorerInto(previous_))
 				return true;
 		}
 
@@ -740,31 +740,31 @@ namespace manga
 	bool Book::findAndLoadNext()
 	{
 		// find first suitable file
-		while( mExplorer.toNextFile() )
+		while( explorer_.toNextFile() )
 		{
-			if(loadFromExplorerInto(mNext))
+			if(loadFromExplorerInto(next_))
 				return true;
 		}
 
 		return false;
 	}
 
-	bool Book::loadFromExplorerInto(ImageData &aData)
+	bool Book::loadFromExplorerInto(ImageData &image_data)
 	{
-		PathToFile tPath = mExplorer.getCurrentPos();
+		PathToFile path = explorer_.getCurrentPos();
 
-		const fs::FilePath &tFile =
-			tPath.pathInArchive.empty() ? tPath.filePath : tPath.pathInArchive;
+		const fs::FilePath &file =
+			path.pathInArchive.empty() ? path.filePath : path.pathInArchive;
 
-		tools::ByteArray tData = mExplorer.readCurrentFile();
-		if( tData.isEmpty() )
+		tools::ByteArray data = explorer_.readCurrentFile();
+		if( data.isEmpty() )
 			return false;
 
-		if( aData.image.load(tFile.getExtension(), tData) )
+        if (image_data.image.load(file.getExtension(), data))
 		{
-			aData.bookmark.currentFile = mExplorer.getCurrentPos();
-			if( aData.cache.get() )
-				aData.cache->onLoaded(aData.image);
+            image_data.bookmark.currentFile = explorer_.getCurrentPos();
+            if (image_data.cache.get())
+                image_data.cache->onLoaded(image_data.image);
 
 			return true;
 		}
@@ -774,25 +774,25 @@ namespace manga
 
 	void Book::preload()
 	{
-		if( mCurrent.empty() )
+		if( current_.empty() )
 			toFirstFile();
 
-		if( !mNext.empty() && !mPrevious.empty() )
+		if( !next_.empty() && !previous_.empty() )
 			return;
 
-		if( !mCurrent.empty() )
+		if( !current_.empty() )
 		{
-			Bookmark tCurrBM = mCurrent.bookmark;
+			Bookmark curr_b_m = current_.bookmark;
 			
-			if( mPrevious.empty() )
+			if( previous_.empty() )
 			{
-				if( mExplorer.enter(tCurrBM.currentFile) )
+				if( explorer_.enter(curr_b_m.currentFile) )
 					findAndLoadPrevious();
 			}
 
-			if( mNext.empty() )
+			if( next_.empty() )
 			{
-				if( mExplorer.enter(tCurrBM.currentFile) )
+				if( explorer_.enter(curr_b_m.currentFile) )
 					findAndLoadNext();
 			}
 		}
@@ -800,27 +800,27 @@ namespace manga
 
 	img::Image Book::currentImage() const
 	{
-		return mCurrent.image;
+		return current_.image;
 	}
 
 	IBookCache *Book::currentCache() const
 	{
-		return mCurrent.cache.get();
+		return current_.cache.get();
 	}
 
-	void Book::setCachePrototype(IBookCache *aCache)
+	void Book::setCachePrototype(IBookCache *cache)
 	{
-		if( aCache )
+		if( cache )
 		{
-			mPrevious.cache.reset(aCache->clone());
-			mCurrent.cache.reset(aCache);
-			mNext.cache.reset(aCache->clone());
+			previous_.cache.reset(cache->clone());
+			current_.cache.reset(cache);
+			next_.cache.reset(cache->clone());
 		}
 		else
 		{
-			mPrevious.cache.reset();
-			mCurrent.cache.reset();
-			mNext.cache.reset();
+			previous_.cache.reset();
+			current_.cache.reset();
+			next_.cache.reset();
 		}
 	}
 }

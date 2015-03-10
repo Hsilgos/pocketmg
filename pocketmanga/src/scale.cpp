@@ -38,53 +38,53 @@ namespace img
 		int offset[4];
 	};
 
-	inline void precalculate(std::vector< BicubicPrecalc > &aWeight, int aOrigDim)
+	inline void precalculate(std::vector< BicubicPrecalc > &weight, int orig_dim)
 	{
-		const int tNewSize = aWeight.size();
-		for ( int dstd = 0; dstd < tNewSize; dstd++ )
+		const int new_size = weight.size();
+		for ( int dstd = 0; dstd < new_size; dstd++ )
 		{
 			// We need to calculate the source pixel to interpolate from - Y-axis
-			const FloatType srcpixd = static_cast<FloatType>(dstd * aOrigDim) / tNewSize;
+			const FloatType srcpixd = static_cast<FloatType>(dstd * orig_dim) / new_size;
 			const FloatType dd = srcpixd - static_cast<int>(srcpixd);
 
-			BicubicPrecalc &tPreCalc = aWeight[dstd];
+			BicubicPrecalc &pre_calc = weight[dstd];
 
 			for ( int k = -1; k <= 2; k++ )
 			{
-				const int tOffset = static_cast<int>(srcpixd + k);
-				tPreCalc.offset[k + 1] = tOffset < 0
+				const int offset = static_cast<int>(srcpixd + k);
+				pre_calc.offset[k + 1] = offset < 0
 					? 0
-					: tOffset >= aOrigDim
-					? aOrigDim - 1
-					: tOffset;
+					: offset >= orig_dim
+					? orig_dim - 1
+					: offset;
 
-				tPreCalc.weight[k + 1] = spline_weight(k - dd);
+				pre_calc.weight[k + 1] = spline_weight(k - dd);
 			}
 		}
 	}
 
 	template<int Depth>
-	void resampleBicubic(const Image &aIn, Image &aOut, int width, int height)
+	void resampleBicubic(const Image &in, Image &out, int width, int height)
 	{
-		const unsigned char* src_data	= aIn.data();
-		unsigned char* dst_data			= aOut.data();
+		const unsigned char* src_data	= in.data();
+		unsigned char* dst_data			= out.data();
 
 		// Precalculate weights
-		std::vector< BicubicPrecalc > tWeightY(height);
-		std::vector< BicubicPrecalc > tWeightX(width);
-		precalculate(tWeightY, aIn.height());
-		precalculate(tWeightX, aIn.width());
+		std::vector< BicubicPrecalc > weight_y(height);
+		std::vector< BicubicPrecalc > weight_x(width);
+		precalculate(weight_y, in.height());
+		precalculate(weight_x, in.width());
 		// ~Precalculate weights
 
 		for ( int dsty = 0; dsty < height; dsty++ )
 		{
 			// We need to calculate the source pixel to interpolate from - Y-axis
-			const BicubicPrecalc &tPreY = tWeightY[dsty];
+			const BicubicPrecalc &pre_y = weight_y[dsty];
 
 			for ( int dstx = 0; dstx < width; dstx++ )
 			{
 				// X-axis of pixel to interpolate from
-				const BicubicPrecalc &tPreX = tWeightX[dstx];
+				const BicubicPrecalc &pre_x = weight_x[dstx];
 
 				// Sums for each color channel
 				//FloatType sum_r = 0, sum_g = 0, sum_b = 0;//, sum_a = 0;
@@ -94,29 +94,29 @@ namespace img
 				for ( int k = -1; k <= 2; k++ )
 				{
 					// Y offset
-					const int y_offset = tPreY.offset[k + 1];
+					const int y_offset = pre_y.offset[k + 1];
 
 					// Loop across the X axis
 					for ( int i = -1; i <= 2; i++ )
 					{
 						// X offset
-						const int x_offset = tPreX.offset[i + 1];
+						const int x_offset = pre_x.offset[i + 1];
 
 						// Calculate the exact position where the source data
 						// should be pulled from based on the x_offset and y_offset
-						const int src_pixel_index = y_offset*aIn.width() + x_offset;
+						const int src_pixel_index = y_offset*in.width() + x_offset;
 
 						// Calculate the weight for the specified pixel according
 						// to the bicubic b-spline kernel we're using for
 						// interpolation
-						FloatType pixel_weight = tPreY.weight[k + 1] * tPreX.weight[i + 1];
+						FloatType pixel_weight = pre_y.weight[k + 1] * pre_x.weight[i + 1];
 
 						// Create a sum of all values for each color channel
 						// adjusted for the pixel's calculated weight
 
-						const int tSrcPosBeg =  src_pixel_index * Depth;
+						const int src_pos_beg =  src_pixel_index * Depth;
 						for( int cnt = 0; cnt < Depth; ++cnt )
-							sum_pixel[cnt] += src_data[tSrcPosBeg + cnt] * pixel_weight;
+							sum_pixel[cnt] += src_data[src_pos_beg + cnt] * pixel_weight;
 					}
 				}
 
@@ -132,13 +132,13 @@ namespace img
 
 	//////////////////////////////////////////////////////////////////////////
 	template<int Depth>
-	void resampleNearest(const Image &aIn, Image &aOut, int width, int height)
+	void resampleNearest(const Image &in, Image &out, int width, int height)
 	{
-		const unsigned char *source_data	= aIn.data();
-		unsigned char *target_data			= aOut.data();
+		const unsigned char *source_data	= in.data();
+		unsigned char *target_data			= out.data();
 
-		const long old_height = aIn.height();
-		const long old_width  = aIn.width();
+		const long old_height = in.height();
+		const long old_width  = in.width();
 		const long x_delta = (old_width<<16) / width;
 		const long y_delta = (old_height<<16) / height;
 
@@ -172,40 +172,40 @@ namespace img
 		FloatType dd1;
 	};
 
-	void precalculate(std::vector< BilinearPrecalc > &aWeight, int aOrigDim)
+	void precalculate(std::vector< BilinearPrecalc > &weight, int orig_dim)
 	{
-		const int tNewSize		= aWeight.size();
-		const FloatType HFactor	= FloatType(aOrigDim) / tNewSize;
-		const int srcpixmax	= aOrigDim - 1;
+		const int new_size		= weight.size();
+		const FloatType HFactor	= FloatType(orig_dim) / new_size;
+		const int srcpixmax	= orig_dim - 1;
 
-		//BilinearPrecalc tPrecalc;
+		//BilinearPrecalc precalc;
 
-		for ( int dsty = 0; dsty < tNewSize; dsty++ )
+		for ( int dsty = 0; dsty < new_size; dsty++ )
 		{
 			// We need to calculate the source pixel to interpolate from - Y-axis
 			FloatType srcpix = FloatType(dsty) * HFactor;
 			FloatType srcpix1 = static_cast<FloatType>(static_cast<int>(srcpix));
 			FloatType srcpix2 = ( srcpix1 == srcpixmax ) ? srcpix1 : srcpix1 + OneValue;
 
-			BilinearPrecalc &tPreCalc = aWeight[dsty];
+			BilinearPrecalc &pre_calc = weight[dsty];
 
-			tPreCalc.dd = srcpix - (int)srcpix;
-			tPreCalc.dd1 = OneValue - tPreCalc.dd;
-			tPreCalc.offset1 = srcpix1 < ZeroValue ? 0 : srcpix1 > srcpixmax ? srcpixmax : (int)srcpix1;
-			tPreCalc.offset2 = srcpix2 < ZeroValue ? 0 : srcpix2 > srcpixmax ? srcpixmax : (int)srcpix2;
+			pre_calc.dd = srcpix - (int)srcpix;
+			pre_calc.dd1 = OneValue - pre_calc.dd;
+			pre_calc.offset1 = srcpix1 < ZeroValue ? 0 : srcpix1 > srcpixmax ? srcpixmax : (int)srcpix1;
+			pre_calc.offset2 = srcpix2 < ZeroValue ? 0 : srcpix2 > srcpixmax ? srcpixmax : (int)srcpix2;
 		}
 	}
 
 	template<int Depth>
-	void resampleBilinear(const Image &aIn, Image &aOut, int width, int height)
+	void resampleBilinear(const Image &in, Image &out, int width, int height)
 	{
-		const unsigned char* src_data = aIn.data();
-		unsigned char* dst_data = aOut.data();
+		const unsigned char* src_data = in.data();
+		unsigned char* dst_data = out.data();
 
-		std::vector< BilinearPrecalc > tWeightY(height);
-		std::vector< BilinearPrecalc > tWeightX(width);
-		precalculate(tWeightY, aIn.height());
-		precalculate(tWeightX, aIn.width());
+		std::vector< BilinearPrecalc > weight_y(height);
+		std::vector< BilinearPrecalc > weight_x(width);
+		precalculate(weight_y, in.height());
+		precalculate(weight_x, in.width());
 
 		// initialize alpha values to avoid g++ warnings about possibly
 		// uninitialized variables
@@ -215,30 +215,30 @@ namespace img
 		for ( int dsty = 0; dsty < height; dsty++ )
 		{
 			// We need to calculate the source pixel to interpolate from - Y-axis
-			const BilinearPrecalc &tPteY = tWeightY[dsty];
+			const BilinearPrecalc &pte_y = weight_y[dsty];
 
 
 			for ( int dstx = 0; dstx < width; dstx++ )
 			{
 				// X-axis of pixel to interpolate from
-				const BilinearPrecalc &tPteX = tWeightX[dstx];
+				const BilinearPrecalc &pte_x = weight_x[dstx];
 
-				int src_pixel_index00 = tPteY.offset1 * aIn.width() + tPteX.offset1;
-				int src_pixel_index01 = tPteY.offset1 * aIn.width() + tPteX.offset2;
-				int src_pixel_index10 = tPteY.offset2 * aIn.width() + tPteX.offset1;
-				int src_pixel_index11 = tPteY.offset2 * aIn.width() + tPteX.offset2;
+				int src_pixel_index00 = pte_y.offset1 * in.width() + pte_x.offset1;
+				int src_pixel_index01 = pte_y.offset1 * in.width() + pte_x.offset2;
+				int src_pixel_index10 = pte_y.offset2 * in.width() + pte_x.offset1;
+				int src_pixel_index11 = pte_y.offset2 * in.width() + pte_x.offset2;
 
 				// first line
 				for( int cnt = 0; cnt < Depth; ++cnt )
-					pixel1[cnt] = src_data[src_pixel_index00 * Depth + cnt] * tPteX.dd1 + src_data[src_pixel_index01 * Depth + cnt] * tPteX.dd;
+					pixel1[cnt] = src_data[src_pixel_index00 * Depth + cnt] * pte_x.dd1 + src_data[src_pixel_index01 * Depth + cnt] * pte_x.dd;
 
 				// second line
 				for( int cnt = 0; cnt < Depth; ++cnt )
-					pixel2[cnt] = src_data[src_pixel_index10 * Depth + cnt] * tPteX.dd1 + src_data[src_pixel_index11 * Depth + cnt] * tPteX.dd;
+					pixel2[cnt] = src_data[src_pixel_index10 * Depth + cnt] * pte_x.dd1 + src_data[src_pixel_index11 * Depth + cnt] * pte_x.dd;
 
 				// result lines
 				for( int cnt = 0; cnt < Depth; ++cnt )
-					dst_data[cnt] = static_cast<unsigned char>(pixel1[cnt] * tPteY.dd1 + pixel2[cnt] * tPteY.dd);
+					dst_data[cnt] = static_cast<unsigned char>(pixel1[cnt] * pte_y.dd1 + pixel2[cnt] * pte_y.dd);
 
 				dst_data += Depth;
 			}
@@ -259,35 +259,35 @@ namespace img
 
 	ScaleFuncs fillFuncs()
 	{
-		ScaleFuncs tResult;
+		ScaleFuncs result;
 
 		// undefined depths
-		tResult.funcs[FastScaling][0]		= 0;
-		tResult.funcs[MiddleScaling][0]		= 0;
-		tResult.funcs[HighScaling][0]		= 0;
-		tResult.funcs[FastScaling][2]		= 0;
-		tResult.funcs[MiddleScaling][2]		= 0;
-		tResult.funcs[HighScaling][2]		= 0;
+		result.funcs[FastScaling][0]		= 0;
+		result.funcs[MiddleScaling][0]		= 0;
+		result.funcs[HighScaling][0]		= 0;
+		result.funcs[FastScaling][2]		= 0;
+		result.funcs[MiddleScaling][2]		= 0;
+		result.funcs[HighScaling][2]		= 0;
 
 		// grey
-		tResult.funcs[FastScaling][1]		= resampleNearest<1>;
-		tResult.funcs[MiddleScaling][1]		= resampleBilinear<1>;
-		tResult.funcs[HighScaling][1]		= resampleBicubic<1>;
+		result.funcs[FastScaling][1]		= resampleNearest<1>;
+		result.funcs[MiddleScaling][1]		= resampleBilinear<1>;
+		result.funcs[HighScaling][1]		= resampleBicubic<1>;
 
 		// rgb, bgr, etc...
-		tResult.funcs[FastScaling][3]		= resampleNearest<3>;
-		tResult.funcs[MiddleScaling][3]		= resampleBilinear<3>;
-		tResult.funcs[HighScaling][3]		= resampleBicubic<3>;
+		result.funcs[FastScaling][3]		= resampleNearest<3>;
+		result.funcs[MiddleScaling][3]		= resampleBilinear<3>;
+		result.funcs[HighScaling][3]		= resampleBicubic<3>;
 
 		// with alpha channel
-		tResult.funcs[FastScaling][4]		= resampleNearest<4>;
-		tResult.funcs[MiddleScaling][4]		= resampleBilinear<4>;
-		tResult.funcs[HighScaling][4]		= resampleBicubic<4>;
+		result.funcs[FastScaling][4]		= resampleNearest<4>;
+		result.funcs[MiddleScaling][4]		= resampleBilinear<4>;
+		result.funcs[HighScaling][4]		= resampleBicubic<4>;
 
-		return tResult;
+		return result;
 	}
 
-	Image scale(const Image &aIn, Image &aCached, ScaleQuality aQuality, int width, int height)
+	Image scale(const Image &in, Image &cached, ScaleQuality quality, int width, int height)
 	{
 		// This function implements a Bicubic B-Spline algorithm for resampling.
 		// This method is certainly a little slower than wxImage's default pixel
@@ -314,49 +314,49 @@ namespace img
 		//
 		// NOTE: below the y_offset and x_offset variables are being set for edge
 		// pixels using the "Mirror" method mentioned above
-		assert( aIn.depth() != 0 );
-		assert( aIn.depth() != 2 );
-		assert( aIn.depth() < ScaleFuncs::MaxDepth );
-		assert( aQuality < ScaleFuncs::FunCount );
+		assert( in.depth() != 0 );
+		assert( in.depth() != 2 );
+		assert( in.depth() < ScaleFuncs::MaxDepth );
+		assert( quality < ScaleFuncs::FunCount );
 
-		static const ScaleFuncs tFuncs = fillFuncs();
+		static const ScaleFuncs funcs = fillFuncs();
 
 
-//		Image tResult;
+//		Image result;
 
 		if( 0 == width && 0 == height )
 			return Image::emptyImage;
 
 		if( 0 == height )
-			height = proportionalHeight(width, aIn.getSize());
+			height = proportionalHeight(width, in.getSize());
 
 		if( 0 == width )
-			width = proportionalWidth(height, aIn.getSize());
+			width = proportionalWidth(height, in.getSize());
 
-		ScaleFuncs::ScaleFun tFun = tFuncs.funcs[aQuality][aIn.depth()];
+		ScaleFuncs::ScaleFun fun = funcs.funcs[quality][in.depth()];
 
-		assert( tFun );
-		if( tFun )
+		assert( fun );
+		if( fun )
 		{
-			Image tTemp;
-			const bool tUseTemp = (&aIn == &aCached);
-			Image &tDst = tUseTemp?tTemp:aCached;
-			//Image tResult(width, height, aIn.depth());
-			tDst.create(width, height, aIn.depth());
-			tFun(aIn, tDst, width, height);
+			Image temp;
+			const bool use_temp = (&in == &cached);
+			Image &dst = use_temp?temp:cached;
+			//Image result(width, height, in.depth());
+			dst.create(width, height, in.depth());
+			fun(in, dst, width, height);
 
-			if( tUseTemp )
-				img::copy(tTemp, aCached);
+			if( use_temp )
+				img::copy(temp, cached);
 
-			return aCached;
+			return cached;
 		}
 
 		return Image::emptyImage;
 	}
 
-	Image scale(const Image &aIn, ScaleQuality aQuality, int width, int height)
+	Image scale(const Image &in, ScaleQuality quality, int width, int height)
 	{
-		Image tResult;
-		return scale(aIn, tResult, aQuality, width, height);
+		Image result;
+		return scale(in, result, quality, width, height);
 	}
 }

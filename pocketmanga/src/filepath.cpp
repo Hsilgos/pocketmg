@@ -2,6 +2,7 @@
 
 #include "defines.h"
 
+#include <algorithm>
 #include <ostream>
 
 namespace
@@ -15,42 +16,42 @@ namespace
 
 namespace fs
 {
-	void FilePath::setGlobalSelector(const char aSelector)
+	void FilePath::setGlobalSelector(const char selector)
 	{
-		DirSelector = aSelector;
+		DirSelector = selector;
 	}
 
 	FilePath::FilePath()
-		:mIsFile(false), mFirstLevel(0)
+		:is_file_(false), first_level_(0)
 	{
 	}
 
-	FilePath::FilePath(const std::string &aPath, bool aIsFile)
-		:mIsFile(false), mFirstLevel(0)
+	FilePath::FilePath(const std::string &path, bool is_file)
+		:is_file_(false), first_level_(0)
 	{
-		set(aPath, aIsFile);
+		set(path, is_file);
 	}
 
-	void FilePath::set(const std::string &aPath, bool aIsFile)
+	void FilePath::set(const std::string &path, bool is_file)
 	{
-		mPath = aPath;
-		mIsFile = aIsFile;
+		path_ = path;
+		is_file_ = is_file;
 
 		parse();
 	}
 
 	void FilePath::clear()
 	{
-		mPath.clear();
-		mIsFile = false;
-		mEntries.clear();
-		mFirstLevel = 0;
+		path_.clear();
+		is_file_ = false;
+		entries_.clear();
+		first_level_ = 0;
 	}
 
 	// returns maximum level
 	size_t FilePath::getLevel() const
 	{
-		return mEntries.size() - mFirstLevel;
+		return entries_.size() - first_level_;
 	}
 
 	size_t FilePath::getDirLevel() const
@@ -58,65 +59,65 @@ namespace fs
 		return getLevel() - (isDirectory() ? 0 : 1);
 	}
 
-	void FilePath::setFirstLevel(size_t aFirstLevel)
+	void FilePath::setFirstLevel(size_t first_level)
 	{
-		mFirstLevel = aFirstLevel;
+		first_level_ = first_level;
 	}
 
-	int FilePath::correctLevel(int aLevel) const
+	int FilePath::correctLevel(int level) const
 	{
-		return mFirstLevel + aLevel;
+		return first_level_ + level;
 	}
 
-	// returns 'true' if entry at level aLevel is directory name
-	bool FilePath::isDirectory(int aLevel) const
+	// returns 'true' if entry at level level is directory name
+	bool FilePath::isDirectory(int level) const
 	{
 		return 
-			(LastLevel == correctLevel(aLevel) || ( getLevel() - 1) == correctLevel(aLevel) )?(!mIsFile):true;
+			(LastLevel == correctLevel(level) || ( getLevel() - 1) == correctLevel(level) )?(!is_file_):true;
 	}
 
-	// return name of entry at level aLevel
-	std::string FilePath::getName(int aLevel) const
+	// return name of entry at level level
+	std::string FilePath::getName(int level) const
 	{
-		if( LastLevel == aLevel )
-			return mEntries.empty() ? utils::EmptyString : mEntries.back();
+		if( LastLevel == level )
+			return entries_.empty() ? utils::EmptyString : entries_.back();
 
-		const int tCorrected = correctLevel(aLevel);
-		const bool good_level = tCorrected < mEntries.size() && tCorrected >= 0;
+		const int corrected = correctLevel(level);
+		const bool good_level = corrected < entries_.size() && corrected >= 0;
 
-		return good_level ? mEntries[tCorrected] : utils::EmptyString;
+		return good_level ? entries_[corrected] : utils::EmptyString;
 	}
 
 	// returns whole path
 	const std::string &FilePath::getPath() const
 	{
-		return mPath;
+		return path_;
 	}
 
 	bool FilePath::empty() const
 	{
-		return mEntries.empty();
+		return entries_.empty();
 	}
 
 	void FilePath::parse()
 	{
-		//std::string::size_type tPos = mPath.find_first_of("/\\");
-		std::string::size_type tPos = 0;
-		std::string::size_type tPrevPos = mPath.find_first_not_of("/\\");
-		if( std::string::npos == tPrevPos )
+		//std::string::size_type pos = path_.find_first_of("/\\");
+		std::string::size_type pos = 0;
+		std::string::size_type prev_pos = path_.find_first_not_of("/\\");
+		if( std::string::npos == prev_pos )
 			return;
 
-		while( tPos != std::string::npos )
+		while( pos != std::string::npos )
 		{
-			tPos = mPath.find_first_of("/\\", tPos + 1);
+			pos = path_.find_first_of("/\\", pos + 1);
 
-			std::string tEntry = mPath.substr(tPrevPos, tPos - tPrevPos);
-			if ( !tEntry.empty() && tEntry != "." )
+			std::string entry = path_.substr(prev_pos, pos - prev_pos);
+			if ( !entry.empty() && entry != "." )
 			{
-				mEntries.push_back(tEntry);
+				entries_.push_back(entry);
 			}
 
-			tPrevPos = tPos + 1;
+			prev_pos = pos + 1;
 		}
 	}
 
@@ -125,201 +126,201 @@ namespace fs
 		if( isDirectory() )
 			return utils::EmptyString;
 
-		std::string tFileName = getFileName();
-		const std::string::size_type tPos = tFileName.find_last_of('.');
-		if( std::string::npos == tPos )
+		std::string file_name = getFileName();
+		const std::string::size_type pos = file_name.find_last_of('.');
+		if( std::string::npos == pos )
 			return utils::EmptyString;
 
-		return tFileName.substr(tPos + 1);
+		return file_name.substr(pos + 1);
 	}
 
 	std::string FilePath::getFileName() const
 	{
-		if( isDirectory() || mEntries.empty() )
+		if( isDirectory() || entries_.empty() )
 			return utils::EmptyString;
 
-		return mEntries.back();
+		return entries_.back();
 	}
 	
 	const std::string &FilePath::getLastEntry() const
 	{
-		return mEntries.empty()?utils::EmptyString:mEntries.back();
+		return entries_.empty()?utils::EmptyString:entries_.back();
 	}
 	
 	void FilePath::rebuildPath()
 	{
-		std::vector<std::string>::const_iterator it = mEntries.begin(), itEnd = mEntries.end();
+		std::vector<std::string>::const_iterator it = entries_.begin(), itEnd = entries_.end();
 		
-		mPath.clear();
+		path_.clear();
 		
 		for(  ;it != itEnd; ++it)
 		{
-			mPath += DirSelector;
-			mPath += *it;
+			path_ += DirSelector;
+			path_ += *it;
 		}
 		
-		if( mPath.empty() )
-			mPath = DirSelector;
+		if( path_.empty() )
+			path_ = DirSelector;
 	}
 	
-	void FilePath::addFolder(const std::string &aName)
+	void FilePath::addFolder(const std::string &name)
 	{
-		if( !aName.empty() )
+		if( !name.empty() )
 		{
-			mEntries.push_back(aName);
+			entries_.push_back(name);
 		
-			if( mPath.empty() || mPath[mPath.size() - 1] != DirSelector )
-				mPath += DirSelector;
+            if (path_.empty() || path_[path_.size() - 1] != DirSelector)
+				path_ += DirSelector;
 		
-			rebuildPath();//mPath += aName;
+			rebuildPath();//path_ += name;
 		}
 	}
 	
 	void FilePath::removeLastEntry()
 	{
-		if( !mEntries.empty() )
-			mEntries.erase(mEntries.end() - 1);
+		if( !entries_.empty() )
+			entries_.erase(entries_.end() - 1);
 
-		mIsFile = false;
+		is_file_ = false;
 		
 		rebuildPath();
 	}
 	
 	bool FilePath::isHidden() const
 	{
-		const std::string &tEntry = getLastEntry();
+		const std::string &entry = getLastEntry();
 		
-		return !tEntry.empty() && tEntry[0] == '.';
+		return !entry.empty() && entry[0] == '.';
 	}	
 	
 	bool FilePath::isBack() const
 	{	
-		const std::string &tEntry = getLastEntry();
+		const std::string &entry = getLastEntry();
 		
-		return  isDirectory() && tEntry.size() == 2 && tEntry[0] == '.' && tEntry[1] == '.';
+		return  isDirectory() && entry.size() == 2 && entry[0] == '.' && entry[1] == '.';
 	}
 
-	bool FilePath::startsWith(const FilePath &aOther, bool aCmpFromBack) const
+	bool FilePath::startsWith(const FilePath &other, bool cmp_from_back) const
 	{
-		if( mEntries.size() < aOther.mEntries.size() )
+		if( entries_.size() < other.entries_.size() )
 			return false;
 
-		return doCompare(aOther, aOther.mEntries.size(), aCmpFromBack);
+		return doCompare(other, other.entries_.size(), cmp_from_back);
 	}
 
-	bool FilePath::startsWith(const FilePath &aOther, size_t aLevel, bool aCmpFromBack) const
+	bool FilePath::startsWith(const FilePath &other, size_t level, bool cmp_from_back) const
 	{
-		if( mEntries.size() < aLevel || aOther.mEntries.size() < aLevel )
+		if( entries_.size() < level || other.entries_.size() < level )
 			return false;
 
-		return doCompare(aOther, aLevel, aCmpFromBack);
+		return doCompare(other, level, cmp_from_back);
 	}
 
-	bool FilePath::equals(const FilePath &aOther, bool aCmpFromBack) const
+	bool FilePath::equals(const FilePath &other, bool cmp_from_back) const
 	{
-		if( mEntries.size() != aOther.mEntries.size() )
+		if( entries_.size() != other.entries_.size() )
 			return false;
 
-		return doCompare(aOther, mEntries.size(), aCmpFromBack);
+		return doCompare(other, entries_.size(), cmp_from_back);
 	}
 
-	bool FilePath::operator == (const FilePath &aOther) const
+	bool FilePath::operator == (const FilePath &other) const
 	{
-		return equals(aOther, false);
+		return equals(other, false);
 	}
 
-	bool FilePath::operator != (const FilePath &aSecond) const
+	bool FilePath::operator != (const FilePath &second) const
 	{
-		return !(aSecond == *this);
+		return !(second == *this);
 	}
 
-	bool FilePath::operator < (const FilePath &aOther) const
+	bool FilePath::operator < (const FilePath &other) const
 	{
-		for( size_t i = 0 ; i < std::min(mEntries.size(), aOther.mEntries.size()) ; ++i )
+		for( size_t i = 0 ; i < std::min(entries_.size(), other.entries_.size()) ; ++i )
 		{
-			if( mEntries[i] != aOther.mEntries[i] )
-				return mEntries[i] < aOther.mEntries[i];
+			if( entries_[i] != other.entries_[i] )
+				return entries_[i] < other.entries_[i];
 		}
 
-		return mEntries.size() < aOther.mEntries.size();
+		return entries_.size() < other.entries_.size();
 	}
 
-	bool FilePath::doCompare(const FilePath &aOther, int aLevel, bool aCmpFromBack) const
+	bool FilePath::doCompare(const FilePath &other, int level, bool cmp_from_back) const
 	{
-		if( aCmpFromBack )
+		if( cmp_from_back )
 		{
-			const size_t tRBegin1 = mEntries.size() - aLevel;
-			const size_t tRBegin2 = aOther.mEntries.size() - aLevel;
+			const size_t r_begin1 = entries_.size() - level;
+			const size_t r_begin2 = other.entries_.size() - level;
 
 			return std::equal(
-						mEntries.rbegin() + tRBegin1,
-						mEntries.rbegin() + tRBegin1 + aLevel,
-						aOther.mEntries.rbegin() + tRBegin2);
+						entries_.rbegin() + r_begin1,
+						entries_.rbegin() + r_begin1 + level,
+						other.entries_.rbegin() + r_begin2);
 		}
 		
 		return std::equal(
-						mEntries.begin(),
-						mEntries.begin() + aLevel,
-						aOther.mEntries.begin());
+						entries_.begin(),
+						entries_.begin() + level,
+						other.entries_.begin());
 	}
 
-	void FilePath::setFile(const std::string &aName)
+	void FilePath::setFile(const std::string &name)
 	{
-		addFolder(aName);
-		mIsFile = true;
+		addFolder(name);
+		is_file_ = true;
 	}
 
-	FilePath FilePath::copy(int aLevel) const
+	FilePath FilePath::copy(int level) const
 	{
-		FilePath tResult;
-		if( LastLevel == aLevel || aLevel >= getLevel() )
+		FilePath result;
+		if( LastLevel == level || level >= getLevel() )
 		{
-			tResult = *this;
+			result = *this;
 		}
 		else
 		{
-			tResult.mEntries.insert(
-				tResult.mEntries.begin(),
-				mEntries.begin(),
-				mEntries.begin() + aLevel + 1);
+			result.entries_.insert(
+				result.entries_.begin(),
+				entries_.begin(),
+				entries_.begin() + level + 1);
 
-			tResult.rebuildPath();
+			result.rebuildPath();
 		}
 
-		return tResult;
+		return result;
 	}
 
-	bool HaveSameDirectory(const FilePath &aFirst, const FilePath &aSecond)
+	bool HaveSameDirectory(const FilePath &first, const FilePath &second)
 	{
-		const size_t tFirstDirLevel = aFirst.getDirLevel();
-		const size_t tSecondDirLevel = aSecond.getDirLevel();
-		if( tFirstDirLevel != tSecondDirLevel )
+		const size_t first_dir_level = first.getDirLevel();
+		const size_t second_dir_level = second.getDirLevel();
+		if( first_dir_level != second_dir_level )
 			return false;
 
-		return aFirst.startsWith(aSecond, tFirstDirLevel);
+		return first.startsWith(second, first_dir_level);
 	}
 
-	std::ostream& operator << (std::ostream& aStream, const fs::FilePath& aPath)
+	std::ostream& operator << (std::ostream& stream, const fs::FilePath& path)
 	{
-		aStream << (aPath.isDirectory() ? "[D]" : "[F]") << aPath.getPath();
-		return aStream;
+		stream << (path.isDirectory() ? "[D]" : "[F]") << path.getPath();
+		return stream;
 	}
 
-	FilePath CopyDirectory(const FilePath &aPath)
+	FilePath CopyDirectory(const FilePath &path)
 	{
-		return aPath.copy(aPath.getDirLevel());
+		return path.copy(path.getDirLevel());
 	}
 
-	FilePath FindCommonPath(const FilePath &aFirst, const FilePath &aSecond)
+	FilePath FindCommonPath(const FilePath &first, const FilePath &second)
 	{
-		const size_t tMinLevel = std::min(aFirst.getLevel(), aSecond.getLevel());
-		for(size_t i = 0; i < tMinLevel; ++i)
+		const size_t min_level = std::min(first.getLevel(), second.getLevel());
+		for(size_t i = 0; i < min_level; ++i)
 		{
-			if( aFirst.getName(i) != aSecond.getName(i) )
-				return i > 0 ? aFirst.copy(i - 1) : FilePath();
+			if( first.getName(i) != second.getName(i) )
+				return i > 0 ? first.copy(i - 1) : FilePath();
 		}
 
-		return aFirst.copy(tMinLevel - 1);
+		return first.copy(min_level - 1);
 	}
 }
 

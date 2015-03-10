@@ -30,26 +30,26 @@ namespace manga
 			int currentShowing;
 
 			Cache();
-			void swap(Cache &aOther);
+			void swap(Cache &other);
 
 			bool nextBounds();
 			bool previousBounds();
 		};
 
-		CacheScaler(const size_t aScreenWidth, const size_t aScreenHeight);
+		CacheScaler(const size_t screen_width, const size_t screen_height);
 
 		Cache &scaledGrey();
 
 	private:
 		CacheScaler &operator = (const CacheScaler &);
 
-		Cache mOrig;
-		Cache mScaled;
-		const size_t mScreenWidth;
-		const size_t mScreenHeight;
+		Cache orig_;
+		Cache scaled_;
+		const size_t screen_width_;
+		const size_t screen_height_;
 
 		virtual IBookCache *clone();
-		virtual void swap(IBookCache *aOther);
-		virtual bool onLoaded(img::Image &aImage);
+		virtual void swap(IBookCache *other);
+		virtual bool onLoaded(img::Image &image);
 	};
 }

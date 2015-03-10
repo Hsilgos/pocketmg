@@ -17,13 +17,13 @@ namespace test
 
 		Report *const report_;
 
-		ReportOutput(const std::string &aRow, const std::string &aColumn, Report *aReport);
+		ReportOutput(const std::string &row, const std::string &column, Report *report);
 		friend class Report;
 	public:
 		PATTERN_IMPL_CLONE(ReportOutput);
 
-		virtual void started(int aCount);
-		virtual void finished(boost::int64_t aMilliseconds);
+		virtual void started(int count);
+		virtual void finished(boost::int64_t milliseconds);
 	};
 
 	class Report
@@ -42,13 +42,13 @@ namespace test
 
 		std::string description_;
 	public:
-		void setDescription(const std::string &aDesc);
+		void setDescription(const std::string &desc);
 
-		void addInfo(const std::string &aRow, const std::string &aColumn, const std::string &aInfo);
+		void addInfo(const std::string &row, const std::string &column, const std::string &info);
 
-		void printTable(std::ostream &aOut);
+		void printTable(std::ostream &out);
 
-		ReportOutput output(const std::string &aRow, const std::string &aColumn);
+		ReportOutput output(const std::string &row, const std::string &column);
 	};
 }
 

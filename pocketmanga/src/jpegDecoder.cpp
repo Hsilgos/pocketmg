@@ -22,7 +22,7 @@ namespace
 
 	class JpgMemSrc: public jpeg_source_mgr
 	{
-		const tools::ByteArray &mBuffer;
+		const tools::ByteArray &buffer_;
 
 		static JpgMemSrc *getThis(j_decompress_ptr cinfo)
 		{
@@ -66,8 +66,8 @@ namespace
 		JpgMemSrc(const JpgMemSrc&);
 		JpgMemSrc operator=(const JpgMemSrc&);
 	public:
-		JpgMemSrc(const tools::ByteArray &aBuffer)
-			:mBuffer(aBuffer)
+		JpgMemSrc(const tools::ByteArray &buffer)
+			:buffer_(buffer)
 		{
 			init_source			= do_init_source;
 			fill_input_buffer	= do_fill_input_buffer;
@@ -75,8 +75,8 @@ namespace
 			term_source			= do_term_source;
 			resync_to_restart	= jpeg_resync_to_restart;
 
-			next_input_byte		= aBuffer.getData();
-			bytes_in_buffer		= aBuffer.getLength();
+			next_input_byte		= buffer.getData();
+			bytes_in_buffer		= buffer.getLength();
 		}
 	};
 }
@@ -85,79 +85,79 @@ namespace img
 {
 	class JpegDecoder: public IDecoder
 	{
-		jpeg_decompress_struct mDesc;
-		jpeg_error_mgr mError;
+		jpeg_decompress_struct desc_;
+		jpeg_error_mgr error_;
 
 		virtual std::vector<std::string> getExts() const
 		{
-			std::vector<std::string> tExts;
+			std::vector<std::string> exts;
 
-			tExts.push_back("jpeg");
-			tExts.push_back("jpg");
-			tExts.push_back("jpe");
-			tExts.push_back("pjpe");
-			tExts.push_back("pjpeg");
-			tExts.push_back("pjpg");
+			exts.push_back("jpeg");
+			exts.push_back("jpg");
+			exts.push_back("jpe");
+			exts.push_back("pjpe");
+			exts.push_back("pjpeg");
+			exts.push_back("pjpg");
 
-			return tExts;
+			return exts;
 		}
 
-		virtual bool decode(const tools::ByteArray &aEncoded, img::Image &aDecoded)
+		virtual bool decode(const tools::ByteArray &encoded, img::Image &decoded)
 		{
-			if( aEncoded.isEmpty() )
+			if( encoded.isEmpty() )
 				return false;
 
-			volatile bool tDecompressStarted = false;
+			volatile bool decompress_started = false;
 
-			JpgMemSrc tMemSrc(aEncoded);
-			mDesc.src = &tMemSrc;
+			JpgMemSrc mem_src(encoded);
+			desc_.src = &mem_src;
 
 			try
 			{
-				int rc = jpeg_read_header(&mDesc, TRUE);
+				int rc = jpeg_read_header(&desc_, TRUE);
 				if (rc != JPEG_HEADER_OK) 
 					return false;
 
-				tDecompressStarted = jpeg_start_decompress(&mDesc) != 0;
-				if( !tDecompressStarted )
+				decompress_started = jpeg_start_decompress(&desc_) != 0;
+				if( !decompress_started )
 				{
 					throw std::logic_error("Failed to start decompression");
 				}
 
-				aDecoded.create(
-					mDesc.output_width,
-					mDesc.output_height,
-					mDesc.num_components);
+				decoded.create(
+					desc_.output_width,
+					desc_.output_height,
+					desc_.num_components);
 
-				unsigned char* tDest = aDecoded.data();
+				unsigned char* dest = decoded.data();
 
 				JSAMPARRAY pJpegBuffer 
-					= (*mDesc.mem->alloc_sarray)((j_common_ptr) &mDesc, JPOOL_IMAGE, mDesc.output_width * mDesc.output_components, 1);
+					= (*desc_.mem->alloc_sarray)((j_common_ptr) &desc_, JPOOL_IMAGE, desc_.output_width * desc_.output_components, 1);
 
-				//const bool tColor = mDesc.output_components > 1;
+				//const bool color = desc_.output_components > 1;
 
-				int tHeight = mDesc.output_height;
-				const int tWidth	= mDesc.output_width;
-				const int tStep		= tWidth * mDesc.num_components;
+				int height = desc_.output_height;
+				const int width	= desc_.output_width;
+				const int step		= width * desc_.num_components;
 
-				for( ; tHeight--; tDest += tStep )
+				for( ; height--; dest += step )
 				{
-					jpeg_read_scanlines( &mDesc, pJpegBuffer, 1 );
-					memcpy( tDest, pJpegBuffer[0], tStep );
+					jpeg_read_scanlines( &desc_, pJpegBuffer, 1 );
+					memcpy( dest, pJpegBuffer[0], step );
 				}
 
-				jpeg_finish_decompress(&mDesc);
+				jpeg_finish_decompress(&desc_);
 
 				return true;
 
 			}
 			catch(...)
 			{
-				if( tDecompressStarted )
+				if( decompress_started )
 				{
 					try
 					{
-						if( !jpeg_finish_decompress(&mDesc) )
+						if( !jpeg_finish_decompress(&desc_) )
 							throw std::logic_error("Failed to stop decompression");
 					}
 					catch(...)
@@ -172,15 +172,15 @@ namespace img
 	public:
 		JpegDecoder()
 		{
-			jpeg_create_decompress(&mDesc);
+			jpeg_create_decompress(&desc_);
 
-			mDesc.err = jpeg_std_error(&mError);
-			mDesc.err->error_exit = do_not_exit;
+			desc_.err = jpeg_std_error(&error_);
+			desc_.err->error_exit = do_not_exit;
 		}
 
 		~JpegDecoder()
 		{
-			jpeg_destroy_decompress(&mDesc);
+			jpeg_destroy_decompress(&desc_);
 		}
 	};
 

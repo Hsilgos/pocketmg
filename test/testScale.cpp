@@ -18,16 +18,16 @@ namespace
 {
 	class ScaleHelper
 	{
-		//wxImage mJpegImage;
+		//wxImage jpeg_image_;
 
 	protected:
-		img::Image mImage;
+		img::Image image_;
 
-		test::Report mReport;
+		test::Report report_;
 
-		const char *qualityName(img::ScaleQuality aQuality)
+		const char *qualityName(img::ScaleQuality quality)
 		{
-			switch(aQuality)
+			switch(quality)
 			{
 			case img::HighScaling:
 				return "BICUBIC";
@@ -42,9 +42,9 @@ namespace
 			return "Unknow";
 		}
 
-		const char *angleName(img::RotateAngle aAngle)
+		const char *angleName(img::RotateAngle angle)
 		{
-			switch(aAngle)
+			switch(angle)
 			{
 			case img::Angle_90:
 				return "90";
@@ -66,60 +66,60 @@ namespace
 		~ScaleHelper()
 		{
 			std::cout << std::endl;
-			mReport.printTable( std::cout );
+			report_.printTable( std::cout );
 			std::cout << std::endl;
 		}
 
-		void init(void *aData, unsigned int aSize)
+		void init(void *data, unsigned int size)
 		{
-			BOOST_REQUIRE( mImage.load("jpg", tools::ByteArray(aData, aSize)) );
+			BOOST_REQUIRE( image_.load("jpg", tools::ByteArray(data, size)) );
 
-			std::stringstream tDescr;
-			tDescr << "Image size: " << mImage.width() << "x" << mImage.height();
-			mReport.setDescription(tDescr.str());
+			std::stringstream descr;
+			descr << "Image size: " << image_.width() << "x" << image_.height();
+			report_.setDescription(descr.str());
 		}
 
-		/*void doScale(const wxSize &aSize, img::ScaleQuality aQuality )
+		/*void doScale(const wxSize &size, img::ScaleQuality quality )
 		{
-			doScale(aSize.x, aSize.y, aQuality);
+			doScale(size.x, size.y, quality);
 		}*/
 
-		void doScale(int aNewWidth, int aNewHeight, img::ScaleQuality aQuality)
+		void doScale(int new_width, int new_height, img::ScaleQuality quality)
 		{
-			if( 0 ==  aNewWidth)
-				aNewWidth = img::proportionalWidth(aNewHeight,  mImage.getSize() );
+			if( 0 ==  new_width)
+				new_width = img::proportionalWidth(new_height,  image_.getSize() );
 
-			if( 0 ==  aNewHeight)
-				aNewHeight = img::proportionalHeight(aNewWidth,  mImage.getSize() );
+			if( 0 ==  new_height)
+				new_height = img::proportionalHeight(new_width,  image_.getSize() );
 
-			std::stringstream tRowName;
-			tRowName << aNewWidth << "x" << aNewHeight;
+			std::stringstream row_name;
+			row_name << new_width << "x" << new_height;
 
-			img::Image tCache;
-			tCache.createSame(mImage);
-			tCache.enableMinimumReallocations(true);
+			img::Image cache;
+			cache.createSame(image_);
+			cache.enableMinimumReallocations(true);
 
-			BENCHMARK( mReport.output(qualityName(aQuality), tRowName.str()) )
-				img::scale(mImage, tCache, aQuality, aNewWidth, aNewHeight);
+			BENCHMARK( report_.output(qualityName(quality), row_name.str()) )
+				img::scale(image_, cache, quality, new_width, new_height);
 		}
 
 		void doGrey()
 		{
-			//BENCHMARK( mReport.output("GREY", tRowName.str()) )
-				img::toGray(mImage, mImage);
+			//BENCHMARK( report_.output("GREY", row_name.str()) )
+				img::toGray(image_, image_);
 		}
 
-		void doRotate(img::RotateAngle aAngle)
+		void doRotate(img::RotateAngle angle)
 		{
-			std::stringstream tDescr;
-			tDescr <<mImage.width() << "x" << mImage.height();
+			std::stringstream descr;
+			descr <<image_.width() << "x" << image_.height();
 
-			img::Image tCache;
-			tCache.createSame(mImage);
-			tCache.enableMinimumReallocations(true);
+			img::Image cache;
+			cache.createSame(image_);
+			cache.enableMinimumReallocations(true);
 
-			BENCHMARK( mReport.output(angleName(aAngle), tDescr.str()) )
-				img::rotate(mImage, tCache, aAngle);
+			BENCHMARK( report_.output(angleName(angle), descr.str()) )
+				img::rotate(image_, cache, angle);
 		}
 	};
 }

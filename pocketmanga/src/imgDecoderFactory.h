@@ -26,12 +26,12 @@ namespace img
 		typedef std::map<std::string, IDecoder *>	DecodersMap;
 		typedef std::list<IDecoder *>				DecodersList;
 
-		DecodersMap		mDecodersMap;
-		DecodersList	mDecodersList;
+		DecodersMap		decoders_map_;
+		DecodersList	decoders_list_;
 	public:
-		void registerDecoder(img::IDecoder *aDecoder);
-		void unregisterDecoder(const std::string &aExt);
-		bool decode(const std::string &aExt, const tools::ByteArray &aData, img::Image &aImage) const;
+		void registerDecoder(img::IDecoder *decoder);
+		void unregisterDecoder(const std::string &ext);
+		bool decode(const std::string &ext, const tools::ByteArray &data, img::Image &image) const;
 	};
 
 

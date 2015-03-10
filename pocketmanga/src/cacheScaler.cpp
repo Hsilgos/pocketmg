@@ -10,17 +10,17 @@ namespace manga
 {
 	IBookCache *CacheScaler::clone()
 	{
-		return new CacheScaler(mScreenWidth, mScreenHeight);
+		return new CacheScaler(screen_width_, screen_height_);
 	}
 
-	void CacheScaler::swap(IBookCache *aOther)
+	void CacheScaler::swap(IBookCache *other_cache)
 	{
-		CacheScaler *tOther = 
-			utils::isDebugging() ? dynamic_cast<CacheScaler *>(aOther) : static_cast<CacheScaler *>(aOther);
+		CacheScaler *other = 
+            utils::isDebugging() ? dynamic_cast<CacheScaler *>(other_cache) : static_cast<CacheScaler *>(other_cache);
 
-		assert(tOther);
-		mOrig.swap(tOther->mOrig);
-		mScaled.swap(tOther->mScaled);
+		assert(other);
+		orig_.swap(other->orig_);
+		scaled_.swap(other->scaled_);
 	}
 
 	CacheScaler::Cache::Cache()
@@ -28,30 +28,30 @@ namespace manga
 		image.enableMinimumReallocations(true);
 	}
 
-	void CacheScaler::Cache::swap(Cache &aOther)
+	void CacheScaler::Cache::swap(Cache &other)
 	{
-		std::swap(orientation, aOther.orientation);
-		std::swap(representation, aOther.representation);
-		std::swap(bounds, aOther.bounds);
-		std::swap(currentShowing, aOther.currentShowing);
-		image.swap(aOther.image);
+		std::swap(orientation, other.orientation);
+		std::swap(representation, other.representation);
+		std::swap(bounds, other.bounds);
+		std::swap(currentShowing, other.currentShowing);
+		image.swap(other.image);
 	}
 
 	bool CacheScaler::Cache::nextBounds()
 	{
 		if( Parts3 == representation )
 		{
-			const int tSecondFrame = (image.width() - bounds.width) / 2;
-			if( bounds.x < tSecondFrame )
+			const int second_frame = (image.width() - bounds.width) / 2;
+			if( bounds.x < second_frame )
 			{
-				bounds.x = tSecondFrame;
+				bounds.x = second_frame;
 				return true;
 			}
 
-			const int tThirdFrame = image.width() - bounds.width;
-			if( bounds.x < tThirdFrame )
+			const int third_frame = image.width() - bounds.width;
+			if( bounds.x < third_frame )
 			{
-				bounds.x = tThirdFrame;
+				bounds.x = third_frame;
 				return true;
 			}
 		}
@@ -63,10 +63,10 @@ namespace manga
 	{
 		if( Parts3 == representation )
 		{
-			const int tSecondFrame = (image.width() - bounds.width) / 2;
-			if( bounds.x > tSecondFrame )
+			const int second_frame = (image.width() - bounds.width) / 2;
+			if( bounds.x > second_frame )
 			{
-				bounds.x = tSecondFrame;
+				bounds.x = second_frame;
 				return true;
 			}
 
@@ -80,82 +80,82 @@ namespace manga
 		return false;
 	}
 
-	bool CacheScaler::onLoaded(img::Image &aImage)
+	bool CacheScaler::onLoaded(img::Image &image)
 	{
-		img::toBgr(aImage, mOrig.image);
-		img::toGray(mOrig.image, mOrig.image);
-		if( mOrig.image.width() < mScreenWidth && mOrig.image.height() < mScreenHeight )
+		img::toBgr(image, orig_.image);
+		img::toGray(orig_.image, orig_.image);
+		if( orig_.image.width() < screen_width_ && orig_.image.height() < screen_height_ )
 		{
-			mScaled.representation = Whole;
-			mScaled.orientation = Vertical;
+			scaled_.representation = Whole;
+			scaled_.orientation = Vertical;
 
-			img::copy(mOrig.image, mScaled.image);
+			img::copy(orig_.image, scaled_.image);
 		}
-		else if( mOrig.image.width() < mScreenHeight && mOrig.image.height() < mScreenWidth )
+		else if( orig_.image.width() < screen_height_ && orig_.image.height() < screen_width_ )
 		{
-			mScaled.representation = Whole;
-			mScaled.orientation = Horizontal;
+			scaled_.representation = Whole;
+			scaled_.orientation = Horizontal;
 
-			img::rotate(mOrig.image, mScaled.image, img::Angle_270);
+			img::rotate(orig_.image, scaled_.image, img::Angle_270);
 		}
-		if( mOrig.image.width() <= mOrig.image.height() )
+		if( orig_.image.width() <= orig_.image.height() )
 		{
-			mScaled.representation = Parts3;
-			mScaled.orientation = Vertical;
+			scaled_.representation = Parts3;
+			scaled_.orientation = Vertical;
 
-			img::scale(mOrig.image, mScaled.image, img::HighScaling,  mScreenHeight, 0);
-			img::rotate(mScaled.image, mScaled.image, img::Angle_270);
+			img::scale(orig_.image, scaled_.image, img::HighScaling,  screen_height_, 0);
+			img::rotate(scaled_.image, scaled_.image, img::Angle_270);
 
-			mScaled.bounds.x = 0;
-			mScaled.bounds.y = 0;
-			mScaled.bounds.width 	= mScreenWidth;
-			mScaled.bounds.height 	= mScreenHeight;
-			mScaled.currentShowing	= 0;
-			/*aDrawable.representType = Parts3;
-			aDrawable.orientation = Vertical;
+			scaled_.bounds.x = 0;
+			scaled_.bounds.y = 0;
+			scaled_.bounds.width 	= screen_width_;
+			scaled_.bounds.height 	= screen_height_;
+			scaled_.currentShowing	= 0;
+			/*drawable.representType = Parts3;
+			drawable.orientation = Vertical;
 
-			const double tImgProp = static_cast<double>(mImage.width())/static_cast<double>(mImage.height());
-			const double tScrProp = static_cast<double>(tScreenWidth)/static_cast<double>(mScreenHeight);
+			const double img_prop = static_cast<double>(image_.width())/static_cast<double>(image_.height());
+			const double scr_prop = static_cast<double>(screen_width)/static_cast<double>(screen_height_);
 
-			if( tImgProp < tScrProp )
-				img::scale(mImage, mDrawable.image, img::HighScaling,  0, mScreenHeight);
+			if( img_prop < scr_prop )
+				img::scale(image_, drawable_.image, img::HighScaling,  0, screen_height_);
 			else
-				img::scale(mImage, mDrawable.image, img::HighScaling, tScreenWidth, 0);
+				img::scale(image_, drawable_.image, img::HighScaling, screen_width, 0);
 
-			aDrawable.currectBouds.x = 0;
-			aDrawable.currectBouds.y = 0;
-			aDrawable.currectBouds.width 	= tScreenWidth;
-			aDrawable.currectBouds.height 	= mScreenHeight;*/
+			drawable.currectBouds.x = 0;
+			drawable.currectBouds.y = 0;
+			drawable.currectBouds.width 	= screen_width;
+			drawable.currectBouds.height 	= screen_height_;*/
 		}
 		else
 		{
-			mScaled.representation = Parts3;
-			mScaled.orientation = Vertical;
+			scaled_.representation = Parts3;
+			scaled_.orientation = Vertical;
 
-			img::scale(mOrig.image, mScaled.image, img::HighScaling,  0, mScreenHeight);
-			//img::rotate(mDrawable.image, mDrawable.image, img::Angle_270);
+			img::scale(orig_.image, scaled_.image, img::HighScaling,  0, screen_height_);
+			//img::rotate(drawable_.image, drawable_.image, img::Angle_270);
 
-			mScaled.bounds.x = 0;
-			mScaled.bounds.y = 0;
-			mScaled.bounds.width 	= mScreenWidth;
-			mScaled.bounds.height 	= mScreenHeight;
-			mScaled.currentShowing	= 0;
-			/*aDrawable.representType = Parts3;
-			aDrawable.orientation = Vertical;
+			scaled_.bounds.x = 0;
+			scaled_.bounds.y = 0;
+			scaled_.bounds.width 	= screen_width_;
+			scaled_.bounds.height 	= screen_height_;
+			scaled_.currentShowing	= 0;
+			/*drawable.representType = Parts3;
+			drawable.orientation = Vertical;
 
-			const double tImgProp = static_cast<double>(mImage.height())/static_cast<double>(mImage.width());
-			const double tScrProp = static_cast<double>(tScreenWidth)/static_cast<double>(mScreenHeight);
+			const double img_prop = static_cast<double>(image_.height())/static_cast<double>(image_.width());
+			const double scr_prop = static_cast<double>(screen_width)/static_cast<double>(screen_height_);
 
-			if( tImgProp < tScrProp )
-				img::scale(mImage, mDrawable.image, img::HighScaling, mScreenHeight, 0);
+			if( img_prop < scr_prop )
+				img::scale(image_, drawable_.image, img::HighScaling, screen_height_, 0);
 			else
-				img::scale(mImage, mDrawable.image, img::HighScaling, 0, tScreenWidth);
+				img::scale(image_, drawable_.image, img::HighScaling, 0, screen_width);
 
-			img::rotate(mDrawable.image, mDrawable.image, img::Angle_270);
-			aDrawable.currectBouds.x = 0;
-			aDrawable.currectBouds.y = 0;
-			aDrawable.currectBouds.width 	= tScreenWidth;
-			aDrawable.currectBouds.height 	= mScreenHeight;*/
+			img::rotate(drawable_.image, drawable_.image, img::Angle_270);
+			drawable.currectBouds.x = 0;
+			drawable.currectBouds.y = 0;
+			drawable.currectBouds.width 	= screen_width;
+			drawable.currectBouds.height 	= screen_height_;*/
 		}
 
 		return true;
@@ -163,11 +163,11 @@ namespace manga
 
 	CacheScaler::Cache &CacheScaler::scaledGrey()
 	{
-		return mScaled;
+		return scaled_;
 	}
 
-	CacheScaler::CacheScaler(const size_t aScreenWidth, const size_t aScreenHeight)
-		:mScreenWidth(aScreenWidth), mScreenHeight(aScreenHeight)
+	CacheScaler::CacheScaler(const size_t screen_width, const size_t screen_height)
+		:screen_width_(screen_width), screen_height_(screen_height)
 	{
 	}
 }

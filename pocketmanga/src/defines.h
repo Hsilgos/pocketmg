@@ -23,11 +23,11 @@ namespace utils
 		Rect(
 			int ax		= 0,
 			int ay		= 0,
-			SizeType aWidth		= 0,
-			SizeType aHeight	= 0);
+			SizeType width		= 0,
+			SizeType height	= 0);
 	};
 
-	Rect restrictBy(const Rect &aSrc, const Rect &aRestricter);
+	Rect restrictBy(const Rect &src, const Rect &restricter);
 
 	struct Size
 	{
@@ -37,7 +37,7 @@ namespace utils
 		SizeType height;
 
 		Size(
-			SizeType aWidth	= 0,
-			SizeType aHeight	= 0);
+			SizeType width	= 0,
+			SizeType height	= 0);
 	};
 }

@@ -14,14 +14,14 @@ namespace archive
 	public:
 		virtual ~IArchive(){};
 
-		virtual bool open(const std::string &aFile ) = 0;
+		virtual bool open(const std::string &file ) = 0;
 		virtual void close() = 0;
-		virtual std::vector<fs::FilePath> getFileList(bool aFilesOnly) = 0;
-		virtual tools::ByteArray getFile(const fs::FilePath &aFileInArchive, size_t aMaxSize) = 0;
+		virtual std::vector<fs::FilePath> getFileList(bool files_only) = 0;
+		virtual tools::ByteArray getFile(const fs::FilePath &file_in_archive, size_t max_size) = 0;
 
 		typedef IArchive* (*FactoryMethod)();
-		static void registerArchiver(const std::string &aPrefExt, FactoryMethod aMethod);
-		static void unregisterArchiver(const std::string &aPrefExt);
+		static void registerArchiver(const std::string &pref_ext, FactoryMethod method);
+		static void unregisterArchiver(const std::string &pref_ext);
 	};
 
 #define AUTO_REGISTER_ARCHIVER(pref_ext, archive_class)														    \
@@ -42,6 +42,6 @@ namespace archive
 		static TOKEN_JOIN(FactoryRegistrar, __LINE__) TOKEN_JOIN(__global_factory_registrar__, __LINE__ );		\
 	}
 
-	IArchive *recognize(const fs::FilePath &aPath);
+	IArchive *recognize(const fs::FilePath &path);
 }
 

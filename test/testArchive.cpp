@@ -5,38 +5,38 @@
 
 namespace test
 {
-	TestArchive::TestArchive(const std::string &aName)
-		:mName(aName)
+	TestArchive::TestArchive(const std::string &name)
+		:name_(name)
 	{
 
 	}
 
 	void TestArchive::addFile(
-		const std::string &aFileInArch, const tools::ByteArray &aData)
+		const std::string &file_in_arch, const tools::ByteArray &data)
 	{
-		fs::FilePath tPath(aFileInArch, true);
-		mContent[tPath] = aData;
+		fs::FilePath path(file_in_arch, true);
+		content_[path] = data;
 	}
 
-	void TestArchive::addFolder(const std::string &aPathInArch)
+	void TestArchive::addFolder(const std::string &path_in_arch)
 	{
-		fs::FilePath tPath(aPathInArch, false);
-		mContent[tPath] = tools::ByteArray::empty;
+		fs::FilePath path(path_in_arch, false);
+		content_[path] = tools::ByteArray::empty;
 	}
 
 	TestArchive::Content &TestArchive::getContent()
 	{
-		return mContent;
+		return content_;
 	}
 
 	const std::string &TestArchive::getName() const
 	{
-		return mName;
+		return name_;
 	}
 
 	bool TestArchive::empty() const 
 	{
-		return mName.empty() && mContent.empty();
+		return name_.empty() && content_.empty();
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -59,30 +59,30 @@ namespace test
 	class ProxyArch: public archive::IArchive
 	{
 	public:
-		ProxyArch(archive::IArchive *aOther)
-			:mOther(aOther)
+		ProxyArch(archive::IArchive *other)
+			:other_(other)
 		{
 		}
 	private:
-		virtual bool open(const std::string &aFile )
+		virtual bool open(const std::string &file )
 		{
-			return mOther->open(aFile);
+			return other_->open(file);
 		}
 
 		virtual void close()
 		{
-			return mOther->close();
+			return other_->close();
 		}
-		virtual std::vector<fs::FilePath> getFileList(bool aFilesOnly)
+		virtual std::vector<fs::FilePath> getFileList(bool files_only)
 		{
-			return mOther->getFileList(aFilesOnly);
+			return other_->getFileList(files_only);
 		}
-		virtual tools::ByteArray getFile(const fs::FilePath &aFileInArchive, size_t aMaxSize)
+		virtual tools::ByteArray getFile(const fs::FilePath &file_in_archive, size_t max_size)
 		{
-			return mOther->getFile(aFileInArchive, aMaxSize);
+			return other_->getFile(file_in_archive, max_size);
 		}
 
-		archive::IArchive *mOther;
+		archive::IArchive *other_;
 	};
 
 	archive::IArchive *TestArchiver::createProxy()
@@ -92,26 +92,26 @@ namespace test
 
 	TestArchiver *TestArchiver::instance = 0;
 	
-	bool TestArchiver::open(const std::string &aFile)
+	bool TestArchiver::open(const std::string &file)
 	{
-		fs::FilePath tPath(aFile, true);
-		if( tPath.getExtension() != ArchExt )
+		fs::FilePath path(file, true);
+		if( path.getExtension() != ArchExt )
 			return false;
 
-		TestFileSystem::Dir *tDir = file_system_->findDirByPath(aFile, true);
-		if( !tDir )
+		TestFileSystem::Dir *dir = file_system_->findDirByPath(file, true);
+		if( !dir )
 			return false;
 
-		if( tDir->archives.empty() )
+		if( dir->archives.empty() )
 			return false;
 
 		std::vector<TestArchive>::iterator
-			it = tDir->archives.begin(),
-			itEnd = tDir->archives.end();
+			it = dir->archives.begin(),
+			itEnd = dir->archives.end();
 
 		for( ;it != itEnd; ++it)
 		{
-			if( it->getName() == tPath.getFileName() )
+			if( it->getName() == path.getFileName() )
 			{
 				current_archive_ = &(*it);
 				return true;
@@ -126,25 +126,25 @@ namespace test
 		current_archive_ = 0;
 	}
 
-	std::vector<fs::FilePath> TestArchiver::getFileList(bool aFilesOnly)
+	std::vector<fs::FilePath> TestArchiver::getFileList(bool files_only)
 	{
-		std::vector<fs::FilePath> tResult;
+		std::vector<fs::FilePath> result;
 		if(current_archive_)
-			utils::collectKeys(current_archive_->getContent(), std::back_inserter(tResult));
-		return tResult;
+			utils::collectKeys(current_archive_->getContent(), std::back_inserter(result));
+		return result;
 	}
 
-	tools::ByteArray TestArchiver::getFile(const fs::FilePath &aFileInArchive, size_t aMaxSize)
+	tools::ByteArray TestArchiver::getFile(const fs::FilePath &file_in_archive, size_t max_size)
 	{
-		tools::ByteArray tResult;
+		tools::ByteArray result;
 
 		if( current_archive_ )
 		{
-			TestArchive::Content::iterator it = current_archive_->getContent().find(aFileInArchive);
+			TestArchive::Content::iterator it = current_archive_->getContent().find(file_in_archive);
 			if( it != current_archive_->getContent().end() )
-				tResult = it->second;
+				result = it->second;
 		}
 
-		return tResult;
+		return result;
 	}
 }

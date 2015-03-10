@@ -17,17 +17,17 @@ namespace pocket
 {
 	class PictureView: public utils::SingletonStatic<PictureView>
 	{
-		std::auto_ptr<manga::Book> mBook;
+		std::auto_ptr<manga::Book> book_;
 
-		manga::CacheScaler *mScaler;
+		manga::CacheScaler *scaler_;
 	public:
-		void setBook( std::auto_ptr<manga::Book> aBook);
+		void setBook( std::auto_ptr<manga::Book> book);
 		bool next();
 		bool previous();
 
 
 
 		void draw();
-		void draw(manga::CacheScaler *aScaler);
+		void draw(manga::CacheScaler *scaler);
 	};
 }

@@ -7,46 +7,46 @@
 
 namespace img
 {
-	void DecoderFactory::registerDecoder(img::IDecoder *aDecoder)
+	void DecoderFactory::registerDecoder(img::IDecoder *decoder)
 	{
-		if( aDecoder )
+		if( decoder )
 		{
-			std::vector<std::string> tExts = aDecoder->getExts();
-			std::vector<std::string>::const_iterator it = tExts.begin(), itEnd = tExts.end();
+			std::vector<std::string> exts = decoder->getExts();
+			std::vector<std::string>::const_iterator it = exts.begin(), itEnd = exts.end();
 			for( ; it != itEnd; ++it )
 			{
-				mDecodersMap[*it] = aDecoder;
+				decoders_map_[*it] = decoder;
 			}
 
-			mDecodersList.push_back(aDecoder);
+			decoders_list_.push_back(decoder);
 		}
 	}
 
-	void DecoderFactory::unregisterDecoder(const std::string &aExt)
+	void DecoderFactory::unregisterDecoder(const std::string &ext)
 	{
-		mDecodersMap.erase(aExt);
+		decoders_map_.erase(ext);
 	}
 
-	bool DecoderFactory::decode(const std::string &aExt, const tools::ByteArray &aData, img::Image &aImage) const
+	bool DecoderFactory::decode(const std::string &ext, const tools::ByteArray &data, img::Image &image) const
 	{
-		img::IDecoder *tFound = 0;
+		img::IDecoder *found = 0;
 
 		// search by extension first...
-		if( !aExt.empty() )
+		if( !ext.empty() )
 		{
-			DecodersMap::const_iterator it = mDecodersMap.find(aExt);
-			if( it != mDecodersMap.end() )
-				tFound = it->second;
+			DecodersMap::const_iterator it = decoders_map_.find(ext);
+			if( it != decoders_map_.end() )
+				found = it->second;
 		}
 
-		if( tFound && tFound->decode(aData, aImage) )
+		if( found && found->decode(data, image) )
 			return true;
 
-		DecodersList::const_iterator it = mDecodersList.begin(), itEnd = mDecodersList.end();
+		DecodersList::const_iterator it = decoders_list_.begin(), itEnd = decoders_list_.end();
 		for ( ; it != itEnd; ++it )
 		{
 			// exclude decoder which we use on last step
-			if( *it != tFound && (*it)->decode(aData, aImage) )
+			if( *it != found && (*it)->decode(data, image) )
 				return true;
 		}
 

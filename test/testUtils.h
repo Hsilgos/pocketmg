@@ -18,8 +18,8 @@ namespace utils
 		return sizeof(void*) == 8?x64:x86;
 	}
 
-	void ideOutput(const char *, bool aEndLine = true);
-	void ideOutput(const wchar_t *, bool aEndLine = true);
+	void ideOutput(const char *, bool end_line = true);
+	void ideOutput(const wchar_t *, bool end_line = true);
 
 	enum ConsoleColor
 	{
@@ -32,9 +32,9 @@ namespace utils
 		CCWhite		= CCBlue|CCGreen|CCRed
 	};
 
-	void setConsoleColor(unsigned int aColor);
+	void setConsoleColor(unsigned int color);
 
-	void doBlockLeakDetect(bool aBlock);
+	void doBlockLeakDetect(bool block);
 	inline void enableLeakDetecting()
 	{
 		if( isDebugging() )
@@ -47,7 +47,7 @@ namespace utils
 	}
 	class BlockLeakDetect
 	{
-		void doBlock(bool aBlock);
+		void doBlock(bool block);
 	public:
 		BlockLeakDetect()
 		{
@@ -61,7 +61,7 @@ namespace utils
 	};
 
 	std::string lastErrorDescription();
-	std::string lastErrorDescription(int aErrorCode);
+	std::string lastErrorDescription(int error_code);
 }
 
 #define ASSERT_RET1( cond ) \

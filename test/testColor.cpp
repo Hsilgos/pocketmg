@@ -15,43 +15,43 @@ namespace test
 	BOOST_AUTO_TEST_CASE( Smoke )
 	{
 		// RGB
-		color::Rgb tRgbSmoke;
+		color::Rgb rgb_smoke;
 
 		STATIC_ASSERT(color::Rgb::RedIndex		== 0,	ShoulBe0);
 		STATIC_ASSERT(color::Rgb::GreenIndex	== 1,	ShoulBe1);
 		STATIC_ASSERT(color::Rgb::BlueIndex		== 2,	ShoulBe2);
 
-		color::Rgb tRgb(1, 2, 3);
-		BOOST_CHECK_EQUAL(tRgb.red(),	1);
-		BOOST_CHECK_EQUAL(tRgb.green(), 2);
-		BOOST_CHECK_EQUAL(tRgb.blue(),	3);
+		color::Rgb rgb(1, 2, 3);
+		BOOST_CHECK_EQUAL(rgb.red(),	1);
+		BOOST_CHECK_EQUAL(rgb.green(), 2);
+		BOOST_CHECK_EQUAL(rgb.blue(),	3);
 
-		color::Rgb tRgbOther = tRgb;
-		BOOST_CHECK_EQUAL(tRgbOther.red(),	1);
-		BOOST_CHECK_EQUAL(tRgbOther.green(), 2);
-		BOOST_CHECK_EQUAL(tRgbOther.blue(),	3);
+		color::Rgb rgb_other = rgb;
+		BOOST_CHECK_EQUAL(rgb_other.red(),	1);
+		BOOST_CHECK_EQUAL(rgb_other.green(), 2);
+		BOOST_CHECK_EQUAL(rgb_other.blue(),	3);
 
-		tRgbSmoke = tRgbOther;
-		BOOST_CHECK_EQUAL(tRgbSmoke.red(),	1);
-		BOOST_CHECK_EQUAL(tRgbSmoke.green(), 2);
-		BOOST_CHECK_EQUAL(tRgbSmoke.blue(),	3);
+		rgb_smoke = rgb_other;
+		BOOST_CHECK_EQUAL(rgb_smoke.red(),	1);
+		BOOST_CHECK_EQUAL(rgb_smoke.green(), 2);
+		BOOST_CHECK_EQUAL(rgb_smoke.blue(),	3);
 
 		// BGR
-		color::Bgr tBgrSmoke;
+		color::Bgr bgr_smoke;
 
 		STATIC_ASSERT(color::Bgr::BlueIndex		== 0,	ShoulBe0);
 		STATIC_ASSERT(color::Bgr::GreenIndex	== 1,	ShoulBe1);
 		STATIC_ASSERT(color::Bgr::RedIndex		== 2,	ShoulBe2);
 
 		// RGBA
-		color::Rgba tRgbaSmoke;
+		color::Rgba rgba_smoke;
 		STATIC_ASSERT(color::Rgba::RedIndex		== 0,	ShoulBe0);
 		STATIC_ASSERT(color::Rgba::GreenIndex	== 1,	ShoulBe1);
 		STATIC_ASSERT(color::Rgba::BlueIndex	== 2,	ShoulBe2);
 		STATIC_ASSERT(color::Rgba::AlphaIndex	== 3,	ShoulBe3);
 
 		// ARGB
-		color::Argb tArgbSmoke;
+		color::Argb argb_smoke;
 		STATIC_ASSERT(color::Argb::AlphaIndex	== 0,	ShoulBe0);
 		STATIC_ASSERT(color::Argb::RedIndex		== 1,	ShoulBe1);
 		STATIC_ASSERT(color::Argb::GreenIndex	== 2,	ShoulBe2);
@@ -60,105 +60,105 @@ namespace test
 
 	BOOST_AUTO_TEST_CASE( rgb2bgr )
 	{
-		color::Rgb tRgb(1, 2, 3);
-		color::Bgr tBgr = tRgb;
+		color::Rgb rgb(1, 2, 3);
+		color::Bgr bgr = rgb;
 
-		BOOST_CHECK_EQUAL(tRgb.red(),	1);
-		BOOST_CHECK_EQUAL(tRgb.green(), 2);
-		BOOST_CHECK_EQUAL(tRgb.blue(),	3);
-		BOOST_CHECK_EQUAL(tBgr.red(),	1);
-		BOOST_CHECK_EQUAL(tBgr.green(), 2);
-		BOOST_CHECK_EQUAL(tBgr.blue(),	3);
+		BOOST_CHECK_EQUAL(rgb.red(),	1);
+		BOOST_CHECK_EQUAL(rgb.green(), 2);
+		BOOST_CHECK_EQUAL(rgb.blue(),	3);
+		BOOST_CHECK_EQUAL(bgr.red(),	1);
+		BOOST_CHECK_EQUAL(bgr.green(), 2);
+		BOOST_CHECK_EQUAL(bgr.blue(),	3);
 
-		BOOST_CHECK_EQUAL(tRgb.colors[0],	1);
-		BOOST_CHECK_EQUAL(tRgb.colors[1],	2);
-		BOOST_CHECK_EQUAL(tRgb.colors[2],	3);
+		BOOST_CHECK_EQUAL(rgb.colors[0],	1);
+		BOOST_CHECK_EQUAL(rgb.colors[1],	2);
+		BOOST_CHECK_EQUAL(rgb.colors[2],	3);
 
-		BOOST_CHECK_EQUAL(tBgr.colors[0],	3);
-		BOOST_CHECK_EQUAL(tBgr.colors[1],	2);
-		BOOST_CHECK_EQUAL(tBgr.colors[2],	1);
+		BOOST_CHECK_EQUAL(bgr.colors[0],	3);
+		BOOST_CHECK_EQUAL(bgr.colors[1],	2);
+		BOOST_CHECK_EQUAL(bgr.colors[2],	1);
 
-		color::Bgr tBgr2(0, 0, 0);
-		tBgr2 = tRgb;
-		BOOST_CHECK_EQUAL(tBgr2.red(),	1);
-		BOOST_CHECK_EQUAL(tBgr2.green(), 2);
-		BOOST_CHECK_EQUAL(tBgr2.blue(),	3);
-		BOOST_CHECK_EQUAL(tBgr2.colors[0],	3);
-		BOOST_CHECK_EQUAL(tBgr2.colors[1],	2);
-		BOOST_CHECK_EQUAL(tBgr2.colors[2],	1);
+		color::Bgr bgr2(0, 0, 0);
+		bgr2 = rgb;
+		BOOST_CHECK_EQUAL(bgr2.red(),	1);
+		BOOST_CHECK_EQUAL(bgr2.green(), 2);
+		BOOST_CHECK_EQUAL(bgr2.blue(),	3);
+		BOOST_CHECK_EQUAL(bgr2.colors[0],	3);
+		BOOST_CHECK_EQUAL(bgr2.colors[1],	2);
+		BOOST_CHECK_EQUAL(bgr2.colors[2],	1);
 
 	}
 
 	BOOST_AUTO_TEST_CASE( rgba2bgra )
 	{
-		color::Rgba tRgba(1, 2, 3, 4);
-		color::Bgra tBgra = tRgba;
+		color::Rgba rgba(1, 2, 3, 4);
+		color::Bgra bgra = rgba;
 
-		BOOST_CHECK_EQUAL(tRgba.red(),		1);
-		BOOST_CHECK_EQUAL(tRgba.green(),	2);
-		BOOST_CHECK_EQUAL(tRgba.blue(),		3);
-		BOOST_CHECK_EQUAL(tRgba.alpha(),	4);
+		BOOST_CHECK_EQUAL(rgba.red(),		1);
+		BOOST_CHECK_EQUAL(rgba.green(),	2);
+		BOOST_CHECK_EQUAL(rgba.blue(),		3);
+		BOOST_CHECK_EQUAL(rgba.alpha(),	4);
 
-		BOOST_CHECK_EQUAL(tBgra.red(),		1);
-		BOOST_CHECK_EQUAL(tBgra.green(),	2);
-		BOOST_CHECK_EQUAL(tBgra.blue(),		3);
-		BOOST_CHECK_EQUAL(tBgra.alpha(),	4);
+		BOOST_CHECK_EQUAL(bgra.red(),		1);
+		BOOST_CHECK_EQUAL(bgra.green(),	2);
+		BOOST_CHECK_EQUAL(bgra.blue(),		3);
+		BOOST_CHECK_EQUAL(bgra.alpha(),	4);
 
-		BOOST_CHECK_EQUAL(tRgba.colors[0],	1);
-		BOOST_CHECK_EQUAL(tRgba.colors[1],	2);
-		BOOST_CHECK_EQUAL(tRgba.colors[2],	3);
-		BOOST_CHECK_EQUAL(tRgba.colors[3],	4);
+		BOOST_CHECK_EQUAL(rgba.colors[0],	1);
+		BOOST_CHECK_EQUAL(rgba.colors[1],	2);
+		BOOST_CHECK_EQUAL(rgba.colors[2],	3);
+		BOOST_CHECK_EQUAL(rgba.colors[3],	4);
 
-		BOOST_CHECK_EQUAL(tBgra.colors[0],	3);
-		BOOST_CHECK_EQUAL(tBgra.colors[1],	2);
-		BOOST_CHECK_EQUAL(tBgra.colors[2],	1);
-		BOOST_CHECK_EQUAL(tBgra.colors[3],	4);
+		BOOST_CHECK_EQUAL(bgra.colors[0],	3);
+		BOOST_CHECK_EQUAL(bgra.colors[1],	2);
+		BOOST_CHECK_EQUAL(bgra.colors[2],	1);
+		BOOST_CHECK_EQUAL(bgra.colors[3],	4);
 
 	}
 
 	BOOST_AUTO_TEST_CASE( rgb2rgba )
 	{
-		color::Rgb  tRgb(1, 2, 3);
-		color::Rgba	tRgba = tRgb;
+		color::Rgb  rgb(1, 2, 3);
+		color::Rgba	rgba = rgb;
 
-		BOOST_CHECK_EQUAL(tRgb.red(),		1);
-		BOOST_CHECK_EQUAL(tRgb.green(),		2);
-		BOOST_CHECK_EQUAL(tRgb.blue(),		3);
+		BOOST_CHECK_EQUAL(rgb.red(),		1);
+		BOOST_CHECK_EQUAL(rgb.green(),		2);
+		BOOST_CHECK_EQUAL(rgb.blue(),		3);
 
-		BOOST_CHECK_EQUAL(tRgba.red(),		1);
-		BOOST_CHECK_EQUAL(tRgba.green(),	2);
-		BOOST_CHECK_EQUAL(tRgba.blue(),		3);
-		BOOST_CHECK_EQUAL(tRgba.alpha(),	color::NotTransparent);
+		BOOST_CHECK_EQUAL(rgba.red(),		1);
+		BOOST_CHECK_EQUAL(rgba.green(),	2);
+		BOOST_CHECK_EQUAL(rgba.blue(),		3);
+		BOOST_CHECK_EQUAL(rgba.alpha(),	color::NotTransparent);
 	}
 
 	BOOST_AUTO_TEST_CASE( rgba2rgb )
 	{
-		color::Rgba tRgba(1, 2, 3, 4);
-		color::Rgb	tRgb = tRgba;
+		color::Rgba rgba(1, 2, 3, 4);
+		color::Rgb	rgb = rgba;
 
-		BOOST_CHECK_EQUAL(tRgba.red(),		1);
-		BOOST_CHECK_EQUAL(tRgba.green(),	2);
-		BOOST_CHECK_EQUAL(tRgba.blue(),		3);
-		BOOST_CHECK_EQUAL(tRgba.alpha(),	4);
+		BOOST_CHECK_EQUAL(rgba.red(),		1);
+		BOOST_CHECK_EQUAL(rgba.green(),	2);
+		BOOST_CHECK_EQUAL(rgba.blue(),		3);
+		BOOST_CHECK_EQUAL(rgba.alpha(),	4);
 
-		BOOST_CHECK_EQUAL(tRgb.red(),		1);
-		BOOST_CHECK_EQUAL(tRgb.green(),		2);
-		BOOST_CHECK_EQUAL(tRgb.blue(),		3);
+		BOOST_CHECK_EQUAL(rgb.red(),		1);
+		BOOST_CHECK_EQUAL(rgb.green(),		2);
+		BOOST_CHECK_EQUAL(rgb.blue(),		3);
 	}
 
 	BOOST_AUTO_TEST_CASE( SmokeRef )
 	{
 		color::Channel buffer[3] = {0};
 
-		color::RgbRef tRgb(buffer, 1, 2, 3);
+		color::RgbRef rgb(buffer, 1, 2, 3);
 
 		STATIC_ASSERT(color::RgbRef::RedIndex		== 0,	ShoulBe0);
 		STATIC_ASSERT(color::RgbRef::GreenIndex		== 1,	ShoulBe1);
 		STATIC_ASSERT(color::RgbRef::BlueIndex		== 2,	ShoulBe2);
 
-		BOOST_CHECK_EQUAL(tRgb.red(),	1);
-		BOOST_CHECK_EQUAL(tRgb.green(), 2);
-		BOOST_CHECK_EQUAL(tRgb.blue(),	3);
+		BOOST_CHECK_EQUAL(rgb.red(),	1);
+		BOOST_CHECK_EQUAL(rgb.green(), 2);
+		BOOST_CHECK_EQUAL(rgb.blue(),	3);
 
 		BOOST_CHECK_EQUAL(buffer[0],	1);
 		BOOST_CHECK_EQUAL(buffer[1],	2);
@@ -169,50 +169,50 @@ namespace test
 	{
 		color::Channel buffer1[3] = {0};
 		color::Channel buffer2[3] = {0};
-		color::RgbRef tRgb(buffer1, 1, 2, 3);
-		color::BgrRef tBgr(buffer2);
-		tBgr = tRgb;
+		color::RgbRef rgb(buffer1, 1, 2, 3);
+		color::BgrRef bgr(buffer2);
+		bgr = rgb;
 
-		BOOST_CHECK_EQUAL(tRgb.red(),	1);
-		BOOST_CHECK_EQUAL(tRgb.green(), 2);
-		BOOST_CHECK_EQUAL(tRgb.blue(),	3);
-		BOOST_CHECK_EQUAL(tBgr.red(),	1);
-		BOOST_CHECK_EQUAL(tBgr.green(), 2);
-		BOOST_CHECK_EQUAL(tBgr.blue(),	3);
+		BOOST_CHECK_EQUAL(rgb.red(),	1);
+		BOOST_CHECK_EQUAL(rgb.green(), 2);
+		BOOST_CHECK_EQUAL(rgb.blue(),	3);
+		BOOST_CHECK_EQUAL(bgr.red(),	1);
+		BOOST_CHECK_EQUAL(bgr.green(), 2);
+		BOOST_CHECK_EQUAL(bgr.blue(),	3);
 
-		BOOST_CHECK_EQUAL(tRgb.colors[0],	1);
-		BOOST_CHECK_EQUAL(tRgb.colors[1],	2);
-		BOOST_CHECK_EQUAL(tRgb.colors[2],	3);
+		BOOST_CHECK_EQUAL(rgb.colors[0],	1);
+		BOOST_CHECK_EQUAL(rgb.colors[1],	2);
+		BOOST_CHECK_EQUAL(rgb.colors[2],	3);
 
-		BOOST_CHECK_EQUAL(tBgr.colors[0],	3);
-		BOOST_CHECK_EQUAL(tBgr.colors[1],	2);
-		BOOST_CHECK_EQUAL(tBgr.colors[2],	1);
+		BOOST_CHECK_EQUAL(bgr.colors[0],	3);
+		BOOST_CHECK_EQUAL(bgr.colors[1],	2);
+		BOOST_CHECK_EQUAL(bgr.colors[2],	1);
 
-		img::Image tImage;
+		img::Image image;
 		BOOST_REQUIRE( 
-			tImage.load("jpg", 
+			image.load("jpg", 
 				tools::ByteArray(
 				get_testJpg_jpg_buf(), 
 				get_testJpg_jpg_size())) );
 
 		BENCHMARK( "Rgb->Bgr" )
-			toBgr(tImage, tImage);
+			toBgr(image, image);
 
 	}
 
 	BOOST_AUTO_TEST_CASE( Rgb2Gray )
 	{
-		img::Image tImage;
+		img::Image image;
 		BOOST_REQUIRE( 
-			tImage.load("jpg", 
+			image.load("jpg", 
 				tools::ByteArray(
 				get_testJpg_jpg_buf(), 
 				get_testJpg_jpg_size())) );
 
-		img::Image tDst;
-		toGray(tImage, tDst);
+		img::Image dst;
+		toGray(image, dst);
 		BENCHMARK( "Rgb->Gray" )
-			toGray(tImage, tDst);
+			toGray(image, dst);
 	}
 
 	BOOST_AUTO_TEST_SUITE_END()

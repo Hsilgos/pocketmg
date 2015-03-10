@@ -1,37 +1,39 @@
 #include "defines.h"
 
+#include <algorithm>
+
 namespace utils
 {
 	const std::string EmptyString;
 
-	Rect::Rect(int ax, int ay, SizeType aWidth, SizeType aHeight)
-		:x(ax), y(ay), width(aWidth), height(aHeight)
+	Rect::Rect(int ax, int ay, SizeType width, SizeType height)
+		:x(ax), y(ay), width(width), height(height)
 	{
 	}
 
-	Rect restrictBy(const Rect &aSrc, const Rect &aRestricter)
+	Rect restrictBy(const Rect &src, const Rect &restricter)
 	{
-		int tSrcX1 = aSrc.x;
-		int tSrcY1 = aSrc.y;
-		int tSrcX2 = aSrc.x + aSrc.width;
-		int tSrcY2 = aSrc.y + aSrc.height;
+		int src_x1 = src.x;
+		int src_y1 = src.y;
+		int src_x2 = src.x + src.width;
+		int src_y2 = src.y + src.height;
 
-		int tRestrX1 = aRestricter.x;
-		int tRestrY1 = aRestricter.y;
-		int tRestrX2 = aRestricter.x + aRestricter.width;
-		int tRestrY2 = aRestricter.y + aRestricter.height;
+		int restr_x1 = restricter.x;
+		int restr_y1 = restricter.y;
+		int restr_x2 = restricter.x + restricter.width;
+		int restr_y2 = restricter.y + restricter.height;
 
-		Rect tResult;
-		tResult.x		= std::max(tSrcX1, tRestrX1);
-		tResult.y		= std::max(tSrcY1, tRestrY1);
-		tResult.width	= std::max<int>(0, std::min(tSrcX2, tRestrX2) - tResult.x);
-		tResult.height	= std::max<int>(0, std::min(tSrcY2, tRestrY2) - tResult.y);
+		Rect result;
+		result.x		= std::max(src_x1, restr_x1);
+		result.y		= std::max(src_y1, restr_y1);
+		result.width	= std::max<int>(0, std::min(src_x2, restr_x2) - result.x);
+		result.height	= std::max<int>(0, std::min(src_y2, restr_y2) - result.y);
 
-		return tResult;
+		return result;
 	}
 
-	Size::Size(SizeType aWidth, SizeType aHeight)
-		:width(aWidth), height(aHeight)
+	Size::Size(SizeType width, SizeType height)
+		:width(width), height(height)
 	{
 	}
 }

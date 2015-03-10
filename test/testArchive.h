@@ -17,22 +17,22 @@ namespace test
 	class TestArchive
 	{
 	public:
-		TestArchive(const std::string &aName = utils::EmptyString);
+		TestArchive(const std::string &name = utils::EmptyString);
 
 		typedef std::map<fs::FilePath, tools::ByteArray> Content;
 
 		void addFile(
-			const std::string &aFileInArch, 
-			const tools::ByteArray &aData = tools::ByteArray::empty);
+			const std::string &file_in_arch, 
+			const tools::ByteArray &data = tools::ByteArray::empty);
 
-		void addFolder(const std::string &aPathInArch);
+		void addFolder(const std::string &path_in_arch);
 
 		Content &getContent();
 		const std::string &getName() const;
 		bool empty() const;
 	private:
-		Content mContent;
-		std::string mName;
+		Content content_;
+		std::string name_;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -52,10 +52,10 @@ namespace test
 
 		static const char *ArchExt;
 
-		bool open(const std::string &aFile);
+		bool open(const std::string &file);
 		void close();
-		std::vector<fs::FilePath> getFileList(bool aFilesOnly);
-		tools::ByteArray getFile(const fs::FilePath &aFileInArchive, size_t aMaxSize);
+		std::vector<fs::FilePath> getFileList(bool files_only);
+		tools::ByteArray getFile(const fs::FilePath &file_in_archive, size_t max_size);
 	};
 }
 

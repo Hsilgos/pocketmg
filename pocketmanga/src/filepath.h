@@ -7,20 +7,20 @@ namespace fs
 {
 	class FilePath
 	{
-		std::string mPath;
-		bool mIsFile;
+		std::string path_;
+		bool is_file_;
 
 		typedef std::vector<std::string> StringVector;
-		std::vector<std::string> mEntries;
+		std::vector<std::string> entries_;
 
-		size_t mFirstLevel;
+		size_t first_level_;
 
 		void parse();
 		void rebuildPath();
 
-		bool doCompare(const FilePath &aOther, int aLevel, bool aCmpFromBack) const;
+		bool doCompare(const FilePath &other, int level, bool cmp_from_back) const;
 
-		int correctLevel(int aLevel) const;
+		int correctLevel(int level) const;
 	public:
 		enum
 		{
@@ -28,16 +28,16 @@ namespace fs
 		};
 
 		FilePath();
-		FilePath(const std::string &aPath, bool aIsFile);
+		FilePath(const std::string &path, bool is_file);
 
-		bool equals(const FilePath &aOther, bool aCmpFromBack = false) const;
+		bool equals(const FilePath &other, bool cmp_from_back = false) const;
 
-		bool operator == (const FilePath &aSecond) const;
-		bool operator != (const FilePath &aSecond) const;
+		bool operator == (const FilePath &second) const;
+		bool operator != (const FilePath &second) const;
 
-		bool operator < (const FilePath &aSecond) const;
+		bool operator < (const FilePath &second) const;
 
-		void set(const std::string &aPath, bool aIsFile);
+		void set(const std::string &path, bool is_file);
 		void clear();
 
 		// returns maximum level
@@ -46,13 +46,13 @@ namespace fs
 
 		// sets level which will be first fo algorythms.
 		// For example for 'sorting'
-		void setFirstLevel(size_t aFirstLevel);
+		void setFirstLevel(size_t first_level);
 
-		// returns 'true' if entry at level aLevel is directory name
-		bool isDirectory(int aLevel = LastLevel) const;
+		// returns 'true' if entry at level level is directory name
+		bool isDirectory(int level = LastLevel) const;
 
-		// return name of entry at level aLevel
-		std::string getName(int aLevel = LastLevel) const;
+		// return name of entry at level level
+		std::string getName(int level = LastLevel) const;
 
 		// returns whole path
 		const std::string &getPath() const;
@@ -64,7 +64,7 @@ namespace fs
 		std::string getFileName() const;
 		const std::string &getLastEntry() const;
 		
-		void addFolder(const std::string &aName);
+		void addFolder(const std::string &name);
 		void removeLastEntry();
 		
 		// .filename
@@ -76,21 +76,21 @@ namespace fs
 		bool empty() const;
 
 		// 
-		bool startsWith(const FilePath &aOther, bool aCmpFromBack = false) const;
-		bool startsWith(const FilePath &aOther, size_t aLevel, bool aCmpFromBack = false) const;
+		bool startsWith(const FilePath &other, bool cmp_from_back = false) const;
+		bool startsWith(const FilePath &other, size_t level, bool cmp_from_back = false) const;
 
-		void setFile(const std::string &aName);
+		void setFile(const std::string &name);
 
-		FilePath copy(int aLevel = LastLevel) const;
+		FilePath copy(int level = LastLevel) const;
 
-		static void setGlobalSelector(const char aSelector);
+		static void setGlobalSelector(const char selector);
 	};
 
-	bool HaveSameDirectory(const FilePath &aFirst, const FilePath &aSecond);
-	FilePath CopyDirectory(const FilePath &aPath);
-	FilePath FindCommonPath(const FilePath &aFirst, const FilePath &aSecond);
+	bool HaveSameDirectory(const FilePath &first, const FilePath &second);
+	FilePath CopyDirectory(const FilePath &path);
+	FilePath FindCommonPath(const FilePath &first, const FilePath &second);
 
-	std::ostream& operator<< (std::ostream& aStream, const fs::FilePath& aPath);
-	//std::istream& operator>> (std::istream& aStream, ByteArray& aArray);
+	std::ostream& operator<< (std::ostream& stream, const fs::FilePath& path);
+	//std::istream& operator>> (std::istream& stream, ByteArray& array);
 }
 

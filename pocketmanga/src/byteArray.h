@@ -20,17 +20,17 @@ namespace tools
 {
 	class AtomicInt
 	{
-		volatile int mValue;
+		volatile int value_;
 	public:
-		AtomicInt(int aInitValue = 0);
+		AtomicInt(int init_value = 0);
 
-		AtomicInt(const AtomicInt &aOther);
-		AtomicInt &operator = (const AtomicInt &aOther);
+		AtomicInt(const AtomicInt &other);
+		AtomicInt &operator = (const AtomicInt &other);
 
 		int getValue() const;
 
-		void inc(int aStep = 1);
-		void dec(int aStep = 1);
+		void inc(int step = 1);
+		void dec(int step = 1);
 
 		operator int () const;
 		AtomicInt &operator ++();
@@ -57,29 +57,29 @@ namespace tools
 			Buffer				buffer;
 		};
 
-		SharedData *mSharedData;
+		SharedData *shared_data_;
 
-		void changeTo(SharedData *aOther);
-		void implByteArray(const void *aData, SizeType aLen);
+		void changeTo(SharedData *other);
+		void implByteArray(const void *data, SizeType len);
 
 		// get data for edit.
 		SharedData *acquire();
 	public:
 		ByteArray();
-		explicit ByteArray(SizeType aLen);
+		explicit ByteArray(SizeType len);
 
 		// CopyBuffer and ReadOnlyBuffer
-		explicit ByteArray(const void *aData, SizeType aLen);
+		explicit ByteArray(const void *data, SizeType len);
 
-		ByteArray(const ByteArray &aOther);
-		ByteArray &operator = (const ByteArray &aOther);
+		ByteArray(const ByteArray &other);
+		ByteArray &operator = (const ByteArray &other);
 
 		iterator begin();
 		iterator end();
 		const_iterator begin() const;
 		const_iterator end() const;
 
-		void reset(const ByteArray &aOther = ByteArray() );
+		void reset(const ByteArray &other = ByteArray() );
 
 		SizeType getLength() const;
 		SizeType getSize() const
@@ -91,130 +91,130 @@ namespace tools
 		const ByteType *getData() const;
 		// return pointer to data for update.
 		// use it carefully.
-		ByteType *askBuffer(SizeType aNewLen);
+		ByteType *askBuffer(SizeType new_len);
 
 		bool isNull() const;
 		bool isEmpty() const;
 
-		bool setChar(SizeType aIndex, char aChar);
+		bool setChar(SizeType index, char character);
 		
-		bool insert(SizeType aIndex, const void *aPtr, SizeType aLength);
-		bool remove(SizeType aIndex, SizeType aCount = std::numeric_limits<SizeType>::max());
+		bool insert(SizeType index, const void *ptr, SizeType length);
+		bool remove(SizeType index, SizeType count = std::numeric_limits<SizeType>::max());
 
-		void resize(SizeType aNewLen);
-		void reserve(SizeType aNewLen);
+		void resize(SizeType new_len);
+		void reserve(SizeType new_len);
 
-		ByteArray copyPart(SizeType aIndex, SizeType aCount = std::numeric_limits<SizeType>::max()) const;
+		ByteArray copyPart(SizeType index, SizeType count = std::numeric_limits<SizeType>::max()) const;
 
-		const ByteType &operator [](SizeType aIndex) const;
-		ByteType &operator [](SizeType aIndex);
+		const ByteType &operator [](SizeType index) const;
+		ByteType &operator [](SizeType index);
 
 		virtual ~ByteArray();
 
 		static const ByteArray empty;
 	};
 
-	bool insert(ByteArray &aArray, ByteArray::SizeType aIndex, const void *aData, ByteArray::SizeType aLength);
-	bool replace(ByteArray &aArray, ByteArray::SizeType aIndex, const void *aData, ByteArray::SizeType aLength);
-	bool replace(ByteArray &aArray, ByteArray::SizeType aIndex, const ByteArray &aSrc);
+	bool insert(ByteArray &array, ByteArray::SizeType index, const void *data, ByteArray::SizeType length);
+	bool replace(ByteArray &array, ByteArray::SizeType index, const void *data, ByteArray::SizeType length);
+	bool replace(ByteArray &array, ByteArray::SizeType index, const ByteArray &src);
 
-	bool append(ByteArray &aArray, const void *aData, ByteArray::SizeType aLength);
-	bool append(ByteArray &aArray, const ByteArray &aOther);
+	bool append(ByteArray &array, const void *data, ByteArray::SizeType length);
+	bool append(ByteArray &array, const ByteArray &other);
 
-	bool prepend(ByteArray &aArray, const void *aData, ByteArray::SizeType aLength);
-	bool prepend(ByteArray &aArray, const ByteArray &aOther);
+	bool prepend(ByteArray &array, const void *data, ByteArray::SizeType length);
+	bool prepend(ByteArray &array, const ByteArray &other);
 
-	void reset(ByteArray &aArray, const char *aData, ByteArray::SizeType aLen);
+	void reset(ByteArray &array, const char *data, ByteArray::SizeType len);
 
 	template <class T>
-	void reset(ByteArray &aArray, const T &aValue)
+	void reset(ByteArray &array, const T &value)
 	{
-		char tBuffer[sizeof(T)];
-		memcpy(&tBuffer[0], &aValue, tBuffer.size());
-		reset(aArray, &tBuffer[0], tBuffer.size());
+		char buffer[sizeof(T)];
+		memcpy(&buffer[0], &value, buffer.size());
+		reset(array, &buffer[0], buffer.size());
 	}
 
-	inline bool fromByteArray(const ByteArray &aArray, ByteArray::SizeType aIndex, void *aPtr, ByteArray::SizeType aCount)
+	inline bool fromByteArray(const ByteArray &array, ByteArray::SizeType index, void *ptr, ByteArray::SizeType count)
 	{
-		if( !aPtr || aIndex + aCount > aArray.getLength() )
+		if( !ptr || index + count > array.getLength() )
 			return false;
 
-		memcpy(aPtr, &aArray[aIndex], aCount);
+		memcpy(ptr, &array[index], count);
 		return true;
 	}
 
 	template <class T>
-	inline bool fromByteArray(const ByteArray &aArray, ByteArray::SizeType aIndex, T &aValue)
+	inline bool fromByteArray(const ByteArray &array, ByteArray::SizeType index, T &value)
 	{
-		return fromByteArray(aArray, aIndex, &aValue, sizeof(T));
+		return fromByteArray(array, index, &value, sizeof(T));
 	}
 
 	template <class T>
-	inline bool fromByteArray(const ByteArray &aArray, T &aValue)
+	inline bool fromByteArray(const ByteArray &array, T &value)
 	{
-		return fromByteArray(aArray, 0, aValue);
+		return fromByteArray(array, 0, value);
 	}
 
 	template <class T>
-	bool insert(ByteArray &aArray, ByteArray::SizeType aIndex, const T &aValue)
+	bool insert(ByteArray &array, ByteArray::SizeType index, const T &value)
 	{
-		char tBuffer[sizeof(T)];
-		memcpy(&tBuffer[0], &aValue, tBuffer.size());
-		return insert(aArray, aIndex, &tBuffer[0], tBuffer.size());
+		char buffer[sizeof(T)];
+		memcpy(&buffer[0], &value, buffer.size());
+		return insert(array, index, &buffer[0], buffer.size());
 	}
 
 	template <class T>
-	bool append(ByteArray &aArray, const T &aValue)
+	bool append(ByteArray &array, const T &value)
 	{
-		return insert(aArray, aArray.getLength(), aValue);
+		return insert(array, array.getLength(), value);
 	}
 
 	template <class T>
-	bool prepend(ByteArray &aArray, const T &aValue)
+	bool prepend(ByteArray &array, const T &value)
 	{
-		return insert(aArray, 0, aValue);
+		return insert(array, 0, value);
 	}
 
 	template <class T>
-	bool replace(ByteArray &aArray, ByteArray::SizeType aIndex, const T &aValue)
+	bool replace(ByteArray &array, ByteArray::SizeType index, const T &value)
 	{
-		return replace(aArray, aIndex, &aValue, sizeof(T));
+		return replace(array, index, &value, sizeof(T));
 	}
 
-	bool append(ByteArray &aArray, const std::string &aStr);
-	bool append(ByteArray &aArray, const char *aStr);
+	bool append(ByteArray &array, const std::string &str);
+	bool append(ByteArray &array, const char *str);
 
-	bool prepend(ByteArray &aArray, const std::string &aStr);
-	bool prepend(ByteArray &aArray, const char *aStr);
+	bool prepend(ByteArray &array, const std::string &str);
+	bool prepend(ByteArray &array, const char *str);
 
 	bool compare(
-		const ByteArray &aArray1,
-		ByteArray::SizeType aFrom1,
-		const ByteArray &aArray2,
-		ByteArray::SizeType aFrom2,
-		ByteArray::SizeType aCount);
+		const ByteArray &array1,
+		ByteArray::SizeType from1,
+		const ByteArray &array2,
+		ByteArray::SizeType from2,
+		ByteArray::SizeType count);
 
-	bool compare(const ByteArray &aArray1, const ByteArray &aArray2);
+	bool compare(const ByteArray &array1, const ByteArray &array2);
 
 	ByteArray::SizeType find(
-		const ByteArray &aArray, 
+		const ByteArray &array, 
 		ByteArray::ByteType a_ch, 
 		ByteArray::SizeType a_from = 0, 
 		ByteArray::SizeType a_maxCount = std::numeric_limits<ByteArray::SizeType>::max());
 
-	ByteArray toByteArray(const std::string &aStr);
+	ByteArray toByteArray(const std::string &str);
 	std::string byteArray2string(
-		const ByteArray &aArray, 
-		ByteArray::SizeType aIndex, 
-		ByteArray::SizeType aCount, 
-		bool aUpto0 = false);
-	inline std::string byteArray2string(const ByteArray &aArray, bool aUpto0 = false)
+		const ByteArray &array, 
+		ByteArray::SizeType index, 
+		ByteArray::SizeType count, 
+		bool upto0 = false);
+	inline std::string byteArray2string(const ByteArray &array, bool upto0 = false)
 	{
-		return byteArray2string(aArray, 0, aArray.getSize(), aUpto0);
+		return byteArray2string(array, 0, array.getSize(), upto0);
 	}
 
-	std::ostream& operator<< (std::ostream& aStream, const ByteArray& aArray);
-	std::istream& operator>> (std::istream& aStream, ByteArray& aArray);
+	std::ostream& operator<< (std::ostream& stream, const ByteArray& array);
+	std::istream& operator>> (std::istream& stream, ByteArray& array);
 }
 
-//std::ostream& operator<< (std::ostream& aStream, const tools::ByteArray& aArray);
+//std::ostream& operator<< (std::ostream& stream, const tools::ByteArray& array);
