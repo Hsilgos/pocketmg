@@ -7,21 +7,19 @@
 #include "inkview.h"
 
 
-namespace pocket
-{
-	class Config
-	{
-		iconfig *config_;
-	public:
-		Config(const std::string &path);
+namespace pocket {
+class Config {
+  iconfig *config_;
+public:
+  Config(const std::string &path);
 
-		~Config();
+  ~Config();
 
-		int readInt(const std::string &name, int def = 0);
-		std::string readString(const std::string &name, const std::string &def = utils::EmptyString);
+  int readInt(const std::string &name, int def = 0);
+  std::string readString(const std::string &name, const std::string &def = utils::EmptyString);
 
-		void write(const std::string &name, int value);
-		void write(const std::string &name, const std::string &value);
-	};
+  void write(const std::string &name, int value);
+  void write(const std::string &name, const std::string &value);
+};
 }
 

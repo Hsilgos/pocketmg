@@ -5,7 +5,7 @@
 
 extern "C"
 {
-  #include <jpeglib.h>
+#include <jpeglib.h>
 }
 #include <stdexcept>
 
@@ -13,180 +13,152 @@ extern "C"
 
 //#include <Windows.h>
 
-namespace 
-{
-	void do_not_exit(j_common_ptr /*cinfo*/)
-	{
-		throw std::logic_error("Error while decoding JPEG image");
-	}
-
-	class JpgMemSrc: public jpeg_source_mgr
-	{
-		const tools::ByteArray &buffer_;
-
-		static JpgMemSrc *getThis(j_decompress_ptr cinfo)
-		{
-			return static_cast<JpgMemSrc *>(cinfo->src);
-		}
-
-		static void do_init_source(j_decompress_ptr /*cinfo*/)
-		{
-		}
-
-		static boolean do_fill_input_buffer(j_decompress_ptr /*cinfo*/)
-		{
-			return FALSE; /* We utilize I/O suspension (or emulsion? ;-) ) */
-		}
-
-		static void do_skip_input_data(j_decompress_ptr cinfo,long num_bytes)
-		{
-			getThis(cinfo)->skip_input_data_impl(num_bytes);
-		}
-
-		static void do_term_source(j_decompress_ptr /*cinfo*/)
-		{
-		}
-
-		//////////////////////////////////////////////////////////////////////////
-
-		void skip_input_data_impl(long num_bytes)
-		{
-			if( num_bytes > bytes_in_buffer )
-			{
-				next_input_byte += bytes_in_buffer;
-				bytes_in_buffer	= 0;
-			}
-			else
-			{
-				next_input_byte += num_bytes;
-				bytes_in_buffer -= num_bytes;
-			}
-		}
-
-		JpgMemSrc(const JpgMemSrc&);
-		JpgMemSrc operator=(const JpgMemSrc&);
-	public:
-		JpgMemSrc(const tools::ByteArray &buffer)
-			:buffer_(buffer)
-		{
-			init_source			= do_init_source;
-			fill_input_buffer	= do_fill_input_buffer;
-			skip_input_data		= do_skip_input_data;
-			term_source			= do_term_source;
-			resync_to_restart	= jpeg_resync_to_restart;
-
-			next_input_byte		= buffer.getData();
-			bytes_in_buffer		= buffer.getLength();
-		}
-	};
+namespace {
+void do_not_exit(j_common_ptr /*cinfo*/) {
+  throw std::logic_error("Error while decoding JPEG image");
 }
 
-namespace img
-{
-	class JpegDecoder: public IDecoder
-	{
-		jpeg_decompress_struct desc_;
-		jpeg_error_mgr error_;
+class JpgMemSrc: public jpeg_source_mgr {
+  const tools::ByteArray &buffer_;
 
-		virtual std::vector<std::string> getExts() const
-		{
-			std::vector<std::string> exts;
+  static JpgMemSrc *getThis(j_decompress_ptr cinfo) {
+    return static_cast<JpgMemSrc *>(cinfo->src);
+  }
 
-			exts.push_back("jpeg");
-			exts.push_back("jpg");
-			exts.push_back("jpe");
-			exts.push_back("pjpe");
-			exts.push_back("pjpeg");
-			exts.push_back("pjpg");
+  static void do_init_source(j_decompress_ptr /*cinfo*/) {
+  }
 
-			return exts;
-		}
+  static boolean do_fill_input_buffer(j_decompress_ptr /*cinfo*/) {
+    return FALSE; /* We utilize I/O suspension (or emulsion? ;-) ) */
+  }
 
-		virtual bool decode(const tools::ByteArray &encoded, img::Image &decoded)
-		{
-			if( encoded.isEmpty() )
-				return false;
+  static void do_skip_input_data(j_decompress_ptr cinfo,long num_bytes) {
+    getThis(cinfo)->skip_input_data_impl(num_bytes);
+  }
 
-			volatile bool decompress_started = false;
+  static void do_term_source(j_decompress_ptr /*cinfo*/) {
+  }
 
-			JpgMemSrc mem_src(encoded);
-			desc_.src = &mem_src;
+  //////////////////////////////////////////////////////////////////////////
 
-			try
-			{
-				int rc = jpeg_read_header(&desc_, TRUE);
-				if (rc != JPEG_HEADER_OK) 
-					return false;
+  void skip_input_data_impl(long num_bytes) {
+    if( num_bytes > bytes_in_buffer ) {
+      next_input_byte += bytes_in_buffer;
+      bytes_in_buffer	= 0;
+    } else {
+      next_input_byte += num_bytes;
+      bytes_in_buffer -= num_bytes;
+    }
+  }
 
-				decompress_started = jpeg_start_decompress(&desc_) != 0;
-				if( !decompress_started )
-				{
-					throw std::logic_error("Failed to start decompression");
-				}
+  JpgMemSrc(const JpgMemSrc&);
+  JpgMemSrc operator=(const JpgMemSrc&);
+public:
+  JpgMemSrc(const tools::ByteArray &buffer)
+    :buffer_(buffer) {
+    init_source			= do_init_source;
+    fill_input_buffer	= do_fill_input_buffer;
+    skip_input_data		= do_skip_input_data;
+    term_source			= do_term_source;
+    resync_to_restart	= jpeg_resync_to_restart;
 
-				decoded.create(
-					desc_.output_width,
-					desc_.output_height,
-					desc_.num_components);
+    next_input_byte		= buffer.getData();
+    bytes_in_buffer		= buffer.getLength();
+  }
+};
+}
 
-				unsigned char* dest = decoded.data();
+namespace img {
+class JpegDecoder: public IDecoder {
+  jpeg_decompress_struct desc_;
+  jpeg_error_mgr error_;
 
-				JSAMPARRAY pJpegBuffer 
-					= (*desc_.mem->alloc_sarray)((j_common_ptr) &desc_, JPOOL_IMAGE, desc_.output_width * desc_.output_components, 1);
+  virtual std::vector<std::string> getExts() const {
+    std::vector<std::string> exts;
 
-				//const bool color = desc_.output_components > 1;
+    exts.push_back("jpeg");
+    exts.push_back("jpg");
+    exts.push_back("jpe");
+    exts.push_back("pjpe");
+    exts.push_back("pjpeg");
+    exts.push_back("pjpg");
 
-				int height = desc_.output_height;
-				const int width	= desc_.output_width;
-				const int step		= width * desc_.num_components;
+    return exts;
+  }
 
-				for( ; height--; dest += step )
-				{
-					jpeg_read_scanlines( &desc_, pJpegBuffer, 1 );
-					memcpy( dest, pJpegBuffer[0], step );
-				}
+  virtual bool decode(const tools::ByteArray &encoded, img::Image &decoded) {
+    if( encoded.isEmpty() )
+      return false;
 
-				jpeg_finish_decompress(&desc_);
+    volatile bool decompress_started = false;
 
-				return true;
+    JpgMemSrc mem_src(encoded);
+    desc_.src = &mem_src;
 
-			}
-			catch(...)
-			{
-				if( decompress_started )
-				{
-					try
-					{
-						if( !jpeg_finish_decompress(&desc_) )
-							throw std::logic_error("Failed to stop decompression");
-					}
-					catch(...)
-					{
-					}
-				}
+    try {
+      int rc = jpeg_read_header(&desc_, TRUE);
+      if (rc != JPEG_HEADER_OK)
+        return false;
 
-				return false;
-			}						
-		}
+      decompress_started = jpeg_start_decompress(&desc_) != 0;
+      if( !decompress_started ) {
+        throw std::logic_error("Failed to start decompression");
+      }
 
-	public:
-		JpegDecoder()
-		{
-			jpeg_create_decompress(&desc_);
+      decoded.create(
+        desc_.output_width,
+        desc_.output_height,
+        desc_.num_components);
 
-			desc_.err = jpeg_std_error(&error_);
-			desc_.err->error_exit = do_not_exit;
-		}
+      unsigned char* dest = decoded.data();
 
-		~JpegDecoder()
-		{
-			jpeg_destroy_decompress(&desc_);
-		}
-	};
+      JSAMPARRAY pJpegBuffer
+        = (*desc_.mem->alloc_sarray)((j_common_ptr) &desc_, JPOOL_IMAGE, desc_.output_width * desc_.output_components, 1);
 
-	//////////////////////////////////////////////////////////////////////////	
+      //const bool color = desc_.output_components > 1;
 
-	AUTO_REGISTER_DECODER( JpegDecoder );
+      int height = desc_.output_height;
+      const int width	= desc_.output_width;
+      const int step		= width * desc_.num_components;
+
+      for( ; height--; dest += step ) {
+        jpeg_read_scanlines( &desc_, pJpegBuffer, 1 );
+        memcpy( dest, pJpegBuffer[0], step );
+      }
+
+      jpeg_finish_decompress(&desc_);
+
+      return true;
+
+    } catch(...) {
+      if( decompress_started ) {
+        try {
+          if( !jpeg_finish_decompress(&desc_) )
+            throw std::logic_error("Failed to stop decompression");
+        } catch(...) {
+        }
+      }
+
+      return false;
+    }
+  }
+
+public:
+  JpegDecoder() {
+    jpeg_create_decompress(&desc_);
+
+    desc_.err = jpeg_std_error(&error_);
+    desc_.err->error_exit = do_not_exit;
+  }
+
+  ~JpegDecoder() {
+    jpeg_destroy_decompress(&desc_);
+  }
+};
+
+//////////////////////////////////////////////////////////////////////////
+
+AUTO_REGISTER_DECODER( JpegDecoder );
 }
 
 

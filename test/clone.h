@@ -1,8 +1,7 @@
 #pragma once
 
 
-namespace pattern
-{
+namespace pattern {
 #define PATTERN_DEFINE_CLONE( IRetClass ) \
 	virtual IRetClass* clone() const = 0;
 

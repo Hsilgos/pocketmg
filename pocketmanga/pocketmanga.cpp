@@ -18,8 +18,7 @@
 
 #include "inkview.h"
 
-namespace
-{
+namespace {
 #ifdef IVSAPP// emulator?
 static const fs::FilePath ConfigPath("/usr/local/pocketbook/config/pocketmanga.cfg", true);
 #else
@@ -44,80 +43,67 @@ void mainscreen_repaint() {
 
 }
 
-std::string bookCfgName(int i)
-{
-	std::stringstream name;
-	name << "book_" << i;
-	return name.str();
+std::string bookCfgName(int i) {
+  std::stringstream name;
+  name << "book_" << i;
+  return name.str();
 }
 
-std::vector<fs::FilePath> loadBooks()
-{
-	std::vector<fs::FilePath> result;
+std::vector<fs::FilePath> loadBooks() {
+  std::vector<fs::FilePath> result;
 
-	pocket::Config cfg(ConfigPath.getPath());
-	const int count = cfg.readInt("bookcount");
-	for( int i = 0; i < count; ++i )
-	{
-		std::string name = bookCfgName(i);
-		std::string book_path = cfg.readString( name );
+  pocket::Config cfg(ConfigPath.getPath());
+  const int count = cfg.readInt("bookcount");
+  for( int i = 0; i < count; ++i ) {
+    std::string name = bookCfgName(i);
+    std::string book_path = cfg.readString( name );
 
-		if( !book_path.empty() )
-			result.push_back( fs::FilePath(book_path, false) );
-	}
+    if( !book_path.empty() )
+      result.push_back( fs::FilePath(book_path, false) );
+  }
 
-	return result;
+  return result;
 }
 
-void addBook(const fs::FilePath &book)
-{
-	pocket::Config cfg(ConfigPath.getPath());
-	const int count = cfg.readInt("bookcount");
-	cfg.write("bookcount", count + 1);
+void addBook(const fs::FilePath &book) {
+  pocket::Config cfg(ConfigPath.getPath());
+  const int count = cfg.readInt("bookcount");
+  cfg.write("bookcount", count + 1);
 
-	cfg.write(bookCfgName(count), book.getPath());
+  cfg.write(bookCfgName(count), book.getPath());
 }
 
-class TestSelector: public pocket::IDirectoryHandler
-{
+class TestSelector: public pocket::IDirectoryHandler {
 public:
-	virtual void selected(const fs::FilePath &path)
-	{
-		addBook(path);
-	}
+  virtual void selected(const fs::FilePath &path) {
+    addBook(path);
+  }
 
-	virtual void onExit();
+  virtual void onExit();
 };
 
-class TestBookListHandler: public pocket::IBookListHandler
-{
-	virtual void startShow( std::auto_ptr<manga::Book> book)
-	{
-		pocket::PictureView::getInstance().setBook(book);
-	}
+class TestBookListHandler: public pocket::IBookListHandler {
+  virtual void startShow( std::auto_ptr<manga::Book> book) {
+    pocket::PictureView::getInstance().setBook(book);
+  }
 
-	virtual void addNewBook()
-	{
-		pocket::openDirectorySelector(new TestSelector);
-	}
+  virtual void addNewBook() {
+    pocket::openDirectorySelector(new TestSelector);
+  }
 
-	virtual void onExit()
-	{
-		CloseApp();
-	}
+  virtual void onExit() {
+    CloseApp();
+  }
 };
 
-class TestBooklistCfg: public pocket::IBooklistCfg
-{
-	virtual std::vector<fs::FilePath> getBooks()
-	{
-		return loadBooks();
-	}
+class TestBooklistCfg: public pocket::IBooklistCfg {
+  virtual std::vector<fs::FilePath> getBooks() {
+    return loadBooks();
+  }
 };
 
-void TestSelector::onExit()
-{
-	pocket::showBooklist(new TestBookListHandler, new TestBooklistCfg);
+void TestSelector::onExit() {
+  pocket::showBooklist(new TestBookListHandler, new TestBooklistCfg);
 }
 
 int main_handler(int type, int par1, int par2) {
@@ -125,21 +111,20 @@ int main_handler(int type, int par1, int par2) {
   std::cout << "type:"<< type << ",part1:"<<par1<<",part2:"<<par2 << std::endl;
 
   if (type == EVT_INIT) {
-	  pocket::showBooklist(new TestBookListHandler, new TestBooklistCfg);
+    pocket::showBooklist(new TestBookListHandler, new TestBooklistCfg);
   }
 
   if (type == EVT_SHOW) {
-	  //pocket::PictureView::getInstance().draw();
+    //pocket::PictureView::getInstance().draw();
   }
 
   if (type == EVT_KEYPRESS) {
 
-	  switch(par1)
-	  {
-	  case KEY_NEXT:
-		  //pocket::PictureView::getInstance().next();
-		  break;
-	  }
+    switch(par1) {
+    case KEY_NEXT:
+      //pocket::PictureView::getInstance().next();
+      break;
+    }
 
     /*switch (par1) {
 
@@ -191,11 +176,10 @@ int main_handler(int type, int par1, int par2) {
 
 }
 
-int main()
-{
-	OpenScreen();
-  
-	InkViewMain(main_handler);
-	return 0;
+int main() {
+  OpenScreen();
+
+  InkViewMain(main_handler);
+  return 0;
 }
 

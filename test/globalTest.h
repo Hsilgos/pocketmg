@@ -8,12 +8,10 @@
 # define UNIT_TEST_EXTERN
 #endif
 
-namespace boost
-{
-	namespace unit_test
-	{
-		class unit_test_log_formatter;
-	}
+namespace boost {
+namespace unit_test {
+class unit_test_log_formatter;
+}
 };
 
 typedef boost::unit_test::unit_test_log_formatter LogFormatter;

@@ -24,25 +24,23 @@
   };\
   typedef implementation::StaticAssertionTest<sizeof(TOKEN_JOIN(__static_assertion_at_line_, __LINE__))> TOKEN_JOIN(__static_assertion_test_at_line_, __LINE__)
 
-  // note that we wrap the non existing type inside a struct to avoid warning
-  // messages about unused variables when static assertions are used at function
-  // scope
-  // the use of sizeof makes sure the assertion error is not ignored by SFINAE
+// note that we wrap the non existing type inside a struct to avoid warning
+// messages about unused variables when static assertions are used at function
+// scope
+// the use of sizeof makes sure the assertion error is not ignored by SFINAE
 
 namespace implementation {
 
-  template <bool>
-  struct StaticAssertion;
+template <bool>
+struct StaticAssertion;
 
-  template <>
-  struct StaticAssertion<true>
-  {
-  }; // StaticAssertion<true>
+template <>
+struct StaticAssertion<true> {
+}; // StaticAssertion<true>
 
-  template<int i>
-  struct StaticAssertionTest
-  {
-  }; // StaticAssertionTest<int>
+template<int i>
+struct StaticAssertionTest {
+}; // StaticAssertionTest<int>
 
 } // namespace implementation
 

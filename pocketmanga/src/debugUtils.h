@@ -1,13 +1,11 @@
 #pragma once
 
-namespace utils
-{
-	inline bool isDebugging()
-	{
+namespace utils {
+inline bool isDebugging() {
 #ifdef _DEBUG
-		return true;
+  return true;
 #else
-		return false;
+  return false;
 #endif
-	}
+}
 }

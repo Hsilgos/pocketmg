@@ -7,32 +7,28 @@
 #include <list>
 #include <string>
 
-namespace tools
-{
-	class ByteArray;
+namespace tools {
+class ByteArray;
 }
 
-namespace img
-{
-	class Image;
+namespace img {
+class Image;
 }
 
-namespace img
-{
-	class IDecoder;
+namespace img {
+class IDecoder;
 
-	class DecoderFactory: public utils::SingletonStatic<DecoderFactory>
-	{
-		typedef std::map<std::string, IDecoder *>	DecodersMap;
-		typedef std::list<IDecoder *>				DecodersList;
+class DecoderFactory: public utils::SingletonStatic<DecoderFactory> {
+  typedef std::map<std::string, IDecoder *>	DecodersMap;
+  typedef std::list<IDecoder *>				DecodersList;
 
-		DecodersMap		decoders_map_;
-		DecodersList	decoders_list_;
-	public:
-		void registerDecoder(img::IDecoder *decoder);
-		void unregisterDecoder(const std::string &ext);
-		bool decode(const std::string &ext, const tools::ByteArray &data, img::Image &image) const;
-	};
+  DecodersMap		decoders_map_;
+  DecodersList	decoders_list_;
+public:
+  void registerDecoder(img::IDecoder *decoder);
+  void unregisterDecoder(const std::string &ext);
+  bool decode(const std::string &ext, const tools::ByteArray &data, img::Image &image) const;
+};
 
 
 #define AUTO_REGISTER_DECODER( decoder_type )																	\

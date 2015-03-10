@@ -16,172 +16,149 @@ namespace btime = boost::posix_time;
 #undef min
 #undef max
 
-namespace
-{
-	class HighTime
-	{
-		ULONG     previous_;
+namespace {
+class HighTime {
+  ULONG     previous_;
 
-		typedef LONG (__stdcall  *NtQueryTimerResolutionFun) (PULONG, PULONG, PULONG);
-		typedef LONG (__stdcall  *NtSetTimerResolutionFun) (ULONG,BOOLEAN,PULONG);
+  typedef LONG (__stdcall  *NtQueryTimerResolutionFun) (PULONG, PULONG, PULONG);
+  typedef LONG (__stdcall  *NtSetTimerResolutionFun) (ULONG,BOOLEAN,PULONG);
 
-		NtSetTimerResolutionFun SetFun;
-		NtQueryTimerResolutionFun QueryFun;
-		HMODULE nt_dll_;
+  NtSetTimerResolutionFun SetFun;
+  NtQueryTimerResolutionFun QueryFun;
+  HMODULE nt_dll_;
 
-		static const ULONG DesiredDelay = 10000;//ns
-	public:
-		HighTime()
-			:SetFun(0), QueryFun(0), nt_dll_(0)
-		{
-			nt_dll_ = LoadLibrary(L"ntdll.dll");
+  static const ULONG DesiredDelay = 10000;//ns
+public:
+  HighTime()
+    :SetFun(0), QueryFun(0), nt_dll_(0) {
+    nt_dll_ = LoadLibrary(L"ntdll.dll");
 
-			if( nt_dll_ )
-			{
-				QueryFun = (NtQueryTimerResolutionFun)GetProcAddress (nt_dll_, "NtQueryTimerResolution");
-				SetFun = (NtSetTimerResolutionFun)GetProcAddress (nt_dll_, "NtSetTimerResolution");
+    if( nt_dll_ ) {
+      QueryFun = (NtQueryTimerResolutionFun)GetProcAddress (nt_dll_, "NtQueryTimerResolution");
+      SetFun = (NtSetTimerResolutionFun)GetProcAddress (nt_dll_, "NtSetTimerResolution");
 
-				if( QueryFun && SetFun )
-				{
-					ULONG max_delay = 0, min_delay = 0, curr_delay = 0;
-					QueryFun(&max_delay, &min_delay, &curr_delay);
+      if( QueryFun && SetFun ) {
+        ULONG max_delay = 0, min_delay = 0, curr_delay = 0;
+        QueryFun(&max_delay, &min_delay, &curr_delay);
 
-					curr_delay = std::min(std::max(DesiredDelay, min_delay), max_delay);
+        curr_delay = std::min(std::max(DesiredDelay, min_delay), max_delay);
 
-					SetFun(curr_delay, TRUE, &previous_);
-				}
-			}
-		}
+        SetFun(curr_delay, TRUE, &previous_);
+      }
+    }
+  }
 
-		~HighTime()
-		{
-			if( QueryFun && SetFun )
-				SetFun(previous_, TRUE, &previous_);
-		}
-	};
+  ~HighTime() {
+    if( QueryFun && SetFun )
+      SetFun(previous_, TRUE, &previous_);
+  }
+};
 }
 
 #else
 
-namespace
-{
-	class HighTime
-	{
-	}
+namespace {
+class HighTime {
+}
 }
 
 #endif
 
-namespace
-{
-	boost::shared_ptr<HighTime> initHighTiming()
-	{
-		static boost::weak_ptr<HighTime> time;
-		boost::shared_ptr<HighTime> result = time.lock();
-		if( !result )
-		{
-			result.reset(new HighTime);
-			time = result;
-		}
+namespace {
+boost::shared_ptr<HighTime> initHighTiming() {
+  static boost::weak_ptr<HighTime> time;
+  boost::shared_ptr<HighTime> result = time.lock();
+  if( !result ) {
+    result.reset(new HighTime);
+    time = result;
+  }
 
-		return result;
-	}
+  return result;
+}
 }
 
-namespace test
-{
-	IBenchmarkOutput::~IBenchmarkOutput()
-	{
-	}
+namespace test {
+IBenchmarkOutput::~IBenchmarkOutput() {
+}
 
-		
-	void Printout::started(int count)
-	{
-		std::stringstream out;
 
-		if( count > 1 )
-			out << "-->Start benchmark '" << format_.str() << "', repeate " << count << " times" << " ...";
-		else
-			out << "-->Start benchmark '" << format_.str() << "' ...";
+void Printout::started(int count) {
+  std::stringstream out;
 
-		BOOST_TEST_MESSAGE( out.str() );
-	}
-	void Printout::finished(boost::int64_t milliseconds)
-	{
-		std::stringstream out;
+  if( count > 1 )
+    out << "-->Start benchmark '" << format_.str() << "', repeate " << count << " times" << " ...";
+  else
+    out << "-->Start benchmark '" << format_.str() << "' ...";
 
-		out 
-			<< "<--Benchmark '"
-			<< format_.str() 
-			<<"' finished, total milliseconds: "
-			<< milliseconds;
+  BOOST_TEST_MESSAGE( out.str() );
+}
+void Printout::finished(boost::int64_t milliseconds) {
+  std::stringstream out;
 
-		BOOST_TEST_MESSAGE( out.str() );
-	}
+  out
+      << "<--Benchmark '"
+      << format_.str()
+      <<"' finished, total milliseconds: "
+      << milliseconds;
 
-	Printout::Printout(const char *name)
-		:format_(name)
-	{
-	}
+  BOOST_TEST_MESSAGE( out.str() );
+}
 
-	//////////////////////////////////////////////////////////////////////////
+Printout::Printout(const char *name)
+  :format_(name) {
+}
 
-	struct TestBenchmark::Private
-	{
-		size_t count;
-		boost::shared_ptr<HighTime> hightTiming;
+//////////////////////////////////////////////////////////////////////////
 
-		boost::posix_time::ptime startTime;
-		boost::posix_time::ptime finishTime;
-		//std::string name;
-		std::auto_ptr<IBenchmarkOutput> output;
-	};
+struct TestBenchmark::Private {
+  size_t count;
+  boost::shared_ptr<HighTime> hightTiming;
 
-	void TestBenchmark::init(IBenchmarkOutput &output, int count)
-	{
-		private_ = new Private;
+  boost::posix_time::ptime startTime;
+  boost::posix_time::ptime finishTime;
+  //std::string name;
+  std::auto_ptr<IBenchmarkOutput> output;
+};
 
-		private_->hightTiming = initHighTiming();
+void TestBenchmark::init(IBenchmarkOutput &output, int count) {
+  private_ = new Private;
 
-		private_->output.reset(output.clone());
-		private_->count		= count;
-		private_->startTime	= tools::get_system_time();
+  private_->hightTiming = initHighTiming();
 
-		private_->output->started(count);
-	}
+  private_->output.reset(output.clone());
+  private_->count		= count;
+  private_->startTime	= tools::get_system_time();
 
-	TestBenchmark::TestBenchmark(const char *name, int count)
-	{
-		init(Printout(name), count);
-	}
+  private_->output->started(count);
+}
 
-	TestBenchmark::TestBenchmark(IBenchmarkOutput &output, int count)
-	{
-		init(output, count);
-	}
+TestBenchmark::TestBenchmark(const char *name, int count) {
+  init(Printout(name), count);
+}
 
-	TestBenchmark::~TestBenchmark()
-	{
-		private_->finishTime = tools::get_system_time();
+TestBenchmark::TestBenchmark(IBenchmarkOutput &output, int count) {
+  init(output, count);
+}
 
-		btime::time_duration duration 
-			= private_->finishTime - private_->startTime;
+TestBenchmark::~TestBenchmark() {
+  private_->finishTime = tools::get_system_time();
 
-		btime::time_duration::tick_type ticks 
-			= duration.total_milliseconds();
+  btime::time_duration duration
+    = private_->finishTime - private_->startTime;
 
-		private_->output->finished(ticks);
+  btime::time_duration::tick_type ticks
+    = duration.total_milliseconds();
 
-		delete private_;
-	}
+  private_->output->finished(ticks);
 
-	bool TestBenchmark::isDone()
-	{
-		return 0 == private_->count;
-	}
+  delete private_;
+}
 
-	void TestBenchmark::next()
-	{
-		private_->count -- ; 
-	}
+bool TestBenchmark::isDone() {
+  return 0 == private_->count;
+}
+
+void TestBenchmark::next() {
+  private_->count -- ;
+}
 }
