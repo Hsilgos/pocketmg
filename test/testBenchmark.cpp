@@ -126,8 +126,8 @@ void TestBenchmark::init(IBenchmarkOutput &output, int count) {
   private_->hightTiming = initHighTiming();
 
   private_->output.reset(output.clone());
-  private_->count		= count;
-  private_->startTime	= tools::get_system_time();
+  private_->count  = count;
+  private_->startTime = tools::get_system_time();
 
   private_->output->started(count);
 }

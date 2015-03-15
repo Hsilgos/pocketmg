@@ -19,13 +19,13 @@ void ideOutput(const char *, bool end_line = true);
 void ideOutput(const wchar_t *, bool end_line = true);
 
 enum ConsoleColor {
-  CCBlue		= 1,
-  CCGreen		= 2,
-  CCRed		= 4,
-  CCYellow	= CCRed|CCGreen,
-  CCPink		= CCRed|CCBlue,
+  CCBlue  = 1,
+  CCGreen  = 2,
+  CCRed  = 4,
+  CCYellow = CCRed|CCGreen,
+  CCPink  = CCRed|CCBlue,
   CCLightGreen= CCGreen|CCBlue,
-  CCWhite		= CCBlue|CCGreen|CCRed
+  CCWhite  = CCBlue|CCGreen|CCRed
 };
 
 void setConsoleColor(unsigned int color);
@@ -56,22 +56,22 @@ std::string lastErrorDescription(int error_code);
 }
 
 #define ASSERT_RET1( cond ) \
-	if( !(cond) )\
-	{\
-		BOOST_ASSERT(false);\
-		return;\
-	}
+ if( !(cond) )\
+ {\
+  BOOST_ASSERT(false);\
+  return;\
+ }
 
 #define ASSERT_RET2( cond, ret ) \
-	if( !(cond) )\
-	{\
-		BOOST_ASSERT(false);\
-		return (ret);\
-	}
+ if( !(cond) )\
+ {\
+  BOOST_ASSERT(false);\
+  return (ret);\
+ }
 
 #define ASSERT_CONTINUE( cond ) \
-	if( !(cond) )\
-	{\
-		BOOST_ASSERT(false);\
-		continue;\
-	}
+ if( !(cond) )\
+ {\
+  BOOST_ASSERT(false);\
+  continue;\
+ }

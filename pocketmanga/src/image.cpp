@@ -63,8 +63,8 @@ void Image::create(SizeType width, SizeType height, unsigned short depth) {
   if( !enable_min_realloc_ || new_size > data_.getSize() )
     data_.resize(new_size);
 
-  size_ =		utils::Size(width, height);
-  depth_		= depth;
+  size_ =  utils::Size(width, height);
+  depth_  = depth;
 }
 
 void Image::createSame(const Image &other) {
@@ -125,7 +125,7 @@ void Image::enableMinimumReallocations(bool enable) {
 
 color::Rgba Image::getPixel(SizeType x, SizeType y) const {
   SizeType dest_pixel = y * size_.width + x;
-  SizeType dest_pos	= dest_pixel * depth_;
+  SizeType dest_pos = dest_pixel * depth_;
 
   switch( depth_ ) {
   case 1:
@@ -141,7 +141,7 @@ color::Rgba Image::getPixel(SizeType x, SizeType y) const {
 
 void Image::setPixel(SizeType x, SizeType y, const color::Rgba& rgb) {
   SizeType dest_pixel = y * size_.width + x;
-  SizeType dest_pos	= dest_pixel * depth_;
+  SizeType dest_pos = dest_pixel * depth_;
 
   switch( depth_ ) {
   case 1:
@@ -160,7 +160,7 @@ void Image::setPixel(SizeType x, SizeType y, const color::Rgba& rgb) {
 
 void Image::setPixel(SizeType x, SizeType y, const color::Gray& grey) {
   SizeType dest_pixel = y * size_.width + x;
-  SizeType dest_pos	= dest_pixel * depth_;
+  SizeType dest_pos = dest_pixel * depth_;
 
   switch( depth_ ) {
   case 1:

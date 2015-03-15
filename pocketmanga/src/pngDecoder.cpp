@@ -45,9 +45,9 @@ void ReadDataFromMemory(png_structp png_ptr, png_bytep outBytes, png_size_t byte
 
   // using spark::InputStream
   // -> replace with your own data source interface
-  const tools::ByteArray& array				= static_cast<MemPngSrc*>(io_ptr)->array;
-  tools::ByteArray::SizeType &seek			= static_cast<MemPngSrc*>(io_ptr)->seek;
-  tools::ByteArray::SizeType still_in_array	= array.getLength() - seek;
+  const tools::ByteArray& array    = static_cast<MemPngSrc*>(io_ptr)->array;
+  tools::ByteArray::SizeType &seek   = static_cast<MemPngSrc*>(io_ptr)->seek;
+  tools::ByteArray::SizeType still_in_array = array.getLength() - seek;
 
   if( still_in_array < byteCountToRead )
     throw std::logic_error("Error while decoding PNG image");
@@ -99,8 +99,8 @@ class PngDecoder: public IDecoder {
         row_pointers = NULL;
       }
 
-      png_structpp png_ptr_copy	= png_ptr ? &png_ptr : NULL;
-      png_infopp info_ptr_copy	= info_ptr ? &info_ptr : NULL;
+      png_structpp png_ptr_copy = png_ptr ? &png_ptr : NULL;
+      png_infopp info_ptr_copy = info_ptr ? &info_ptr : NULL;
 
       png_destroy_read_struct(png_ptr_copy, info_ptr_copy, NULL);
     }
@@ -134,8 +134,8 @@ class PngDecoder: public IDecoder {
       png_set_read_fn(png.png_ptr, &mem_src, ReadDataFromMemory);
       png_read_info(png.png_ptr, png.info_ptr);
 
-      const unsigned int bit_depth	= png_get_bit_depth(png.png_ptr, png.info_ptr);
-      const unsigned int color_type	= png_get_color_type(png.png_ptr, png.info_ptr);
+      const unsigned int bit_depth = png_get_bit_depth(png.png_ptr, png.info_ptr);
+      const unsigned int color_type = png_get_color_type(png.png_ptr, png.info_ptr);
 
       unsigned short bytes_per_pixel = 3;
 
@@ -173,8 +173,8 @@ class PngDecoder: public IDecoder {
 
       //////////////////////////////////////////////////////////////////////////
 
-      const unsigned int width	= png_get_image_width(png.png_ptr, png.info_ptr);
-      const unsigned int height	= png_get_image_height(png.png_ptr, png.info_ptr);
+      const unsigned int width = png_get_image_width(png.png_ptr, png.info_ptr);
+      const unsigned int height = png_get_image_height(png.png_ptr, png.info_ptr);
 
       decoded.create(width, height, bytes_per_pixel);
 

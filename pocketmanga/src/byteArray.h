@@ -11,9 +11,9 @@
 #endif
 
 /*
-	ByteArray has semantic of smart pointer. Data will not be copied in operator = and
-	in copy constructor. Reference will be incremented by one. When object is destroyed
-	reference is decremented by one. When references is 0 then buffer will be deleted.
+ ByteArray has semantic of smart pointer. Data will not be copied in operator = and
+ in copy constructor. Reference will be incremented by one. When object is destroyed
+ reference is decremented by one. When references is 0 then buffer will be deleted.
 */
 
 namespace tools {
@@ -40,17 +40,17 @@ public:
 
 class ByteArray {
 public:
-  typedef unsigned char				ByteType;
-  typedef std::vector<ByteType>		Buffer;
-  typedef Buffer::size_type			SizeType;
-  typedef Buffer::iterator			iterator;
-  typedef Buffer::const_iterator		const_iterator;
+  typedef unsigned char    ByteType;
+  typedef std::vector<ByteType>  Buffer;
+  typedef Buffer::size_type   SizeType;
+  typedef Buffer::iterator   iterator;
+  typedef Buffer::const_iterator  const_iterator;
 
   static const SizeType npos;
 private:
   struct SharedData {
-    AtomicInt			ref;
-    Buffer				buffer;
+    AtomicInt   ref;
+    Buffer    buffer;
   };
 
   SharedData *shared_data_;

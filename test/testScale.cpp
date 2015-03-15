@@ -72,7 +72,7 @@ public:
 
   /*void doScale(const wxSize &size, img::ScaleQuality quality )
   {
-  	doScale(size.x, size.y, quality);
+   doScale(size.x, size.y, quality);
   }*/
 
   void doScale(int new_width, int new_height, img::ScaleQuality quality) {

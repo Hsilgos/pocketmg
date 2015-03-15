@@ -12,8 +12,8 @@ typedef float FloatType;
 typedef double FloatType;
 #endif
 
-static const FloatType ZeroValue	= 0.0;
-static const FloatType OneValue		= 1.0;
+static const FloatType ZeroValue = 0.0;
+static const FloatType OneValue  = 1.0;
 }
 
 namespace img {
@@ -57,8 +57,8 @@ inline void precalculate(std::vector< BicubicPrecalc > &weight, int orig_dim) {
 
 template<int Depth>
 void resampleBicubic(const Image &in, Image &out, int width, int height) {
-  const unsigned char* src_data	= in.data();
-  unsigned char* dst_data			= out.data();
+  const unsigned char* src_data = in.data();
+  unsigned char* dst_data   = out.data();
 
   // Precalculate weights
   std::vector< BicubicPrecalc > weight_y(height);
@@ -120,8 +120,8 @@ void resampleBicubic(const Image &in, Image &out, int width, int height) {
 //////////////////////////////////////////////////////////////////////////
 template<int Depth>
 void resampleNearest(const Image &in, Image &out, int width, int height) {
-  const unsigned char *source_data	= in.data();
-  unsigned char *target_data			= out.data();
+  const unsigned char *source_data = in.data();
+  unsigned char *target_data   = out.data();
 
   const long old_height = in.height();
   const long old_width  = in.width();
@@ -156,9 +156,9 @@ struct BilinearPrecalc {
 };
 
 void precalculate(std::vector< BilinearPrecalc > &weight, int orig_dim) {
-  const int new_size		= weight.size();
-  const FloatType HFactor	= FloatType(orig_dim) / new_size;
-  const int srcpixmax	= orig_dim - 1;
+  const int new_size  = weight.size();
+  const FloatType HFactor = FloatType(orig_dim) / new_size;
+  const int srcpixmax = orig_dim - 1;
 
   //BilinearPrecalc precalc;
 
@@ -238,27 +238,27 @@ ScaleFuncs fillFuncs() {
   ScaleFuncs result;
 
   // undefined depths
-  result.funcs[FastScaling][0]		= 0;
-  result.funcs[MiddleScaling][0]		= 0;
-  result.funcs[HighScaling][0]		= 0;
-  result.funcs[FastScaling][2]		= 0;
-  result.funcs[MiddleScaling][2]		= 0;
-  result.funcs[HighScaling][2]		= 0;
+  result.funcs[FastScaling][0]  = 0;
+  result.funcs[MiddleScaling][0]  = 0;
+  result.funcs[HighScaling][0]  = 0;
+  result.funcs[FastScaling][2]  = 0;
+  result.funcs[MiddleScaling][2]  = 0;
+  result.funcs[HighScaling][2]  = 0;
 
   // grey
-  result.funcs[FastScaling][1]		= resampleNearest<1>;
-  result.funcs[MiddleScaling][1]		= resampleBilinear<1>;
-  result.funcs[HighScaling][1]		= resampleBicubic<1>;
+  result.funcs[FastScaling][1]  = resampleNearest<1>;
+  result.funcs[MiddleScaling][1]  = resampleBilinear<1>;
+  result.funcs[HighScaling][1]  = resampleBicubic<1>;
 
   // rgb, bgr, etc...
-  result.funcs[FastScaling][3]		= resampleNearest<3>;
-  result.funcs[MiddleScaling][3]		= resampleBilinear<3>;
-  result.funcs[HighScaling][3]		= resampleBicubic<3>;
+  result.funcs[FastScaling][3]  = resampleNearest<3>;
+  result.funcs[MiddleScaling][3]  = resampleBilinear<3>;
+  result.funcs[HighScaling][3]  = resampleBicubic<3>;
 
   // with alpha channel
-  result.funcs[FastScaling][4]		= resampleNearest<4>;
-  result.funcs[MiddleScaling][4]		= resampleBilinear<4>;
-  result.funcs[HighScaling][4]		= resampleBicubic<4>;
+  result.funcs[FastScaling][4]  = resampleNearest<4>;
+  result.funcs[MiddleScaling][4]  = resampleBilinear<4>;
+  result.funcs[HighScaling][4]  = resampleBicubic<4>;
 
   return result;
 }
@@ -297,7 +297,7 @@ Image scale(const Image &in, Image &cached, ScaleQuality quality, int width, int
   static const ScaleFuncs funcs = fillFuncs();
 
 
-//		Image result;
+//  Image result;
 
   if( 0 == width && 0 == height )
     return Image::emptyImage;

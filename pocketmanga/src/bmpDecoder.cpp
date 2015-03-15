@@ -1,6 +1,7 @@
 #include "imgDecoder.h"
 #include "imgDecoderFactory.h"
 
+#include "forbid_copy_assign.h"
 #include "byteArray.h"
 
 #include "image.h"
@@ -11,35 +12,35 @@ namespace {
 #pragma pack(push,2)
 
 struct BITMAPFILEHEADER {
-  unsigned short		type;
-  unsigned long 		size;
-  unsigned short		reserved1;
-  unsigned short		reserved2;
-  unsigned long		offBits;
+  unsigned short  type;
+  unsigned long   size;
+  unsigned short  reserved1;
+  unsigned short  reserved2;
+  unsigned long  offBits;
 };
 
 #pragma pack(pop)
 
 
 struct BITMAPINFOHEADER {
-  unsigned long	size;
-  long			width;
-  long			height;
-  unsigned short	planes;
-  unsigned short	bitCount;
-  unsigned long	compression;
-  unsigned long	sizeImage;
-  long			xPelsPerMeter;
-  long			yPelsPerMeter;
-  unsigned long	clrUsed;
-  unsigned long	clrImportant;
+  unsigned long size;
+  long   width;
+  long   height;
+  unsigned short planes;
+  unsigned short bitCount;
+  unsigned long compression;
+  unsigned long sizeImage;
+  long   xPelsPerMeter;
+  long   yPelsPerMeter;
+  unsigned long clrUsed;
+  unsigned long clrImportant;
 };
 
 static const unsigned short BmpType = 0x4d42; // 'MB'
 
 enum Compreesion {
-  NoCompression	= 0, // BI_RGB,
-  BitFields		= 3  // BI_BITFIELDS
+  NoCompression = 0, // BI_RGB,
+  BitFields  = 3  // BI_BITFIELDS
 };
 
 struct Palette {
@@ -57,6 +58,9 @@ struct Palette {
   Palette(const unsigned char *data, unsigned int size)
     :data(data), size(size) {
   }
+
+private:
+    FORBID_ASSIGN(Palette);
 };
 }
 
@@ -252,9 +256,9 @@ public:
     unsigned long data_size,
     const Palette &/*pallete*/,
     img::Image &decoded) {
-    unsigned short mask_blue		= 0x1F;
-    unsigned short mask_green	= mask_blue << 5;
-    unsigned short mask_red		= mask_blue << 10;
+    unsigned short mask_blue  = 0x1F;
+    unsigned short mask_green = mask_blue << 5;
+    unsigned short mask_red  = mask_blue << 10;
 
     return loadColor16_XXX(
              width,
@@ -313,12 +317,12 @@ public:
       const unsigned char* src = &src_begin[( height - y - 1 ) * src_scanline];
 
       for( unsigned short x = 0; x < width; ++x) {
-        dst[0]	= src[2];
-        dst[1]	= src[1];
-        dst[2]	= src[0];
+        dst[0] = src[2];
+        dst[1] = src[1];
+        dst[2] = src[0];
 
         if( 4 == byte_per_pixel )
-          dst[3]	= src[3];
+          dst[3] = src[3];
 
         dst += byte_per_pixel;
         src += byte_per_pixel;
@@ -365,11 +369,11 @@ public:
       )
       return false;
 
-    const unsigned int width			= info.width;
-    const unsigned int height			= std::abs(info.height);
+    const unsigned int width   = info.width;
+    const unsigned int height   = std::abs(info.height);
 
-    const unsigned int palette_begin	= sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
-    const unsigned int palette_size		= header.offBits - palette_begin;
+    const unsigned int palette_begin = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+    const unsigned int palette_size  = header.offBits - palette_begin;
 
     if( encoded.getSize() < palette_begin ||
         encoded.getSize() < header.offBits )

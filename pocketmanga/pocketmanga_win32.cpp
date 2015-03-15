@@ -12,7 +12,7 @@
 #include "src/defines.h"
 #include "src/cacheScaler.h"
 
-#include <opencv2/opencv.hpp>
+/*#include <opencv2/opencv.hpp>
 
 cv::Mat to_cv(const img::Image &img) {
   img::Image rotated = img::rotate(img, img::Angle_90);
@@ -81,7 +81,7 @@ int main() {
     //img = img::rotate(img, img::Angle_90);
 
     //cv::imshow("ololo1", to_cv(img));
-    cv::imshow("ololo1", to_cv(scaler->scaledGrey()));
+    /*cv::imshow("ololo1", to_cv(scaler->scaledGrey()));
 
     book.preload();
 
@@ -90,13 +90,13 @@ int main() {
       cv::imshow("ololo1", to_cv(scaler->scaledGrey()));
       cv::waitKey(3000);
       cv::imshow("ololo1", to_cv(scaler->scaledGrey()));
-    }
+    }*/
     //cv::Mat to_cv(img2)
     //cv::imshow("ololo2", mat2);
     //cv::imshow("ololo2", mat2);
     //cv::imshow("ololo2", mat2);
 
-    cv::waitKey(3000);
+    /*cv::waitKey(3000);*/
 
 
   }
@@ -105,17 +105,17 @@ int main() {
   return 0;
 
 
-  /*	fs::IFileManager *mgr = fs::IFileManager::create();
-  	std::vector<fs::FilePath> list = mgr->getFileList("i:\\books\\Prison School\\Том 01", fs::IFileManager::Directory, true);
+  /* fs::IFileManager *mgr = fs::IFileManager::create();
+   std::vector<fs::FilePath> list = mgr->getFileList("i:\\books\\Prison School\\Том 01", fs::IFileManager::Directory, true);
 
-  	fs::sort(list, fs::FirstWordThenNumbers);
-  	//fs::sort(list, fs::JustNumbers);
+   fs::sort(list, fs::FirstWordThenNumbers);
+   //fs::sort(list, fs::JustNumbers);
 
-  	std::vector<fs::FilePath>::iterator it = list.begin(), itEnd = list.end();
-  	for ( ; it != itEnd; ++it )
-  	{
-  		std::cout << it->getPath() << std::endl;
-  	}
+   std::vector<fs::FilePath>::iterator it = list.begin(), itEnd = list.end();
+   for ( ; it != itEnd; ++it )
+   {
+    std::cout << it->getPath() << std::endl;
+   }
 
-  	return 0;*/
+   return 0;*/
 }

@@ -12,8 +12,8 @@
 #include <iostream>
 
 namespace {
-static const unsigned int Width		= 256;
-static const unsigned int Height	= 128;
+static const unsigned int Width  = 256;
+static const unsigned int Height = 128;
 }
 
 

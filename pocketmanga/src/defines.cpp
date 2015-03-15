@@ -21,10 +21,10 @@ Rect restrictBy(const Rect &src, const Rect &restricter) {
   int restr_y2 = restricter.y + restricter.height;
 
   Rect result;
-  result.x		= std::max(src_x1, restr_x1);
-  result.y		= std::max(src_y1, restr_y1);
-  result.width	= std::max<int>(0, std::min(src_x2, restr_x2) - result.x);
-  result.height	= std::max<int>(0, std::min(src_y2, restr_y2) - result.y);
+  result.x  = std::max(src_x1, restr_x1);
+  result.y  = std::max(src_y1, restr_y1);
+  result.width = std::max<int>(0, std::min(src_x2, restr_x2) - result.x);
+  result.height = std::max<int>(0, std::min(src_y2, restr_y2) - result.y);
 
   return result;
 }

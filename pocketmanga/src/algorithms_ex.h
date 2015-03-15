@@ -112,12 +112,12 @@ inline std::size_t get_stream_size(std::istream &stream) {
   return size;
 }
 
-// 	template<class KeyType, class ValueType>
-// 	const std::pair<KeyType, ValueType> &fetch_element(
-// 		const std::map<KeyType, ValueType> &collect,
-// 		size_t index,
-// 		const ValueType &def_value = ValueType())
-// 	{
-// 		return fetch_element_tmpl(collect, index, def_value);
-// 	}
+//  template<class KeyType, class ValueType>
+//  const std::pair<KeyType, ValueType> &fetch_element(
+//   const std::map<KeyType, ValueType> &collect,
+//   size_t index,
+//   const ValueType &def_value = ValueType())
+//  {
+//   return fetch_element_tmpl(collect, index, def_value);
+//  }
 }

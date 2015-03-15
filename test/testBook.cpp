@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE( ExplorerWithArchive ) {
 class ExplorerTestFixture {
 public:
   ExplorerTestFixture()
-    :	file_system_(new TestFileSystem),
+    : file_system_(new TestFileSystem),
       archiver_(file_system_.get()) {
   }
 

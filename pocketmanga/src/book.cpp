@@ -18,9 +18,9 @@
 // random access
 
 namespace {
-const int MaxFilesize			= 1024 * 1024 * 20;
-const size_t ArchiveJustOpened	= std::numeric_limits<size_t>::max();
-const size_t FileNotSpecified	= std::numeric_limits<size_t>::max();
+const int MaxFilesize   = 1024 * 1024 * 20;
+const size_t ArchiveJustOpened = std::numeric_limits<size_t>::max();
+const size_t FileNotSpecified = std::numeric_limits<size_t>::max();
 
 struct CmpForLevel {
   const fs::FilePath &entry;
@@ -223,7 +223,7 @@ bool BookExplorer::setRoot(const fs::FilePath &root) {
   const bool files_only = (fs::IFileManager::Directory != (find_entries_ & fs::IFileManager::Directory));
   FixUpFileTree(files_, root, fs::WordNumberOrder(), files_only);
   //if( std::find(files_.begin(), files_.end(), root) == files_.end() )
-  //	files_.push_back(root);
+  // files_.push_back(root);
 
 
   return enter(PathToFile(root));

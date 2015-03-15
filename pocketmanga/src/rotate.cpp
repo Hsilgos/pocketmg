@@ -25,21 +25,21 @@ typedef img::Image::SizeType SizeType;
 
 namespace img {
 void rotate90_1(const Image &src, Image &dst) {
-  const SizeType orig_height	= src.height();
-  const SizeType orig_width	= src.width();
+  const SizeType orig_height = src.height();
+  const SizeType orig_width = src.width();
 
-  const SizeType new_height	= src.width();
-  const SizeType new_width		= src.height();
+  const SizeType new_height = src.width();
+  const SizeType new_width  = src.height();
 
   dst.create(new_width, new_height, src.depth());
 
-  const unsigned char* src_data	= src.data();
-  unsigned char* dst_data			= dst.data();
+  const unsigned char* src_data = src.data();
+  unsigned char* dst_data   = dst.data();
 
   for( SizeType y = 0; y < orig_height; ++y ) {
     for( SizeType x = 0; x < orig_width; ++x ) {
-      SizeType pixel_src_ind = y * orig_width + x;//y * orig_width	+ x;
-      SizeType pixel_dst_ind = x * new_width + new_width - y - 1;//x * new_width	+ new_width - y - 1;
+      SizeType pixel_src_ind = y * orig_width + x;//y * orig_width + x;
+      SizeType pixel_dst_ind = x * new_width + new_width - y - 1;//x * new_width + new_width - y - 1;
 
       assert( pixel_src_ind < orig_height * orig_width);
       assert( pixel_dst_ind < new_height * new_width);
@@ -51,21 +51,21 @@ void rotate90_1(const Image &src, Image &dst) {
 }
 
 void rotate90_3(const Image &src, Image &dst) {
-  const SizeType orig_height	= src.height();
-  const SizeType orig_width	= src.width();
+  const SizeType orig_height = src.height();
+  const SizeType orig_width = src.width();
 
-  const SizeType new_height	= src.width();
-  const SizeType new_width		= src.height();
+  const SizeType new_height = src.width();
+  const SizeType new_width  = src.height();
 
   dst.create(new_width, new_height, src.depth());
 
-  const unsigned char* src_data	= src.data();
-  unsigned char* dst_data			= dst.data();
+  const unsigned char* src_data = src.data();
+  unsigned char* dst_data   = dst.data();
 
   for( SizeType y = 0; y < orig_height; ++y ) {
     for( SizeType x = 0; x < orig_width; ++x ) {
-      SizeType pixel_src_ind = y * orig_width + x;//y * orig_width	+ x;
-      SizeType pixel_dst_ind = x * new_width + new_width - y - 1;//x * new_width	+ new_width - y - 1;
+      SizeType pixel_src_ind = y * orig_width + x;//y * orig_width + x;
+      SizeType pixel_dst_ind = x * new_width + new_width - y - 1;//x * new_width + new_width - y - 1;
 
       assert( pixel_src_ind < orig_height * orig_width);
       assert( pixel_dst_ind < new_height * new_width);
@@ -79,16 +79,16 @@ void rotate90_3(const Image &src, Image &dst) {
 
 
 void rotate180_1(const Image &src, Image &dst) {
-  const SizeType orig_height	= src.height();
-  const SizeType orig_width	= src.width();
+  const SizeType orig_height = src.height();
+  const SizeType orig_width = src.width();
 
-  const SizeType new_height	= src.height();
-  const SizeType new_width		= src.width();
+  const SizeType new_height = src.height();
+  const SizeType new_width  = src.width();
 
   dst.create(new_width, new_height, src.depth());
 
-  const unsigned char* src_data	= src.data();
-  unsigned char* dst_data			= dst.data();
+  const unsigned char* src_data = src.data();
+  unsigned char* dst_data   = dst.data();
 
   for( SizeType y = 0; y < orig_height; ++y ) {
     const SizeType destinationY = (new_height - 1 - y) * new_width;
@@ -108,16 +108,16 @@ void rotate180_1(const Image &src, Image &dst) {
 }
 
 void rotate180_3(const Image &src, Image &dst) {
-  const SizeType orig_height	= src.height();
-  const SizeType orig_width	= src.width();
+  const SizeType orig_height = src.height();
+  const SizeType orig_width = src.width();
 
-  const SizeType new_height	= src.height();
-  const SizeType new_width		= src.width();
+  const SizeType new_height = src.height();
+  const SizeType new_width  = src.width();
 
   dst.create(new_width, new_height, src.depth());
 
-  const unsigned char* src_data	= src.data();
-  unsigned char* dst_data			= dst.data();
+  const unsigned char* src_data = src.data();
+  unsigned char* dst_data   = dst.data();
 
   for( SizeType y = 0; y < orig_height; ++y ) {
     const SizeType destinationY = (new_height - 1 - y) * new_width;
@@ -139,16 +139,16 @@ void rotate180_3(const Image &src, Image &dst) {
 }
 
 void rotate270_1(const Image &src, Image &dst) {
-  const SizeType orig_height	= src.height();
-  const SizeType orig_width	= src.width();
+  const SizeType orig_height = src.height();
+  const SizeType orig_width = src.width();
 
-  const SizeType new_height	= src.width();
-  const SizeType new_width	= src.height();
+  const SizeType new_height = src.width();
+  const SizeType new_width = src.height();
 
   dst.create(new_width, new_height, src.depth());
 
-  const unsigned char* src_data	= src.data();
-  unsigned char* dst_data			= dst.data();
+  const unsigned char* src_data = src.data();
+  unsigned char* dst_data   = dst.data();
 
   for( SizeType y = 0; y < orig_height; ++y ) {
     const SizeType destinationX = y;
@@ -168,16 +168,16 @@ void rotate270_1(const Image &src, Image &dst) {
 }
 
 void rotate270_3(const Image &src, Image &dst) {
-  const SizeType orig_height	= src.height();
-  const SizeType orig_width	= src.width();
+  const SizeType orig_height = src.height();
+  const SizeType orig_width = src.width();
 
-  const SizeType new_height	= src.width();
-  const SizeType new_width		= src.height();
+  const SizeType new_height = src.width();
+  const SizeType new_width  = src.height();
 
   dst.create(new_width, new_height, src.depth());
 
-  const unsigned char* src_data	= src.data();
-  unsigned char* dst_data			= dst.data();
+  const unsigned char* src_data = src.data();
+  unsigned char* dst_data   = dst.data();
 
   for( SizeType y = 0; y < orig_height; ++y ) {
     const SizeType destinationX = y;

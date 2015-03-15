@@ -13,13 +13,13 @@ public:
 
   virtual ~IBenchmarkOutput();
 
-  virtual void started(int count)			= 0;
-  virtual void finished(boost::int64_t milliseconds)	= 0;
+  virtual void started(int count)   = 0;
+  virtual void finished(boost::int64_t milliseconds) = 0;
 };
 
 class Printout: public IBenchmarkOutput {
   //const std::string name_;
-  boost::format	format_;
+  boost::format format_;
 
   PATTERN_IMPL_CLONE(Printout);
 
@@ -54,6 +54,6 @@ public:
 }
 
 #define BENCHMARK_REPEAT( Name, CountDebug, CountRelease ) \
-	for(test::TestBenchmark bench(Name, (utils::isDebugging()?(CountDebug):(CountRelease))); !bench.isDone(); bench.next() )
+ for(test::TestBenchmark bench(Name, (utils::isDebugging()?(CountDebug):(CountRelease))); !bench.isDone(); bench.next() )
 
 #define BENCHMARK( Name ) BENCHMARK_REPEAT( Name, 1, 1 )

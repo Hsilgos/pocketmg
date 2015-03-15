@@ -84,17 +84,17 @@ public:
 };
 
 #define AUTO_REGISTER_FACTORY( fact_type, type_id ,concrete_factory ) \
-		namespace																												\
-		{																														\
-			struct BOOST_JOIN(FactoryRegistrar, __LINE__)																		\
-			{																													\
-				BOOST_JOIN(FactoryRegistrar, __LINE__)()																		\
-				{																												\
-					fact_type::getInstance().regFactory(type_id, concrete_factory);												\
-				}																												\
-			};																													\
-			static BOOST_JOIN(FactoryRegistrar, __LINE__) BOOST_JOIN(__global_factory_registrar__, __LINE__ );					\
-		}
+  namespace                            \
+  {                              \
+   struct BOOST_JOIN(FactoryRegistrar, __LINE__)                  \
+   {                             \
+    BOOST_JOIN(FactoryRegistrar, __LINE__)()                  \
+    {                            \
+     fact_type::getInstance().regFactory(type_id, concrete_factory);            \
+    }                            \
+   };                             \
+   static BOOST_JOIN(FactoryRegistrar, __LINE__) BOOST_JOIN(__global_factory_registrar__, __LINE__ );     \
+  }
 
 }
 

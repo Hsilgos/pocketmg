@@ -18,10 +18,10 @@ protected:
 
   struct CalculatedCoeffs {
     enum {
-      ColorCount	= 256,
+      ColorCount = 256,
       red_coeff   = 6968,
       green_coeff = 23434,
-      blue_coeff	= 32768 - red_coeff - green_coeff
+      blue_coeff = 32768 - red_coeff - green_coeff
     };
 
     int r[ColorCount];
@@ -126,34 +126,34 @@ struct ColorBase {
   typedef Int2Type<Color3> Color3Type;
   typedef Int2Type<Color4> Color4Type;
 
-  typedef Int2Type<Red>		RedType;
-  typedef Int2Type<Green>		GreenType;
-  typedef Int2Type<Blue>		BlueType;
-  typedef Int2Type<Alpha>		AlphaType;
-  typedef Int2Type<NoChannel>	NoType;
+  typedef Int2Type<Red>  RedType;
+  typedef Int2Type<Green>  GreenType;
+  typedef Int2Type<Blue>  BlueType;
+  typedef Int2Type<Alpha>  AlphaType;
+  typedef Int2Type<NoChannel> NoType;
 
-  ChannelsType	colors;
+  ChannelsType colors;
 
   enum ColorIndex {
-    RedIndex =	is_type<RedType,	Color1Type>::value?0:
-    is_type<RedType,	Color2Type>::value?1:
-    is_type<RedType,	Color3Type>::value?2:
-    is_type<RedType,	Color4Type>::value?3:-1,
+    RedIndex = is_type<RedType, Color1Type>::value?0:
+    is_type<RedType, Color2Type>::value?1:
+    is_type<RedType, Color3Type>::value?2:
+    is_type<RedType, Color4Type>::value?3:-1,
 
-    GreenIndex =is_type<GreenType,	Color1Type>::value?0:
-    is_type<GreenType,	Color2Type>::value?1:
-    is_type<GreenType,	Color3Type>::value?2:
-    is_type<GreenType,	Color4Type>::value?3:-1,
+    GreenIndex =is_type<GreenType, Color1Type>::value?0:
+    is_type<GreenType, Color2Type>::value?1:
+    is_type<GreenType, Color3Type>::value?2:
+    is_type<GreenType, Color4Type>::value?3:-1,
 
-    BlueIndex =	is_type<BlueType,	Color1Type>::value?0:
-    is_type<BlueType,	Color2Type>::value?1:
-    is_type<BlueType,	Color3Type>::value?2:
-    is_type<BlueType,	Color4Type>::value?3:-1,
+    BlueIndex = is_type<BlueType, Color1Type>::value?0:
+    is_type<BlueType, Color2Type>::value?1:
+    is_type<BlueType, Color3Type>::value?2:
+    is_type<BlueType, Color4Type>::value?3:-1,
 
-    AlphaIndex =is_type<AlphaType,	Color1Type>::value?0:
-    is_type<AlphaType,	Color2Type>::value?1:
-    is_type<AlphaType,	Color3Type>::value?2:
-    is_type<AlphaType,	Color4Type>::value?3:-1
+    AlphaIndex =is_type<AlphaType, Color1Type>::value?0:
+    is_type<AlphaType, Color2Type>::value?1:
+    is_type<AlphaType, Color3Type>::value?2:
+    is_type<AlphaType, Color4Type>::value?3:-1
   };
 
   STATIC_ASSERT( (RedIndex != -1), no_red_channel );
@@ -212,9 +212,9 @@ struct ColorBase {
   template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
   bool operator == (const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType> &other) const {
     return
-      red()	== other.red() &&
+      red() == other.red() &&
       green() == other.green() &&
-      blue()	== other.blue() &&
+      blue() == other.blue() &&
       alpha() == other.alpha();
   }
 
@@ -503,7 +503,7 @@ typedef Color4RefTmpl<Alpha, Blue, Green, Red, const Channel *> AbgrConstRef;
 
 
 
-//typedef GrayTmpl<Channel[1]>	Gray;
-//typedef GrayTmpl<Channel*>		GrayRef;
+//typedef GrayTmpl<Channel[1]> Gray;
+//typedef GrayTmpl<Channel*>  GrayRef;
 }
 

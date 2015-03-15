@@ -90,9 +90,9 @@ bool CacheScaler::onLoaded(img::Image &image) {
 
     scaled_.bounds.x = 0;
     scaled_.bounds.y = 0;
-    scaled_.bounds.width 	= screen_width_;
-    scaled_.bounds.height 	= screen_height_;
-    scaled_.currentShowing	= 0;
+    scaled_.bounds.width  = screen_width_;
+    scaled_.bounds.height  = screen_height_;
+    scaled_.currentShowing = 0;
     /*drawable.representType = Parts3;
     drawable.orientation = Vertical;
 
@@ -100,14 +100,14 @@ bool CacheScaler::onLoaded(img::Image &image) {
     const double scr_prop = static_cast<double>(screen_width)/static_cast<double>(screen_height_);
 
     if( img_prop < scr_prop )
-    	img::scale(image_, drawable_.image, img::HighScaling,  0, screen_height_);
+     img::scale(image_, drawable_.image, img::HighScaling,  0, screen_height_);
     else
-    	img::scale(image_, drawable_.image, img::HighScaling, screen_width, 0);
+     img::scale(image_, drawable_.image, img::HighScaling, screen_width, 0);
 
     drawable.currectBouds.x = 0;
     drawable.currectBouds.y = 0;
-    drawable.currectBouds.width 	= screen_width;
-    drawable.currectBouds.height 	= screen_height_;*/
+    drawable.currectBouds.width  = screen_width;
+    drawable.currectBouds.height  = screen_height_;*/
   } else {
     scaled_.representation = Parts3;
     scaled_.orientation = Vertical;
@@ -117,9 +117,9 @@ bool CacheScaler::onLoaded(img::Image &image) {
 
     scaled_.bounds.x = 0;
     scaled_.bounds.y = 0;
-    scaled_.bounds.width 	= screen_width_;
-    scaled_.bounds.height 	= screen_height_;
-    scaled_.currentShowing	= 0;
+    scaled_.bounds.width  = screen_width_;
+    scaled_.bounds.height  = screen_height_;
+    scaled_.currentShowing = 0;
     /*drawable.representType = Parts3;
     drawable.orientation = Vertical;
 
@@ -127,15 +127,15 @@ bool CacheScaler::onLoaded(img::Image &image) {
     const double scr_prop = static_cast<double>(screen_width)/static_cast<double>(screen_height_);
 
     if( img_prop < scr_prop )
-    	img::scale(image_, drawable_.image, img::HighScaling, screen_height_, 0);
+     img::scale(image_, drawable_.image, img::HighScaling, screen_height_, 0);
     else
-    	img::scale(image_, drawable_.image, img::HighScaling, 0, screen_width);
+     img::scale(image_, drawable_.image, img::HighScaling, 0, screen_width);
 
     img::rotate(drawable_.image, drawable_.image, img::Angle_270);
     drawable.currectBouds.x = 0;
     drawable.currectBouds.y = 0;
-    drawable.currectBouds.width 	= screen_width;
-    drawable.currectBouds.height 	= screen_height_;*/
+    drawable.currectBouds.width  = screen_width;
+    drawable.currectBouds.height  = screen_height_;*/
   }
 
   return true;

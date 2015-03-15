@@ -75,11 +75,11 @@ ByteArray::ByteArray(const void *data, SizeType len)
 
 const ByteArray::SizeType ByteArray::npos = std::numeric_limits<ByteArray::SizeType>::max();
 
-void ByteArray::implByteArray(const void *data, SizeType len) {
-  if( data && len > 0 ) {
+void ByteArray::implByteArray(const void *raw_data, SizeType len) {
+    if (raw_data && len > 0) {
     shared_data_ = new SharedData;
 
-    const ByteType *data = static_cast<const ByteType *>(data);
+    const ByteType *data = static_cast<const ByteType *>(raw_data);
     shared_data_->buffer.assign(data, data + len);
     shared_data_->ref.inc();
   }
@@ -150,10 +150,10 @@ void ByteArray::changeTo(ByteArray::SharedData *other) {
 ByteArray::SharedData *ByteArray::acquire() {
   if( shared_data_ ) {
     if( shared_data_->ref.getValue() > 1 ) {
-      SharedData *other		= shared_data_;
+      SharedData *other  = shared_data_;
 
-      shared_data_				= new SharedData;
-      shared_data_->buffer		= other->buffer;
+      shared_data_    = new SharedData;
+      shared_data_->buffer  = other->buffer;
 
       shared_data_->ref.inc();
       other->ref.dec();
@@ -301,7 +301,7 @@ void ByteArray::reserve(SizeType new_len) {
   }
 }
 
-ByteArray ByteArray::copyPart(SizeType index, SizeType count) const {
+ByteArray ByteArray::copyPart(SizeType index, SizeType copy_count) const {
 
   if( shared_data_ ) {
 
@@ -309,7 +309,7 @@ ByteArray ByteArray::copyPart(SizeType index, SizeType count) const {
     if( index >= shared_data_->buffer.size() )
       return ByteArray();
 
-    SizeType count = count;
+    SizeType count = copy_count;
     if( (count > my_len) || (index > (my_len - count)) )
       count = my_len - index;
 
@@ -361,8 +361,8 @@ bool insert(ByteArray &array, ByteArray::SizeType index, const void *data, ByteA
 
 bool replace(ByteArray &array, ByteArray::SizeType index, const void *data, ByteArray::SizeType length) {
   const char *ch_data = static_cast<const char *>(data);
-  ByteArray::SizeType from	= index;
-  ByteArray::SizeType to	= std::min(index + length, array.getSize());
+  ByteArray::SizeType from = index;
+  ByteArray::SizeType to = std::min(index + length, array.getSize());
   for ( ByteArray::SizeType i = from; i < to; ++i )
     array[i] = ch_data[i - from];
 
@@ -501,13 +501,13 @@ std::string byteArray2string(const ByteArray &array, ByteArray::SizeType index, 
   if( index > array.getSize() )
     return std::string();
 
-  ByteArray::SizeType from	= index;
-  ByteArray::SizeType to	= std::min(index + count, array.getSize());
+  ByteArray::SizeType from = index;
+  ByteArray::SizeType to = std::min(index + count, array.getSize());
 
   if( upto0 ) {
     ByteArray::SizeType found = find(array, '\0', index, count);
     if( found != std::string::npos )
-      to	= found;
+      to = found;
   }
 
   return std::string(array.getData() + from, array.getData() + to);

@@ -37,10 +37,10 @@ dst[0] = Rgb(255, 255, 255);
 */
 
 class Image {
-  tools::ByteArray	data_;
+  tools::ByteArray data_;
 
-  utils::Size			size_;
-  unsigned short		depth_;
+  utils::Size   size_;
+  unsigned short  depth_;
 
   bool enable_min_realloc_;
 public:
@@ -89,8 +89,8 @@ public:
 
   static const Image emptyImage;
 
-//		ibitmap *native();
-//		const ibitmap *native() const;
+//  ibitmap *native();
+//  const ibitmap *native() const;
 };
 
 utils::Rect getRect(const Image &src);

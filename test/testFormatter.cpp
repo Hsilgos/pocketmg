@@ -36,8 +36,8 @@ class TestLogFormatter: public btest::unit_test_log_formatter {
   virtual ~TestLogFormatter() {}
 
   class Output {
-    unsigned int	color_;
-    std::stringstream	stream_;
+    unsigned int color_;
+    std::stringstream stream_;
   public:
     Output(unsigned int color = utils::CCWhite)
       :color_(color) {
@@ -104,10 +104,10 @@ class TestLogFormatter: public btest::unit_test_log_formatter {
     Output() << "Tests finished" << std::endl;
     Output() << "Total checks:   "<< check_count_ << std::endl;
     Output() << "Total time:    " << duration2str(diff_time) << std::endl;
-    Output(fatal_error_count_>0?utils::CCRed:utils::CCWhite)				<< "Fatal errors:   "<< fatal_error_count_ << std::endl;
-    Output(error_count_>0?utils::CCRed:utils::CCWhite)					<< "Errors:         "<< error_count_ << std::endl;
+    Output(fatal_error_count_>0?utils::CCRed:utils::CCWhite)    << "Fatal errors:   "<< fatal_error_count_ << std::endl;
+    Output(error_count_>0?utils::CCRed:utils::CCWhite)     << "Errors:         "<< error_count_ << std::endl;
     Output(warning_count_>0?(utils::CCGreen|utils::CCRed):utils::CCWhite)<< "Warnings:       "<< warning_count_ << std::endl;
-    //Output(FindMemoryLeaks::getCount()>0?utils::CCRed:utils::CCWhite)	<< "Memory leaks:   "<< FindMemoryLeaks::getCount() << std::endl;
+    //Output(FindMemoryLeaks::getCount()>0?utils::CCRed:utils::CCWhite) << "Memory leaks:   "<< FindMemoryLeaks::getCount() << std::endl;
     Output() << "***************************" << std::endl;
   }
 

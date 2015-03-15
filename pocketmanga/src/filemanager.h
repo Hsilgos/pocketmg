@@ -29,9 +29,9 @@ class NumberOrder: public Comparator {
 class IFileManager {
 public:
   enum EntryTypes {
-    File			= 1,
-    Directory		= 2,
-    FileAndDirectory	= File|Directory
+    File   = 1,
+    Directory  = 2,
+    FileAndDirectory = File|Directory
   };
 
   //virtual std::vector<fs::FilePath> getFileList(const std::string &root, EntryTypes entries, bool recursive) = 0;

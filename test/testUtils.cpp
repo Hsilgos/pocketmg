@@ -30,9 +30,9 @@ void ideOutput(const wchar_t *output, bool end_line) {
 void doBlockLeakDetect(bool block) {
   int flags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
 
-  if(block)	// Disable allocation tracking
+  if(block) // Disable allocation tracking
     flags &= ~_CRTDBG_ALLOC_MEM_DF;
-  else		// Enable allocation tracking
+  else  // Enable allocation tracking
     flags |= _CRTDBG_ALLOC_MEM_DF;
 
   _CrtSetDbgFlag(flags);

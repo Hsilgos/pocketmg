@@ -120,8 +120,8 @@ private:
 };
 
 struct Bookmark {
-  PathToFile		currentFile;
-  fs::FilePath	rootDir;
+  PathToFile  currentFile;
+  fs::FilePath rootDir;
 };
 
 class IBookCache {

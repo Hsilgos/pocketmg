@@ -11,10 +11,10 @@ void doTest(
   utils::Rect restrict(xrest, yrest, wrest, hrest);
 
   utils::Rect result = restrictBy(rect, restrict);
-  BOOST_CHECK_EQUAL( result.x,		xresult);
-  BOOST_CHECK_EQUAL( result.y,		yresult);
-  BOOST_CHECK_EQUAL( result.width,	wresult);
-  BOOST_CHECK_EQUAL( result.height,	hresult);
+  BOOST_CHECK_EQUAL( result.x,  xresult);
+  BOOST_CHECK_EQUAL( result.y,  yresult);
+  BOOST_CHECK_EQUAL( result.width, wresult);
+  BOOST_CHECK_EQUAL( result.height, hresult);
 }
 }
 
