@@ -23,8 +23,8 @@ protected:
 
   test::Report report_;
 
-  const char *qualityName(img::ScaleQuality quality) {
-    switch(quality) {
+  const char* qualityName(img::ScaleQuality quality) {
+    switch (quality) {
     case img::HighScaling:
       return "BICUBIC";
     case img::FastScaling:
@@ -38,8 +38,8 @@ protected:
     return "Unknow";
   }
 
-  const char *angleName(img::RotateAngle angle) {
-    switch(angle) {
+  const char* angleName(img::RotateAngle angle) {
+    switch (angle) {
     case img::Angle_90:
       return "90";
     case img::Angle_180:
@@ -53,17 +53,16 @@ protected:
     return "Unknow";
   }
 public:
-  ScaleHelper() {
-  }
+  ScaleHelper() {}
 
   ~ScaleHelper() {
     std::cout << std::endl;
-    report_.printTable( std::cout );
+    report_.printTable(std::cout);
     std::cout << std::endl;
   }
 
-  void init(void *data, unsigned int size) {
-    BOOST_REQUIRE( image_.load("jpg", tools::ByteArray(data, size)) );
+  void init(void* data, unsigned int size) {
+    BOOST_REQUIRE(image_.load("jpg", tools::ByteArray(data, size)));
 
     std::stringstream descr;
     descr << "Image size: " << image_.width() << "x" << image_.height();
@@ -71,16 +70,16 @@ public:
   }
 
   /*void doScale(const wxSize &size, img::ScaleQuality quality )
-  {
-   doScale(size.x, size.y, quality);
-  }*/
+     {
+     doScale(size.x, size.y, quality);
+     }*/
 
   void doScale(int new_width, int new_height, img::ScaleQuality quality) {
-    if( 0 ==  new_width)
-      new_width = img::proportionalWidth(new_height,  image_.getSize() );
+    if (0 ==  new_width)
+      new_width = img::proportionalWidth(new_height,  image_.getSize());
 
-    if( 0 ==  new_height)
-      new_height = img::proportionalHeight(new_width,  image_.getSize() );
+    if (0 ==  new_height)
+      new_height = img::proportionalHeight(new_width,  image_.getSize());
 
     std::stringstream row_name;
     row_name << new_width << "x" << new_height;
@@ -89,7 +88,7 @@ public:
     cache.createSame(image_);
     cache.enableMinimumReallocations(true);
 
-    BENCHMARK( report_.output(qualityName(quality), row_name.str()) )
+    BENCHMARK(report_.output(qualityName(quality), row_name.str()))
     img::scale(image_, cache, quality, new_width, new_height);
   }
 
@@ -100,13 +99,13 @@ public:
 
   void doRotate(img::RotateAngle angle) {
     std::stringstream descr;
-    descr <<image_.width() << "x" << image_.height();
+    descr << image_.width() << "x" << image_.height();
 
     img::Image cache;
     cache.createSame(image_);
     cache.enableMinimumReallocations(true);
 
-    BENCHMARK( report_.output(angleName(angle), descr.str()) )
+    BENCHMARK(report_.output(angleName(angle), descr.str()))
     img::rotate(image_, cache, angle);
   }
 };
@@ -115,9 +114,9 @@ public:
 
 namespace test {
 // --log_level=test_suite --run_test=TestScale
-BOOST_AUTO_TEST_SUITE( TestScale )
+BOOST_AUTO_TEST_SUITE(TestScale)
 
-BOOST_FIXTURE_TEST_CASE( TestColor, ScaleHelper ) {
+BOOST_FIXTURE_TEST_CASE(TestColor, ScaleHelper) {
   init(get_testJpg_jpg_buf(), get_testJpg_jpg_size());
 
   doScale(2000, 0, img::HighScaling);
@@ -133,7 +132,7 @@ BOOST_FIXTURE_TEST_CASE( TestColor, ScaleHelper ) {
   doScale(690, 0, img::FastScaling);
 }
 
-BOOST_FIXTURE_TEST_CASE( TestGrey, ScaleHelper ) {
+BOOST_FIXTURE_TEST_CASE(TestGrey, ScaleHelper) {
   init(get_testJpg_jpg_buf(), get_testJpg_jpg_size());
 
   doGrey();
@@ -151,7 +150,7 @@ BOOST_FIXTURE_TEST_CASE( TestGrey, ScaleHelper ) {
   doScale(690, 0, img::FastScaling);
 }
 
-BOOST_FIXTURE_TEST_CASE( TestRotate_Color, ScaleHelper ) {
+BOOST_FIXTURE_TEST_CASE(TestRotate_Color, ScaleHelper) {
   init(get_testJpg_jpg_buf(), get_testJpg_jpg_size());
 
   doRotate(img::Angle_90);
@@ -160,7 +159,7 @@ BOOST_FIXTURE_TEST_CASE( TestRotate_Color, ScaleHelper ) {
 }
 
 
-BOOST_FIXTURE_TEST_CASE( TestRotate, ScaleHelper ) {
+BOOST_FIXTURE_TEST_CASE(TestRotate, ScaleHelper) {
   init(get_testJpg_jpg_buf(), get_testJpg_jpg_size());
 
   doGrey();

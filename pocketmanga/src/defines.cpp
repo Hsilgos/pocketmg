@@ -6,10 +6,9 @@ namespace utils {
 const std::string EmptyString;
 
 Rect::Rect(int ax, int ay, SizeType width, SizeType height)
-  :x(ax), y(ay), width(width), height(height) {
-}
+  : x(ax), y(ay), width(width), height(height) {}
 
-Rect restrictBy(const Rect &src, const Rect &restricter) {
+Rect restrictBy(const Rect& src, const Rect& restricter) {
   int src_x1 = src.x;
   int src_y1 = src.y;
   int src_x2 = src.x + src.width;
@@ -30,6 +29,5 @@ Rect restrictBy(const Rect &src, const Rect &restricter) {
 }
 
 Size::Size(SizeType width, SizeType height)
-  :width(width), height(height) {
-}
+  : width(width), height(height) {}
 }

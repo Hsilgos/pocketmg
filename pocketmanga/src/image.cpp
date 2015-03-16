@@ -8,46 +8,43 @@
 #include <stdexcept>
 
 namespace {
-inline size_t dataSize(
-  img::Image::SizeType width,
-  img::Image::SizeType height,
-  unsigned short depth) {
+inline size_t dataSize(img::Image::SizeType width,
+                       img::Image::SizeType height,
+                       unsigned short depth) {
   return width * height * depth;
 }
 }
 
 namespace img {
-bool Image::load(const tools::ByteArray &buffer) {
+bool Image::load(const tools::ByteArray& buffer) {
   return load(utils::EmptyString, buffer);
 }
 
-bool Image::load(const std::string &file_ext, const tools::ByteArray &buffer) {
+bool Image::load(const std::string& file_ext, const tools::ByteArray& buffer) {
   return DecoderFactory::getInstance().decode(file_ext, buffer, *this);
 }
 
-Image Image::loadFrom(const tools::ByteArray &buffer) {
+Image Image::loadFrom(const tools::ByteArray& buffer) {
   Image result;
-  if( result.load(buffer) )
+  if (result.load(buffer))
     return result;
 
   return Image::emptyImage;
 }
 
-Image Image::loadFrom(const std::string &file_ext, const tools::ByteArray &buffer) {
+Image Image::loadFrom(const std::string& file_ext, const tools::ByteArray& buffer) {
   Image result;
-  if( result.load(file_ext, buffer) )
+  if (result.load(file_ext, buffer))
     return result;
 
   return Image::emptyImage;
 }
 
 Image::Image()
-  :enable_min_realloc_(false),
-   depth_(0) {
-}
+  : enable_min_realloc_(false), depth_(0) {}
 
 Image::Image(SizeType width, SizeType height, unsigned short depth)
-  :enable_min_realloc_(false) {
+  : enable_min_realloc_(false) {
   create(width, height, depth);
 }
 
@@ -57,21 +54,21 @@ Image::~Image() {
 
 void Image::create(SizeType width, SizeType height, unsigned short depth) {
   const size_t new_size = ::dataSize(width, height, depth);
-  if( 0 == new_size )
+  if (0 == new_size)
     return;
 
-  if( !enable_min_realloc_ || new_size > data_.getSize() )
+  if (!enable_min_realloc_ || new_size > data_.getSize())
     data_.resize(new_size);
 
   size_ =  utils::Size(width, height);
   depth_  = depth;
 }
 
-void Image::createSame(const Image &other) {
+void Image::createSame(const Image& other) {
   create(other.width(), other.height(), other.depth());
 }
 
-const utils::Size &Image::getSize() const {
+const utils::Size& Image::getSize() const {
   return size_;
 }
 
@@ -107,15 +104,15 @@ void Image::destroy() {
   data_.reset();
 }
 
-unsigned char *Image::data(SizeType offset) {
-  return empty()?0:(data_.askBuffer(data_.getLength()) + offset);
+unsigned char* Image::data(SizeType offset) {
+  return empty() ? 0 : (data_.askBuffer(data_.getLength()) + offset);
 }
 
-const unsigned char *Image::data(SizeType offset) const {
-  return empty()?0:(data_.getData() + offset);
+const unsigned char* Image::data(SizeType offset) const {
+  return empty() ? 0 : (data_.getData() + offset);
 }
 
-void Image::swap(Image &other) {
+void Image::swap(Image& other) {
   std::swap(*this, other);
 }
 
@@ -127,7 +124,7 @@ color::Rgba Image::getPixel(SizeType x, SizeType y) const {
   SizeType dest_pixel = y * size_.width + x;
   SizeType dest_pos = dest_pixel * depth_;
 
-  switch( depth_ ) {
+  switch (depth_) {
   case 1:
     return color::GrayConstRef(&data_[dest_pos]);
   case 3:
@@ -143,7 +140,7 @@ void Image::setPixel(SizeType x, SizeType y, const color::Rgba& rgb) {
   SizeType dest_pixel = y * size_.width + x;
   SizeType dest_pos = dest_pixel * depth_;
 
-  switch( depth_ ) {
+  switch (depth_) {
   case 1:
     color::GrayRef(&data_[dest_pos], rgb);
     break;
@@ -162,7 +159,7 @@ void Image::setPixel(SizeType x, SizeType y, const color::Gray& grey) {
   SizeType dest_pixel = y * size_.width + x;
   SizeType dest_pos = dest_pixel * depth_;
 
-  switch( depth_ ) {
+  switch (depth_) {
   case 1:
     color::GrayRef(&data_[dest_pos], grey);
     break;
@@ -185,80 +182,80 @@ bool Image::empty() const {
 }
 
 //////////////////////////////////////////////////////////////////////////
-utils::Rect getRect(const Image &src) {
+utils::Rect getRect(const Image& src) {
   return utils::Rect(0, 0, src.width(), src.height());
 }
 
-bool toGray(const Image &src, Image &dst) {
-  if( src.empty() )
+bool toGray(const Image& src, Image& dst) {
+  if (src.empty())
     return false;
 
-  if( &src != &dst )
-    dst.create( src.width(), src.height(), 1 );
+  if (&src != &dst)
+    dst.create(src.width(), src.height(), 1);
 
   const unsigned short bytes_per_pixel = src.depth();
-  if( 3 != bytes_per_pixel && 4 != bytes_per_pixel )
+  if (3 != bytes_per_pixel && 4 != bytes_per_pixel)
     return false;
 
-  const unsigned char *line_src = src.data();
-  unsigned char *line_dst = dst.data();
+  const unsigned char* line_src = src.data();
+  unsigned char* line_dst = dst.data();
 
-  const Image::SizeType  total_iters = src.height() * src.width();
+  const Image::SizeType total_iters = src.height() * src.width();
 
-  for( Image::SizeType i = 0; i < total_iters; ++i, line_src += bytes_per_pixel, ++line_dst ) {
+  for (Image::SizeType i = 0; i < total_iters; ++i, line_src += bytes_per_pixel, ++line_dst) {
     color::RgbConstRef rgb(line_src);
     color::GrayRef(line_dst, rgb);
   }
 
-  if( &src == &dst )
+  if (&src == &dst)
     dst.setDepth(1);
 
   return true;
 }
 
-bool toBgr(const Image &src, Image &dst) {
-  if( src.empty() )
+bool toBgr(const Image& src, Image& dst) {
+  if (src.empty())
     return false;
 
   const unsigned int bytes_per_pixel = src.depth();
 
-  if( bytes_per_pixel != 3 && bytes_per_pixel != 4 )
+  if (bytes_per_pixel != 3 && bytes_per_pixel != 4)
     return false;
 
   dst = src;
 
-  const Image::SizeType  total_iters = src.height() * src.width();
-  unsigned char *line_src = dst.data();
-  for( Image::SizeType i = 0; i < total_iters; ++i, line_src += bytes_per_pixel )
+  const Image::SizeType total_iters = src.height() * src.width();
+  unsigned char* line_src = dst.data();
+  for (Image::SizeType i = 0; i < total_iters; ++i, line_src += bytes_per_pixel)
     color::RgbRef(line_src).swap(color::RgbRef::RedIndex, color::RgbRef::BlueIndex);
 
   return true;
 }
 
-bool copyRect(const img::Image &src, img::Image &dst, const utils::Rect &rect_to_copy) {
+bool copyRect(const img::Image& src, img::Image& dst, const utils::Rect& rect_to_copy) {
   utils::Rect rect = restrictBy(rect_to_copy, getRect(src));
 
-  if( rect.width <= 0|| rect.height <= 0)
+  if (rect.width <= 0 || rect.height <= 0)
     return false;
 
   const unsigned short bytes_per_pixel = src.depth();
 
-  if( &src != &dst )
+  if (&src != &dst)
     dst.create(rect.width, rect.height, bytes_per_pixel);
 
   const int scan_line = rect.width * bytes_per_pixel;
 
-  for( int i = rect.y; i < rect.y + rect.height; ++i) {
-    const int dst_position = (i - rect.y)* scan_line;
-    unsigned char *line_dst = dst.data( dst_position );
+  for (int i = rect.y; i < rect.y + rect.height; ++i) {
+    const int dst_position = (i - rect.y) * scan_line;
+    unsigned char* line_dst = dst.data(dst_position);
 
     const int src_position = (i * src.width() + rect.x) * bytes_per_pixel;
-    const unsigned char *line_src = src.data( src_position );
+    const unsigned char* line_src = src.data(src_position);
 
     memcpy(line_dst, line_src, scan_line);
   }
 
-  if( &src == &dst ) {
+  if (&src == &dst) {
     dst.setWidth(rect.width);
     dst.setHeight(rect.height);
   }
@@ -266,13 +263,12 @@ bool copyRect(const img::Image &src, img::Image &dst, const utils::Rect &rect_to
   return true;
 }
 
-void copy(const img::Image &src, img::Image &dst) {
+void copy(const img::Image& src, img::Image& dst) {
   dst.createSame(src);
   memcpy(dst.data(), src.data(), dataSize(src));
 }
 
-Image::SizeType dataSize(const img::Image &img) {
+Image::SizeType dataSize(const img::Image& img) {
   return ::dataSize(img.width(), img.height(), img.depth());
 }
 }
-

@@ -3,11 +3,6 @@
 
 #include <png.h>
 
-//#ifdef WIN32
-//#include <pngstruct.h>
-//#include <pnginfo.h>
-//# endif
-
 #include <stdexcept>
 #include <sstream>
 
@@ -21,17 +16,14 @@ static void img_my_png_error(png_structp /*png_ptr*/, png_const_charp error_stri
   throw std::logic_error(info.str());
 }
 
-static void img_my_png_warning(png_structp /*a*/, png_const_charp /*b*/) {
-}
+static void img_my_png_warning(png_structp /*a*/, png_const_charp /*b*/) {}
 
 struct MemPngSrc {
   const tools::ByteArray& array;
   tools::ByteArray::SizeType seek;
 
   MemPngSrc(const tools::ByteArray& array)
-    :array(array),
-     seek(0) {
-  }
+    : array(array), seek(0) {}
 
 private:
   MemPngSrc(const MemPngSrc&);
@@ -40,16 +32,16 @@ private:
 
 void ReadDataFromMemory(png_structp png_ptr, png_bytep outBytes, png_size_t byteCountToRead) {
   png_voidp io_ptr = png_get_io_ptr(png_ptr);
-  if( !io_ptr )
+  if (!io_ptr)
     throw std::logic_error("Error while decoding PNG image");   // add custom error handling here
 
   // using spark::InputStream
   // -> replace with your own data source interface
   const tools::ByteArray& array    = static_cast<MemPngSrc*>(io_ptr)->array;
-  tools::ByteArray::SizeType &seek   = static_cast<MemPngSrc*>(io_ptr)->seek;
+  tools::ByteArray::SizeType& seek   = static_cast<MemPngSrc*>(io_ptr)->seek;
   tools::ByteArray::SizeType still_in_array = array.getLength() - seek;
 
-  if( still_in_array < byteCountToRead )
+  if (still_in_array < byteCountToRead)
     throw std::logic_error("Error while decoding PNG image");
 
   memcpy(outBytes, array.getData() + seek, byteCountToRead);
@@ -71,7 +63,7 @@ inline bool do_use_swap() {
 }
 
 namespace img {
-class PngDecoder: public IDecoder {
+class PngDecoder : public IDecoder {
   virtual std::vector<std::string> getExts() const {
     std::vector<std::string> exts;
 
@@ -84,17 +76,13 @@ class PngDecoder: public IDecoder {
   struct PngStruct {
     png_structp png_ptr;
     png_infop info_ptr;
-    png_bytep *row_pointers;
+    png_bytep* row_pointers;
 
     PngStruct()
-      :png_ptr(0),
-       info_ptr(0),
-       row_pointers(0) {
-
-    }
+      : png_ptr(0), info_ptr(0), row_pointers(0) {}
 
     ~PngStruct() {
-      if( row_pointers ) {
+      if (row_pointers) {
         free(row_pointers);
         row_pointers = NULL;
       }
@@ -107,25 +95,25 @@ class PngDecoder: public IDecoder {
 
   };
 
-  virtual bool decode(const tools::ByteArray &encoded, img::Image &decoded) {
+  virtual bool decode(const tools::ByteArray& encoded, img::Image& decoded) {
     static const int PngSignatureLength = 8;
 
-    if( encoded.getSize() < PngSignatureLength ||
+    if (encoded.getSize() < PngSignatureLength ||
         !png_check_sig(const_cast<png_bytep>(encoded.getData()), PngSignatureLength))
       return false;
 
     PngStruct png;
     png.png_ptr = png_create_read_struct(
-                    PNG_LIBPNG_VER_STRING,
-                    NULL,
-                    img_my_png_error,
-                    img_my_png_warning);
+      PNG_LIBPNG_VER_STRING,
+      NULL,
+      img_my_png_error,
+      img_my_png_warning);
 
-    if( !png.png_ptr )
+    if (!png.png_ptr)
       return false;
 
     png.info_ptr = png_create_info_struct(png.png_ptr);
-    if(!png.info_ptr)
+    if (!png.info_ptr)
       return false;
 
     try {
@@ -145,7 +133,7 @@ class PngDecoder: public IDecoder {
       if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
         png_set_expand(png.png_ptr);
 
-      if ( png_get_valid(png.png_ptr, png.info_ptr, PNG_INFO_tRNS) ) {
+      if (png_get_valid(png.png_ptr, png.info_ptr, PNG_INFO_tRNS)) {
         png_set_expand(png.png_ptr);
         bytes_per_pixel++;
       }
@@ -154,19 +142,19 @@ class PngDecoder: public IDecoder {
           color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
         png_set_gray_to_rgb(png.png_ptr);
 
-      if ( bit_depth == 16 ) {
-        if( do_use_swap() )
+      if (bit_depth == 16) {
+        if (do_use_swap())
           png_set_swap(png.png_ptr);
 
         bytes_per_pixel *= sizeof(unsigned short);
       }
 
       png_set_interlace_handling(png.png_ptr);
-      if (color_type==PNG_COLOR_TYPE_RGB_ALPHA ||
-          color_type==PNG_COLOR_TYPE_GRAY_ALPHA) {
-        if( bytes_per_pixel == 3 ||
-            bytes_per_pixel == 3*sizeof(unsigned short))
-          bytes_per_pixel=4*bytes_per_pixel/3;
+      if (color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
+          color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
+        if (bytes_per_pixel == 3 ||
+            bytes_per_pixel == 3 * sizeof(unsigned short))
+          bytes_per_pixel = 4 * bytes_per_pixel / 3;
       }
 
       png_read_update_info(png.png_ptr, png.info_ptr);
@@ -181,13 +169,13 @@ class PngDecoder: public IDecoder {
       const unsigned int scanline = decoded.scanline();
 
       png.row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * height);
-      unsigned char *data = decoded.data();
+      unsigned char* data = decoded.data();
       for (unsigned int y = 0; y < height; ++y)
         png.row_pointers[y] = &(data[y * scanline]);
 
       png_read_image(png.png_ptr, png.row_pointers);
       png_read_end(png.png_ptr, NULL);
-    } catch( std::exception &) {
+    } catch(std::exception&) {
       //std::string error = exc.what();
       return false;
     }
@@ -198,5 +186,5 @@ class PngDecoder: public IDecoder {
 
 //////////////////////////////////////////////////////////////////////////
 
-AUTO_REGISTER_DECODER( PngDecoder );
+AUTO_REGISTER_DECODER(PngDecoder);
 }

@@ -18,26 +18,26 @@ namespace btime = boost::posix_time;
 
 namespace {
 class HighTime {
-  ULONG     previous_;
+  ULONG previous_;
 
-  typedef LONG (__stdcall  *NtQueryTimerResolutionFun) (PULONG, PULONG, PULONG);
-  typedef LONG (__stdcall  *NtSetTimerResolutionFun) (ULONG,BOOLEAN,PULONG);
+  typedef LONG (__stdcall  * NtQueryTimerResolutionFun)(PULONG, PULONG, PULONG);
+  typedef LONG (__stdcall  * NtSetTimerResolutionFun)(ULONG, BOOLEAN, PULONG);
 
   NtSetTimerResolutionFun SetFun;
   NtQueryTimerResolutionFun QueryFun;
   HMODULE nt_dll_;
 
-  static const ULONG DesiredDelay = 10000;//ns
+  static const ULONG DesiredDelay = 10000; //ns
 public:
   HighTime()
-    :SetFun(0), QueryFun(0), nt_dll_(0) {
+    : SetFun(0), QueryFun(0), nt_dll_(0) {
     nt_dll_ = LoadLibrary(L"ntdll.dll");
 
-    if( nt_dll_ ) {
-      QueryFun = (NtQueryTimerResolutionFun)GetProcAddress (nt_dll_, "NtQueryTimerResolution");
-      SetFun = (NtSetTimerResolutionFun)GetProcAddress (nt_dll_, "NtSetTimerResolution");
+    if (nt_dll_) {
+      QueryFun = (NtQueryTimerResolutionFun)GetProcAddress(nt_dll_, "NtQueryTimerResolution");
+      SetFun = (NtSetTimerResolutionFun)GetProcAddress(nt_dll_, "NtSetTimerResolution");
 
-      if( QueryFun && SetFun ) {
+      if (QueryFun && SetFun) {
         ULONG max_delay = 0, min_delay = 0, curr_delay = 0;
         QueryFun(&max_delay, &min_delay, &curr_delay);
 
@@ -49,7 +49,7 @@ public:
   }
 
   ~HighTime() {
-    if( QueryFun && SetFun )
+    if (QueryFun && SetFun)
       SetFun(previous_, TRUE, &previous_);
   }
 };
@@ -58,8 +58,7 @@ public:
 #else
 
 namespace {
-class HighTime {
-}
+class HighTime {}
 }
 
 #endif
@@ -68,7 +67,7 @@ namespace {
 boost::shared_ptr<HighTime> initHighTiming() {
   static boost::weak_ptr<HighTime> time;
   boost::shared_ptr<HighTime> result = time.lock();
-  if( !result ) {
+  if (!result) {
     result.reset(new HighTime);
     time = result;
   }
@@ -78,35 +77,33 @@ boost::shared_ptr<HighTime> initHighTiming() {
 }
 
 namespace test {
-IBenchmarkOutput::~IBenchmarkOutput() {
-}
+IBenchmarkOutput::~IBenchmarkOutput() {}
 
 
 void Printout::started(int count) {
   std::stringstream out;
 
-  if( count > 1 )
+  if (count > 1)
     out << "-->Start benchmark '" << format_.str() << "', repeate " << count << " times" << " ...";
   else
     out << "-->Start benchmark '" << format_.str() << "' ...";
 
-  BOOST_TEST_MESSAGE( out.str() );
+  BOOST_TEST_MESSAGE(out.str());
 }
 void Printout::finished(boost::int64_t milliseconds) {
   std::stringstream out;
 
   out
-      << "<--Benchmark '"
-      << format_.str()
-      <<"' finished, total milliseconds: "
-      << milliseconds;
+  << "<--Benchmark '"
+  << format_.str()
+  << "' finished, total milliseconds: "
+  << milliseconds;
 
-  BOOST_TEST_MESSAGE( out.str() );
+  BOOST_TEST_MESSAGE(out.str());
 }
 
-Printout::Printout(const char *name)
-  :format_(name) {
-}
+Printout::Printout(const char* name)
+  : format_(name) {}
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -120,7 +117,7 @@ struct TestBenchmark::Private {
   std::auto_ptr<IBenchmarkOutput> output;
 };
 
-void TestBenchmark::init(IBenchmarkOutput &output, int count) {
+void TestBenchmark::init(IBenchmarkOutput& output, int count) {
   private_ = new Private;
 
   private_->hightTiming = initHighTiming();
@@ -132,11 +129,11 @@ void TestBenchmark::init(IBenchmarkOutput &output, int count) {
   private_->output->started(count);
 }
 
-TestBenchmark::TestBenchmark(const char *name, int count) {
+TestBenchmark::TestBenchmark(const char* name, int count) {
   init(Printout(name), count);
 }
 
-TestBenchmark::TestBenchmark(IBenchmarkOutput &output, int count) {
+TestBenchmark::TestBenchmark(IBenchmarkOutput& output, int count) {
   init(output, count);
 }
 
@@ -159,6 +156,6 @@ bool TestBenchmark::isDone() {
 }
 
 void TestBenchmark::next() {
-  private_->count -- ;
+  private_->count--;
 }
 }

@@ -6,24 +6,24 @@
 #include <iostream>
 
 namespace {
-template <class InputIterator, class T>
-T accumulate ( InputIterator first, InputIterator last, T init ) {
-  while ( first!=last )
+template<class InputIterator, class T>
+T accumulate(InputIterator first, InputIterator last, T init) {
+  while (first != last)
     init = init + *first++;  // or: init=binary_op(init,*first++) for the binary_op version
   return init;
 }
 
-void printValue(std::ostream &out, const std::string &value, size_t size) {
+void printValue(std::ostream& out, const std::string& value, size_t size) {
   out << value;
-  for( size_t i = value.size(); i < size; ++i )
+  for (size_t i = value.size(); i < size; ++i)
     out << " ";
 }
 
-typedef std::vector< std::string > StringList;
-typedef std::vector< size_t > IntList;
-void printValueS(std::ostream &out, const StringList &values, const IntList &sizes) {
+typedef std::vector<std::string> StringList;
+typedef std::vector<size_t> IntList;
+void printValueS(std::ostream& out, const StringList& values, const IntList& sizes) {
   out << "|";
-  for( size_t i = 0 ; i < values.size(); ++i ) {
+  for (size_t i = 0; i < values.size(); ++i) {
     printValue(out, values[i], sizes[i]);
     out << "|";
   }
@@ -32,12 +32,10 @@ void printValueS(std::ostream &out, const StringList &values, const IntList &siz
 }
 
 namespace test {
-ReportOutput::ReportOutput(const std::string &row, const std::string &column, Report *report)
-  :row_(row), column_(column), report_(report) {
-}
+ReportOutput::ReportOutput(const std::string& row, const std::string& column, Report* report)
+  : row_(row), column_(column), report_(report) {}
 
-void ReportOutput::started(int) {
-}
+void ReportOutput::started(int) {}
 
 void ReportOutput::finished(boost::int64_t milliseconds) {
   std::string info = boost::lexical_cast<std::string>(milliseconds);
@@ -48,11 +46,11 @@ void ReportOutput::finished(boost::int64_t milliseconds) {
 
 //////////////////////////////////////////////////////////////////////////
 
-void Report::addInfo(const std::string &row, const std::string &column, const std::string &info) {
-  if( rows_.end() == std::find(rows_.begin(), rows_.end(), row) )
+void Report::addInfo(const std::string& row, const std::string& column, const std::string& info) {
+  if (rows_.end() == std::find(rows_.begin(), rows_.end(), row))
     rows_.push_back(row);
 
-  if( columns_.end() == std::find(columns_.begin(), columns_.end(), column) )
+  if (columns_.end() == std::find(columns_.begin(), columns_.end(), column))
     columns_.push_back(column);
 
   table_[row][column] = info;
@@ -61,33 +59,33 @@ void Report::addInfo(const std::string &row, const std::string &column, const st
 
 /*
         ---------------------
-        |Head1|Head1  |Head3|
-  -----------------------------
-|row1   |10   |20     |30   |
------------------------------
-|row 2  |1    |2      |3    |
------------------------------
-|row  30|301  |1234556|321  |
------------------------------
-*/
+   |Head1|Head1  |Head3|
+   -----------------------------
+   |row1   |10   |20     |30   |
+   -----------------------------
+   |row 2  |1    |2      |3    |
+   -----------------------------
+   |row  30|301  |1234556|321  |
+   -----------------------------
+ */
 
-void Report::printTable(std::ostream &out) {
+void Report::printTable(std::ostream& out) {
   IntList widths;
 
-  for( StringList::const_iterator it = columns_.begin(), itEnd = columns_.end(); it != itEnd; ++it ) {
-    const std::string &tab_name = *it;
-    widths.push_back( tab_name.size() );
+  for (StringList::const_iterator it = columns_.begin(), itEnd = columns_.end(); it != itEnd; ++it) {
+    const std::string& tab_name = *it;
+    widths.push_back(tab_name.size());
 
-    for( TableContent::const_iterator itTab = table_.begin(), itTbEnd = table_.end(); itTab != itTbEnd; ++itTab ) {
-      const ColumnMap &columns = itTab->second;
-      ColumnMap::const_iterator itContent = columns.find( tab_name );
-      if( itContent != columns.end() )
-        widths.back() = std::max(widths.back(), itContent->second.size() );
+    for (TableContent::const_iterator itTab = table_.begin(), itTbEnd = table_.end(); itTab != itTbEnd; ++itTab) {
+      const ColumnMap& columns = itTab->second;
+      ColumnMap::const_iterator itContent = columns.find(tab_name);
+      if (itContent != columns.end())
+        widths.back() = std::max(widths.back(), itContent->second.size());
     }
   }
 
   size_t first_column_size = 0;
-  for( StringList::const_iterator it = rows_.begin(), itEnd = rows_.end(); it != itEnd; ++it )
+  for (StringList::const_iterator it = rows_.begin(), itEnd = rows_.end(); it != itEnd; ++it)
     first_column_size = std::max(first_column_size, it->size());
 
 
@@ -99,7 +97,7 @@ void Report::printTable(std::ostream &out) {
   const std::string table_row_sep(table_sep_len, '-');
 
   // description
-  if( !description_.empty() ) {
+  if (!description_.empty()) {
     out << description_ << std::endl;
   }
 
@@ -110,12 +108,12 @@ void Report::printTable(std::ostream &out) {
   out << table_row_sep << std::endl;
 
   // print content
-  for( StringList::const_iterator it = rows_.begin(), itEnd = rows_.end(); it != itEnd; ++it ) {
+  for (StringList::const_iterator it = rows_.begin(), itEnd = rows_.end(); it != itEnd; ++it) {
     StringList row_with_name;
     row_with_name.push_back(*it);
 
-    ColumnMap &column_map = table_[*it];
-    for( StringList::const_iterator itCol = columns_.begin(), itColEnd = columns_.end(); itCol != itColEnd; ++itCol )
+    ColumnMap& column_map = table_[*it];
+    for (StringList::const_iterator itCol = columns_.begin(), itColEnd = columns_.end(); itCol != itColEnd; ++itCol)
       row_with_name.push_back(column_map[*itCol]);
 
     IntList widths_with_name = widths;
@@ -126,12 +124,11 @@ void Report::printTable(std::ostream &out) {
   }
 }
 
-ReportOutput Report::output(const std::string &row, const std::string &column) {
+ReportOutput Report::output(const std::string& row, const std::string& column) {
   return ReportOutput(row, column, this);
 }
 
-void Report::setDescription(const std::string &desc) {
+void Report::setDescription(const std::string& desc) {
   description_ = desc;
 }
 }
-

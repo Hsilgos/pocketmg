@@ -9,9 +9,9 @@
 
 namespace test {
 // --log_level=test_suite --run_test=TestColor
-BOOST_AUTO_TEST_SUITE( TestColor )
+BOOST_AUTO_TEST_SUITE(TestColor)
 
-BOOST_AUTO_TEST_CASE( Smoke ) {
+BOOST_AUTO_TEST_CASE(Smoke) {
   // RGB
   color::Rgb rgb_smoke;
 
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE( Smoke ) {
   STATIC_ASSERT(color::Argb::BlueIndex == 3, ShoulBe3);
 }
 
-BOOST_AUTO_TEST_CASE( rgb2bgr ) {
+BOOST_AUTO_TEST_CASE(rgb2bgr) {
   color::Rgb rgb(1, 2, 3);
   color::Bgr bgr = rgb;
 
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE( rgb2bgr ) {
 
 }
 
-BOOST_AUTO_TEST_CASE( rgba2bgra ) {
+BOOST_AUTO_TEST_CASE(rgba2bgra) {
   color::Rgba rgba(1, 2, 3, 4);
   color::Bgra bgra = rgba;
 
@@ -112,8 +112,8 @@ BOOST_AUTO_TEST_CASE( rgba2bgra ) {
 
 }
 
-BOOST_AUTO_TEST_CASE( rgb2rgba ) {
-  color::Rgb  rgb(1, 2, 3);
+BOOST_AUTO_TEST_CASE(rgb2rgba) {
+  color::Rgb rgb(1, 2, 3);
   color::Rgba rgba = rgb;
 
   BOOST_CHECK_EQUAL(rgb.red(),  1);
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE( rgb2rgba ) {
   BOOST_CHECK_EQUAL(rgba.alpha(), color::NotTransparent);
 }
 
-BOOST_AUTO_TEST_CASE( rgba2rgb ) {
+BOOST_AUTO_TEST_CASE(rgba2rgb) {
   color::Rgba rgba(1, 2, 3, 4);
   color::Rgb rgb = rgba;
 
@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE( rgba2rgb ) {
   BOOST_CHECK_EQUAL(rgb.blue(),  3);
 }
 
-BOOST_AUTO_TEST_CASE( SmokeRef ) {
+BOOST_AUTO_TEST_CASE(SmokeRef) {
   color::Channel buffer[3] = {0};
 
   color::RgbRef rgb(buffer, 1, 2, 3);
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE( SmokeRef ) {
   BOOST_CHECK_EQUAL(buffer[2], 3);
 }
 
-BOOST_AUTO_TEST_CASE( RgbRef2BgrRef ) {
+BOOST_AUTO_TEST_CASE(RgbRef2BgrRef) {
   color::Channel buffer1[3] = {0};
   color::Channel buffer2[3] = {0};
   color::RgbRef rgb(buffer1, 1, 2, 3);
@@ -185,24 +185,24 @@ BOOST_AUTO_TEST_CASE( RgbRef2BgrRef ) {
     image.load("jpg",
                tools::ByteArray(
                  get_testJpg_jpg_buf(),
-                 get_testJpg_jpg_size())) );
+                 get_testJpg_jpg_size())));
 
-  BENCHMARK( "Rgb->Bgr" )
+  BENCHMARK("Rgb->Bgr")
   toBgr(image, image);
 
 }
 
-BOOST_AUTO_TEST_CASE( Rgb2Gray ) {
+BOOST_AUTO_TEST_CASE(Rgb2Gray) {
   img::Image image;
   BOOST_REQUIRE(
     image.load("jpg",
                tools::ByteArray(
                  get_testJpg_jpg_buf(),
-                 get_testJpg_jpg_size())) );
+                 get_testJpg_jpg_size())));
 
   img::Image dst;
   toGray(image, dst);
-  BENCHMARK( "Rgb->Gray" )
+  BENCHMARK("Rgb->Gray")
   toGray(image, dst);
 }
 

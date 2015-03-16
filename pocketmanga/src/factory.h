@@ -10,9 +10,8 @@
 #include <stdexcept>
 
 namespace tool {
-template <class FunSignature>
-class function {
-};
+template<class FunSignature>
+class function {};
 }
 
 namespace pattern {
@@ -29,9 +28,9 @@ private:
   FactoryCollect creators_;
 
 protected:
-  ConcreteFactory doGet(const IdType &id) {
+  ConcreteFactory doGet(const IdType& id) {
     typename FactoryCollect::const_iterator it = creators_.find(id);
-    if( it != creators_.end() )
+    if (it != creators_.end())
       return it->second;
 
     std::stringstream error_info;
@@ -41,13 +40,13 @@ protected:
     throw std::invalid_argument(error_info.str());
   }
 
-  void doGetKeylist(std::vector<IdType> &list) {
+  void doGetKeylist(std::vector<IdType>& list) {
     list.reserve(creators_.size());
     utils::collectKeys(creators_, std::back_inserter(list));
   }
 public:
   // Returns concrete factory
-  ConcreteFactory get(const IdType &id) {
+  ConcreteFactory get(const IdType& id) {
     return doGet(id);
   }
 
@@ -57,7 +56,7 @@ public:
     return list;
   }
 
-  void regFactory(const IdType &id, ConcreteFactory factory) {
+  void regFactory(const IdType& id, ConcreteFactory factory) {
     creators_[id] = factory;
   }
 };
@@ -65,14 +64,13 @@ public:
 template<
   class Signature,
   class IdType>
-class SingletonFactory:
-  public utils::SingletonStatic< SingletonFactory<Signature, IdType> >,
-  public Factory<Signature, IdType> {
+class SingletonFactory :
+  public utils::SingletonStatic<SingletonFactory<Signature, IdType> >, public Factory<Signature, IdType> {
   typedef Factory<Signature, IdType> BaseFactory;
   typedef typename BaseFactory::ConcreteFactory ConcreteFactory;
   typedef SingletonFactory<Signature, IdType> ThisFactory;
 public:
-  static ConcreteFactory get(const IdType &id) {
+  static ConcreteFactory get(const IdType& id) {
     return ThisFactory::getInstance().doGet(id);
   }
 
@@ -83,18 +81,17 @@ public:
   }
 };
 
-#define AUTO_REGISTER_FACTORY( fact_type, type_id ,concrete_factory ) \
+#define AUTO_REGISTER_FACTORY(fact_type, type_id, concrete_factory) \
   namespace                            \
   {                              \
-   struct BOOST_JOIN(FactoryRegistrar, __LINE__)                  \
-   {                             \
-    BOOST_JOIN(FactoryRegistrar, __LINE__)()                  \
+  struct BOOST_JOIN (FactoryRegistrar, __LINE__)                  \
+  {                             \
+    BOOST_JOIN(FactoryRegistrar, __LINE__) ()                  \
     {                            \
-     fact_type::getInstance().regFactory(type_id, concrete_factory);            \
+      fact_type::getInstance().regFactory(type_id, concrete_factory);            \
     }                            \
-   };                             \
-   static BOOST_JOIN(FactoryRegistrar, __LINE__) BOOST_JOIN(__global_factory_registrar__, __LINE__ );     \
+  };                             \
+  static BOOST_JOIN(FactoryRegistrar, __LINE__) BOOST_JOIN(__global_factory_registrar__, __LINE__);     \
   }
 
 }
-

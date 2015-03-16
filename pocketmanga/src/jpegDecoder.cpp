@@ -18,31 +18,29 @@ void do_not_exit(j_common_ptr /*cinfo*/) {
   throw std::logic_error("Error while decoding JPEG image");
 }
 
-class JpgMemSrc: public jpeg_source_mgr {
-  const tools::ByteArray &buffer_;
+class JpgMemSrc : public jpeg_source_mgr {
+  const tools::ByteArray& buffer_;
 
-  static JpgMemSrc *getThis(j_decompress_ptr cinfo) {
-    return static_cast<JpgMemSrc *>(cinfo->src);
+  static JpgMemSrc* getThis(j_decompress_ptr cinfo) {
+    return static_cast<JpgMemSrc*>(cinfo->src);
   }
 
-  static void do_init_source(j_decompress_ptr /*cinfo*/) {
-  }
+  static void do_init_source(j_decompress_ptr /*cinfo*/) {}
 
   static boolean do_fill_input_buffer(j_decompress_ptr /*cinfo*/) {
     return FALSE; /* We utilize I/O suspension (or emulsion? ;-) ) */
   }
 
-  static void do_skip_input_data(j_decompress_ptr cinfo,long num_bytes) {
+  static void do_skip_input_data(j_decompress_ptr cinfo, long num_bytes) {
     getThis(cinfo)->skip_input_data_impl(num_bytes);
   }
 
-  static void do_term_source(j_decompress_ptr /*cinfo*/) {
-  }
+  static void do_term_source(j_decompress_ptr /*cinfo*/) {}
 
   //////////////////////////////////////////////////////////////////////////
 
   void skip_input_data_impl(long num_bytes) {
-      if (num_bytes > 0 && static_cast<long>(num_bytes) > bytes_in_buffer) {
+    if (num_bytes > 0 && static_cast<size_t>(num_bytes) > bytes_in_buffer) {
       next_input_byte += bytes_in_buffer;
       bytes_in_buffer = 0;
     } else {
@@ -54,8 +52,8 @@ class JpgMemSrc: public jpeg_source_mgr {
   JpgMemSrc(const JpgMemSrc&);
   JpgMemSrc operator=(const JpgMemSrc&);
 public:
-  JpgMemSrc(const tools::ByteArray &buffer)
-    :buffer_(buffer) {
+  JpgMemSrc(const tools::ByteArray& buffer)
+    : buffer_(buffer) {
     init_source   = do_init_source;
     fill_input_buffer = do_fill_input_buffer;
     skip_input_data  = do_skip_input_data;
@@ -69,7 +67,7 @@ public:
 }
 
 namespace img {
-class JpegDecoder: public IDecoder {
+class JpegDecoder : public IDecoder {
   jpeg_decompress_struct desc_;
   jpeg_error_mgr error_;
 
@@ -86,8 +84,8 @@ class JpegDecoder: public IDecoder {
     return exts;
   }
 
-  virtual bool decode(const tools::ByteArray &encoded, img::Image &decoded) {
-    if( encoded.isEmpty() )
+  virtual bool decode(const tools::ByteArray& encoded, img::Image& decoded) {
+    if (encoded.isEmpty())
       return false;
 
     volatile bool decompress_started = false;
@@ -101,7 +99,7 @@ class JpegDecoder: public IDecoder {
         return false;
 
       decompress_started = jpeg_start_decompress(&desc_) != 0;
-      if( !decompress_started ) {
+      if (!decompress_started) {
         throw std::logic_error("Failed to start decompression");
       }
 
@@ -113,7 +111,7 @@ class JpegDecoder: public IDecoder {
       unsigned char* dest = decoded.data();
 
       JSAMPARRAY pJpegBuffer
-        = (*desc_.mem->alloc_sarray)((j_common_ptr) &desc_, JPOOL_IMAGE, desc_.output_width * desc_.output_components, 1);
+        = (*desc_.mem->alloc_sarray)((j_common_ptr) & desc_, JPOOL_IMAGE, desc_.output_width * desc_.output_components, 1);
 
       //const bool color = desc_.output_components > 1;
 
@@ -121,9 +119,9 @@ class JpegDecoder: public IDecoder {
       const int width = desc_.output_width;
       const int step  = width * desc_.num_components;
 
-      for( ; height--; dest += step ) {
-        jpeg_read_scanlines( &desc_, pJpegBuffer, 1 );
-        memcpy( dest, pJpegBuffer[0], step );
+      for (; height--; dest += step) {
+        jpeg_read_scanlines(&desc_, pJpegBuffer, 1);
+        memcpy(dest, pJpegBuffer[0], step);
       }
 
       jpeg_finish_decompress(&desc_);
@@ -131,12 +129,11 @@ class JpegDecoder: public IDecoder {
       return true;
 
     } catch(...) {
-      if( decompress_started ) {
+      if (decompress_started) {
         try {
-          if( !jpeg_finish_decompress(&desc_) )
+          if (!jpeg_finish_decompress(&desc_))
             throw std::logic_error("Failed to stop decompression");
-        } catch(...) {
-        }
+        } catch(...) {}
       }
 
       return false;
@@ -158,8 +155,5 @@ public:
 
 //////////////////////////////////////////////////////////////////////////
 
-AUTO_REGISTER_DECODER( JpegDecoder );
+AUTO_REGISTER_DECODER(JpegDecoder);
 }
-
-
-

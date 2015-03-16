@@ -7,7 +7,7 @@
 #include "testFormatter.h"
 
 
-#if defined( __i386__ ) && defined ( __ANDROID__ )
+#if defined(__i386__) && defined(__ANDROID__)
 
 #include <setjmp.h>
 
@@ -22,14 +22,14 @@ int sigsetjmp(sigjmp_buf env, int savemask) {
 #endif
 
 namespace test {
-BOOST_GLOBAL_FIXTURE( TestGlobalFixture );
+BOOST_GLOBAL_FIXTURE(TestGlobalFixture);
 }
 
-int ExternalRunStr(const std::string &args, LogFormatter *form) {
+int ExternalRunStr(const std::string& args, LogFormatter* form) {
   return test::DoExternalRunStr(&init_unit_test_suite, args, form);
 }
 
-int ExternalRunMain(int argc, char* argv[], LogFormatter *form) {
+int ExternalRunMain(int argc, char* argv[], LogFormatter* form) {
   return test::DoExternalRunMain(&init_unit_test_suite, argc, argv, form);
 }
 

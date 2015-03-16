@@ -12,10 +12,10 @@ namespace {
 }
 
 namespace archive {
-class ZipArchive: public IArchive {
+class ZipArchive : public IArchive {
   unzFile zip_file_;
 
-  bool open(const std::string &file ) {
+  bool open(const std::string& file) {
     close();
 
     zip_file_ = unzOpen(file.c_str());
@@ -24,21 +24,21 @@ class ZipArchive: public IArchive {
   }
 
   void close() {
-    if( zip_file_ ) {
+    if (zip_file_) {
       unzClose(zip_file_);
       zip_file_ = 0;
     }
   }
 
-  bool isDirectory(const std::string &path) const {
+  bool isDirectory(const std::string& path) const {
     return !path.empty() && path[path.size() - 1] == '/';
   }
 
-  fs::FilePath createFilepath(const std::string &path) {
-    if( path.empty() )
+  fs::FilePath createFilepath(const std::string& path) {
+    if (path.empty())
       return fs::FilePath();
 
-    fs::FilePath tfpsth(path, !isDirectory(path) );
+    fs::FilePath tfpsth(path, !isDirectory(path));
 
     return tfpsth;
   }
@@ -49,13 +49,13 @@ class ZipArchive: public IArchive {
 
     const int MaxFileName = 1024;
     char buffer[MaxFileName];
-    while( UNZ_OK == result ) {
+    while (UNZ_OK == result) {
       unz_file_info file_info = {0};
       unzGetCurrentFileInfo(zip_file_, &file_info, buffer, MaxFileName, NULL, 0, NULL, 0);
 
       fs::FilePath path = createFilepath(buffer);
 
-      if( !path.empty() && ( !path.isDirectory() || !files_only ) )
+      if (!path.empty() && (!path.isDirectory() || !files_only))
         list.push_back(path);
 
       result = unzGoToNextFile(zip_file_);
@@ -64,29 +64,29 @@ class ZipArchive: public IArchive {
     return list;
   }
 
-  tools::ByteArray getFile(const fs::FilePath &file_in_archive, size_t max_size) {
+  tools::ByteArray getFile(const fs::FilePath& file_in_archive, size_t max_size) {
     tools::ByteArray data;
-    if( UNZ_OK != unzLocateFile(zip_file_, file_in_archive.getPath().c_str(), 1) )
+    if (UNZ_OK != unzLocateFile(zip_file_, file_in_archive.getPath().c_str(), 1))
       return data;
 
-    if( UNZ_OK != unzOpenCurrentFile(zip_file_) )
+    if (UNZ_OK != unzOpenCurrentFile(zip_file_))
       return data;
 
     // read length
     unz_file_info file_info = {0};
-    if( UNZ_OK != unzGetCurrentFileInfo(zip_file_, &file_info, NULL, 0, NULL, 0, NULL, 0) ) {
+    if (UNZ_OK != unzGetCurrentFileInfo(zip_file_, &file_info, NULL, 0, NULL, 0, NULL, 0)) {
       unzCloseCurrentFile(zip_file_);
       return data;
     }
 
-    if( file_info.uncompressed_size > max_size ) {
+    if (file_info.uncompressed_size > max_size) {
       unzCloseCurrentFile(zip_file_);
       return data;
     }
 
-    void *buff_ptr = data.askBuffer(file_info.uncompressed_size);
+    void* buff_ptr = data.askBuffer(file_info.uncompressed_size);
     const int total_read = unzReadCurrentFile(zip_file_, buff_ptr, data.getLength());
-    if( total_read != file_info.uncompressed_size )
+    if (static_cast<uLong>(total_read) != file_info.uncompressed_size)
       data.reset();
 
     unzCloseCurrentFile(zip_file_);
@@ -98,8 +98,7 @@ class ZipArchive: public IArchive {
   }
 public:
   ZipArchive()
-    :zip_file_(0) {
-  }
+    : zip_file_(0) {}
 };
 
 AUTO_REGISTER_ARCHIVER("zip", ZipArchive);

@@ -17,12 +17,12 @@
  * STATIC_ASSERT(true, this_message_will_never_be_displayed);
  */
 
-#define STATIC_ASSERT(expression, message)\
-  struct TOKEN_JOIN(__static_assertion_at_line_, __LINE__)\
-  {\
-    implementation::StaticAssertion<static_cast<bool>((expression))> TOKEN_JOIN(TOKEN_JOIN(TOKEN_JOIN(STATIC_ASSERTION_FAILED_AT_LINE_, __LINE__), _), message);\
-  };\
-  typedef implementation::StaticAssertionTest<sizeof(TOKEN_JOIN(__static_assertion_at_line_, __LINE__))> TOKEN_JOIN(__static_assertion_test_at_line_, __LINE__)
+#define STATIC_ASSERT(expression, message) \
+  struct TOKEN_JOIN (__static_assertion_at_line_, __LINE__) \
+  { \
+    implementation::StaticAssertion<static_cast<bool>((expression))> TOKEN_JOIN(TOKEN_JOIN(TOKEN_JOIN(STATIC_ASSERTION_FAILED_AT_LINE_, __LINE__), _), message); \
+  }; \
+  typedef implementation::StaticAssertionTest<sizeof(TOKEN_JOIN(__static_assertion_at_line_, __LINE__))> TOKEN_JOIN (__static_assertion_test_at_line_, __LINE__)
 
 // note that we wrap the non existing type inside a struct to avoid warning
 // messages about unused variables when static assertions are used at function
@@ -31,16 +31,13 @@
 
 namespace implementation {
 
-template <bool>
+template<bool>
 struct StaticAssertion;
 
-template <>
-struct StaticAssertion<true> {
-}; // StaticAssertion<true>
+template<>
+struct StaticAssertion<true> {}; // StaticAssertion<true>
 
 template<int i>
-struct StaticAssertionTest {
-}; // StaticAssertionTest<int>
+struct StaticAssertionTest {}; // StaticAssertionTest<int>
 
 } // namespace implementation
-

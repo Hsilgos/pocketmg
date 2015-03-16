@@ -22,18 +22,17 @@ class RotateFixture {
 public:
   img::Image image_;
 
-  virtual color::Rgba pixelFor(
-    unsigned int x,
-    unsigned int y,
-    unsigned int w) = 0;
+  virtual color::Rgba pixelFor(unsigned int x,
+                               unsigned int y,
+                               unsigned int w) = 0;
 
   void create(int depth) {
     image_.create(Width, Height, 3);
 
     unsigned int h = image_.height();
     unsigned int w = image_.width();
-    for( unsigned int y = 0; y < h; ++y ) {
-      for( unsigned int x = 0; x < w; ++x ) {
+    for (unsigned int y = 0; y < h; ++y) {
+      for (unsigned int x = 0; x < w; ++x) {
         image_.setPixel(x, y, pixelFor(x, y, w));
       }
     }
@@ -45,8 +44,8 @@ public:
 
     unsigned int h = image_.height();
     unsigned int w = image_.width();
-    for( unsigned int y = 0; y < h; ++y ) {
-      for( unsigned int x = 0; x < w; ++x ) {
+    for (unsigned int y = 0; y < h; ++y) {
+      for (unsigned int x = 0; x < w; ++x) {
         BOOST_CHECK(pixelFor(y, w - x - 1, h) == image_.getPixel(x, y));
       }
     }
@@ -58,8 +57,8 @@ public:
 
     unsigned int h = image_.height();
     unsigned int w = image_.width();
-    for( unsigned int y = 0; y < h; ++y ) {
-      for( unsigned int x = 0; x < w; ++x ) {
+    for (unsigned int y = 0; y < h; ++y) {
+      for (unsigned int x = 0; x < w; ++x) {
         BOOST_CHECK(pixelFor(w - x - 1, h - y - 1, w) == image_.getPixel(x, y));
       }
     }
@@ -71,19 +70,18 @@ public:
 
     unsigned int h = image_.height();
     unsigned int w = image_.width();
-    for( unsigned int y = 0; y < h; ++y ) {
-      for( unsigned int x = 0; x < w; ++x ) {
+    for (unsigned int y = 0; y < h; ++y) {
+      for (unsigned int x = 0; x < w; ++x) {
         BOOST_CHECK(pixelFor(h - y - 1, x, h) == image_.getPixel(x, y));
       }
     }
   }
 };
 
-class RotateColorFixture: public RotateFixture {
-  color::Rgba pixelFor(
-    unsigned int x,
-    unsigned int y,
-    unsigned int w) {
+class RotateColorFixture : public RotateFixture {
+  color::Rgba pixelFor(unsigned int x,
+                       unsigned int y,
+                       unsigned int w) {
     unsigned int pos = y * w + x;
 
     color::Rgb result;
@@ -98,12 +96,11 @@ class RotateColorFixture: public RotateFixture {
 };
 
 
-class RotateGreyFixture: public RotateFixture {
+class RotateGreyFixture : public RotateFixture {
 public:
-  color::Rgba pixelFor(
-    unsigned int x,
-    unsigned int y,
-    unsigned int w) {
+  color::Rgba pixelFor(unsigned int x,
+                       unsigned int y,
+                       unsigned int w) {
     unsigned int pos = y * w + x;
 
     color::Gray result;
@@ -119,9 +116,9 @@ public:
 
 namespace test {
 // --log_level=test_suite --run_test=TestRotate
-BOOST_AUTO_TEST_SUITE( TestRotate )
+BOOST_AUTO_TEST_SUITE(TestRotate)
 
-BOOST_FIXTURE_TEST_CASE( Test90Color, RotateColorFixture ) {
+BOOST_FIXTURE_TEST_CASE(Test90Color, RotateColorFixture) {
   create(3);
 
   image_ = img::rotate(image_, img::Angle_90);
@@ -129,7 +126,7 @@ BOOST_FIXTURE_TEST_CASE( Test90Color, RotateColorFixture ) {
   check90();
 }
 
-BOOST_FIXTURE_TEST_CASE( Test180Color, RotateColorFixture ) {
+BOOST_FIXTURE_TEST_CASE(Test180Color, RotateColorFixture) {
   create(3);
 
   image_ = img::rotate(image_, img::Angle_180);
@@ -137,7 +134,7 @@ BOOST_FIXTURE_TEST_CASE( Test180Color, RotateColorFixture ) {
   check180();
 }
 
-BOOST_FIXTURE_TEST_CASE( Test270Color, RotateColorFixture ) {
+BOOST_FIXTURE_TEST_CASE(Test270Color, RotateColorFixture) {
   create(3);
 
   image_ = img::rotate(image_, img::Angle_270);
@@ -147,7 +144,7 @@ BOOST_FIXTURE_TEST_CASE( Test270Color, RotateColorFixture ) {
 
 //////////////////////////////////////////////////////////////////////////
 
-BOOST_FIXTURE_TEST_CASE( Test90ColorSelf, RotateColorFixture ) {
+BOOST_FIXTURE_TEST_CASE(Test90ColorSelf, RotateColorFixture) {
   create(3);
 
   img::rotate(image_, image_, img::Angle_90);
@@ -155,7 +152,7 @@ BOOST_FIXTURE_TEST_CASE( Test90ColorSelf, RotateColorFixture ) {
   check90();
 }
 
-BOOST_FIXTURE_TEST_CASE( Test180ColorSelf, RotateColorFixture ) {
+BOOST_FIXTURE_TEST_CASE(Test180ColorSelf, RotateColorFixture) {
   create(3);
 
   img::rotate(image_, image_, img::Angle_180);
@@ -163,7 +160,7 @@ BOOST_FIXTURE_TEST_CASE( Test180ColorSelf, RotateColorFixture ) {
   check180();
 }
 
-BOOST_FIXTURE_TEST_CASE( Test270ColorSelf, RotateColorFixture ) {
+BOOST_FIXTURE_TEST_CASE(Test270ColorSelf, RotateColorFixture) {
   create(3);
 
   img::rotate(image_, image_, img::Angle_270);
@@ -173,7 +170,7 @@ BOOST_FIXTURE_TEST_CASE( Test270ColorSelf, RotateColorFixture ) {
 
 //////////////////////////////////////////////////////////////////////////
 
-BOOST_FIXTURE_TEST_CASE( Test90Grey, RotateGreyFixture ) {
+BOOST_FIXTURE_TEST_CASE(Test90Grey, RotateGreyFixture) {
   create(1);
 
   image_ = img::rotate(image_, img::Angle_90);
@@ -181,7 +178,7 @@ BOOST_FIXTURE_TEST_CASE( Test90Grey, RotateGreyFixture ) {
   check90();
 }
 
-BOOST_FIXTURE_TEST_CASE( Test180Grey, RotateGreyFixture ) {
+BOOST_FIXTURE_TEST_CASE(Test180Grey, RotateGreyFixture) {
   create(1);
 
   image_ = img::rotate(image_, img::Angle_180);
@@ -189,7 +186,7 @@ BOOST_FIXTURE_TEST_CASE( Test180Grey, RotateGreyFixture ) {
   check180();
 }
 
-BOOST_FIXTURE_TEST_CASE( Test270Grey, RotateGreyFixture ) {
+BOOST_FIXTURE_TEST_CASE(Test270Grey, RotateGreyFixture) {
   create(1);
 
   image_ = img::rotate(image_, img::Angle_270);
@@ -199,7 +196,7 @@ BOOST_FIXTURE_TEST_CASE( Test270Grey, RotateGreyFixture ) {
 
 //////////////////////////////////////////////////////////////////////////
 
-BOOST_FIXTURE_TEST_CASE( Test90GreySelf, RotateGreyFixture ) {
+BOOST_FIXTURE_TEST_CASE(Test90GreySelf, RotateGreyFixture) {
   create(1);
 
   img::rotate(image_, image_, img::Angle_90);
@@ -207,7 +204,7 @@ BOOST_FIXTURE_TEST_CASE( Test90GreySelf, RotateGreyFixture ) {
   check90();
 }
 
-BOOST_FIXTURE_TEST_CASE( Test180GreySelf, RotateGreyFixture ) {
+BOOST_FIXTURE_TEST_CASE(Test180GreySelf, RotateGreyFixture) {
   create(1);
 
   img::rotate(image_, image_, img::Angle_180);
@@ -215,7 +212,7 @@ BOOST_FIXTURE_TEST_CASE( Test180GreySelf, RotateGreyFixture ) {
   check180();
 }
 
-BOOST_FIXTURE_TEST_CASE( Test270GreySelf, RotateGreyFixture ) {
+BOOST_FIXTURE_TEST_CASE(Test270GreySelf, RotateGreyFixture) {
   create(1);
 
   img::rotate(image_, image_, img::Angle_270);
@@ -225,4 +222,3 @@ BOOST_FIXTURE_TEST_CASE( Test270GreySelf, RotateGreyFixture ) {
 
 BOOST_AUTO_TEST_SUITE_END()
 }
-

@@ -3,7 +3,7 @@
 #include "book.h"
 
 namespace manga {
-class CacheScaler: public IBookCache {
+class CacheScaler : public IBookCache {
 public:
   enum Orientation {
     Vertical,
@@ -25,7 +25,7 @@ public:
     int currentShowing;
 
     Cache();
-    void swap(Cache &other);
+    void swap(Cache& other);
 
     bool nextBounds();
     bool previousBounds();
@@ -33,18 +33,18 @@ public:
 
   CacheScaler(const size_t screen_width, const size_t screen_height);
 
-  Cache &scaledGrey();
+  Cache& scaledGrey();
 
 private:
-  CacheScaler &operator = (const CacheScaler &);
+  CacheScaler& operator =(const CacheScaler&);
 
   Cache orig_;
   Cache scaled_;
   const size_t screen_width_;
   const size_t screen_height_;
 
-  virtual IBookCache *clone();
-  virtual void swap(IBookCache *other);
-  virtual bool onLoaded(img::Image &image);
+  virtual IBookCache* clone();
+  virtual void swap(IBookCache* other);
+  virtual bool onLoaded(img::Image& image);
 };
 }
