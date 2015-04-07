@@ -79,7 +79,6 @@ boost::shared_ptr<HighTime> initHighTiming() {
 namespace test {
 IBenchmarkOutput::~IBenchmarkOutput() {}
 
-
 void Printout::started(int count) {
   std::stringstream out;
 
@@ -90,6 +89,7 @@ void Printout::started(int count) {
 
   BOOST_TEST_MESSAGE(out.str());
 }
+
 void Printout::finished(boost::int64_t milliseconds) {
   std::stringstream out;
 
@@ -127,6 +127,10 @@ void TestBenchmark::init(IBenchmarkOutput& output, int count) {
   private_->startTime = tools::get_system_time();
 
   private_->output->started(count);
+}
+
+void TestBenchmark::resetTimer() {
+  private_->startTime = tools::get_system_time();
 }
 
 TestBenchmark::TestBenchmark(const char* name, int count) {

@@ -8,6 +8,8 @@
 
 #include "color.h"
 
+#include "test_support.h"
+
 namespace tools {
 class ByteArray;
 }
@@ -41,6 +43,7 @@ class Image {
 
   utils::Size size_;
   unsigned short depth_;
+  size_t align_;
 
   bool enable_min_realloc_;
 public:
@@ -49,7 +52,7 @@ public:
   Image();
   ~Image();
 
-  Image(SizeType width, SizeType height, unsigned short depth);
+  Image(SizeType width, SizeType height, unsigned short depth, size_t align = 1);
 
   bool load(const tools::ByteArray& buffer);
   bool load(const std::string& file_ext, const tools::ByteArray& buffer);
@@ -57,7 +60,7 @@ public:
   static Image loadFrom(const tools::ByteArray& buffer);
   static Image loadFrom(const std::string& file_ext, const tools::ByteArray& buffer);
 
-  void create(SizeType width, SizeType height, unsigned short depth);
+  void create(SizeType width, SizeType height, unsigned short depth, size_t align = 1);
   void createSame(const Image& other);
   void destroy();
   bool empty() const;
@@ -66,7 +69,8 @@ public:
   SizeType width() const;
   SizeType height() const;
   unsigned short depth() const;
-  SizeType scanline() const;
+  size_t alignment() const;
+  SizeType scanline(bool with_alignment) const;
 
   void setDepth(unsigned short depth);
   void setWidth(SizeType width);
@@ -94,10 +98,12 @@ public:
 };
 
 utils::Rect getRect(const Image& src);
+bool areValidDimentions(Image::SizeType width, Image::SizeType height, unsigned short depth, size_t align);
+Image::SizeType correctScanline(Image::SizeType scanline, size_t align);
 
 bool toGray(const Image& src, Image& dst);
-
 bool toBgr(const Image& src, Image& dst);
+bool rgba2rgb(const Image& src, Image& dst);
 
 bool copyRect(const img::Image& src, img::Image& dst, const utils::Rect& rect_to_copy);
 void copy(const img::Image& src, img::Image& dst);

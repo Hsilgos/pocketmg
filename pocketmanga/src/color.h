@@ -161,11 +161,11 @@ struct ColorBase {
 
   ColorBase() {}
 
-  template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType> ColorBase(const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType>& other)                                                                                                       {
+  template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType> ColorBase(const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType>& other) {
     apply(other);
   }
 
-  template<class OtherChannelsType> ColorBase(const GrayTmpl<OtherChannelsType>& gray)                                   {
+  template<class OtherChannelsType> ColorBase(const GrayTmpl<OtherChannelsType>& gray) {
     apply(gray);
   }
 
@@ -387,7 +387,7 @@ public:
     set(value);
   }
 
-  template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType> Gray(const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType>& other)                                                                                                       {
+  template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType> Gray(const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType>& other) {
     set(coeff.get(other.red(), other.green(), other.blue()));
   }
 

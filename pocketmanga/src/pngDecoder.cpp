@@ -164,9 +164,9 @@ class PngDecoder : public IDecoder {
       const unsigned int width = png_get_image_width(png.png_ptr, png.info_ptr);
       const unsigned int height = png_get_image_height(png.png_ptr, png.info_ptr);
 
-      decoded.create(width, height, bytes_per_pixel);
+      decoded.create(width, height, bytes_per_pixel, getAlignment());
 
-      const unsigned int scanline = decoded.scanline();
+      const unsigned int scanline = decoded.scanline(true);
 
       png.row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * height);
       unsigned char* data = decoded.data();

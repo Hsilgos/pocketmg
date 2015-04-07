@@ -60,11 +60,13 @@ void resampleBicubic(const Image& in, Image& out, int width, int height) {
   const unsigned char* src_data = in.data();
   unsigned char* dst_data   = out.data();
 
+  const img::Image::SizeType src_image_width = in.width();
+  const img::Image::SizeType src_image_height = in.height();
   // Precalculate weights
   std::vector<BicubicPrecalc> weight_y(height);
   std::vector<BicubicPrecalc> weight_x(width);
-  precalculate(weight_y, in.height());
-  precalculate(weight_x, in.width());
+  precalculate(weight_y, src_image_height);
+  precalculate(weight_x, src_image_width);
   // ~Precalculate weights
 
   for (int dsty = 0; dsty < height; dsty++) {
@@ -84,6 +86,7 @@ void resampleBicubic(const Image& in, Image& out, int width, int height) {
         // Y offset
         const int y_offset = pre_y.offset[k + 1];
 
+        const int src_pixel_middle = y_offset * src_image_width;
         // Loop across the X axis
         for (int i = -1; i <= 2; i++) {
           // X offset
@@ -91,7 +94,7 @@ void resampleBicubic(const Image& in, Image& out, int width, int height) {
 
           // Calculate the exact position where the source data
           // should be pulled from based on the x_offset and y_offset
-          const int src_pixel_index = y_offset * in.width() + x_offset;
+          const int src_pixel_index = src_pixel_middle + x_offset;
 
           // Calculate the weight for the specified pixel according
           // to the bicubic b-spline kernel we're using for

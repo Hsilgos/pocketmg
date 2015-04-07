@@ -84,6 +84,7 @@ public:
 
   PathToFile getCurrentPos() const;
   tools::ByteArray readCurrentFile() const;
+
 private:
   BookExplorer(const BookExplorer&);
   BookExplorer& operator =(const BookExplorer&);
@@ -145,6 +146,7 @@ public:
   IBookCache* currentCache() const;
 
   bool setRoot(const fs::FilePath& root);
+
   bool toFirstFile();
   bool toLastFile();
 

@@ -17,7 +17,7 @@ public:
   virtual void finished(boost::int64_t milliseconds) = 0;
 };
 
-class Printout: public IBenchmarkOutput {
+class Printout : public IBenchmarkOutput {
   //const std::string name_;
   boost::format format_;
 
@@ -26,10 +26,10 @@ class Printout: public IBenchmarkOutput {
   virtual void started(int count);
   virtual void finished(boost::int64_t milliseconds);
 public:
-  Printout(const char *name);
+  Printout(const char* name);
 
-  template <typename T>
-  Printout& operator %(const T &value) {
+  template<typename T>
+  Printout& operator %(const T& value) {
     format_ % value;
 
     return *this;
@@ -37,23 +37,27 @@ public:
 };
 
 class TestBenchmark {
-  struct Private;
-  Private *private_;
-
-  TestBenchmark(const TestBenchmark &);
-  TestBenchmark &operator = (const TestBenchmark &);
-
-  void init(IBenchmarkOutput &output, int count);
 public:
-  TestBenchmark(const char *name, int count);
-  TestBenchmark(IBenchmarkOutput &output, int count);
+  TestBenchmark(const char* name, int count);
+  TestBenchmark(IBenchmarkOutput& output, int count);
   ~TestBenchmark();
+  void resetTimer();
   bool isDone();
   void next();
+
+private:
+  TestBenchmark(const TestBenchmark&);
+  TestBenchmark& operator =(const TestBenchmark&);
+
+  void init(IBenchmarkOutput& output, int count);
+  struct Private;
+  Private* private_;
 };
 }
 
-#define BENCHMARK_REPEAT( Name, CountDebug, CountRelease ) \
- for(test::TestBenchmark bench(Name, (utils::isDebugging()?(CountDebug):(CountRelease))); !bench.isDone(); bench.next() )
+#define BENCHMARK_REPEAT(Name, CountDebug, CountRelease) \
+  for (test::TestBenchmark benchmark(Name, (utils::isDebugging() ? (CountDebug) : (CountRelease))); !benchmark.isDone(); benchmark.next())
 
-#define BENCHMARK( Name ) BENCHMARK_REPEAT( Name, 1, 1 )
+#define BENCHMARK(Name) BENCHMARK_REPEAT(Name, 1, 1)
+#define GET_LOCAL_BECHMARK() benchmark
+#define BENCHMARK_RESET_TIMER() GET_LOCAL_BECHMARK().resetTimer();

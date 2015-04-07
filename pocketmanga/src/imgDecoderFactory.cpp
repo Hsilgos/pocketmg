@@ -6,6 +6,9 @@
 #include "imgDecoder.h"
 
 namespace img {
+DecoderFactory::DecoderFactory() : align_(1), byte_per_pixel_(0) {
+}
+
 void DecoderFactory::registerDecoder(img::IDecoder* decoder) {
   if (decoder) {
     std::vector<std::string> exts = decoder->getExts();
@@ -15,6 +18,24 @@ void DecoderFactory::registerDecoder(img::IDecoder* decoder) {
     }
 
     decoders_list_.push_back(decoder);
+    decoder->setAlignment(align_);
+    decoder->setDesiredBytePerPixel(byte_per_pixel_);
+  }
+}
+
+void DecoderFactory::setAlignment(size_t align) {
+  align_ = align;
+  DecodersMap::const_iterator it = decoders_map_.begin(), itEnd = decoders_map_.end();
+  for (; it != itEnd; ++it) {
+    it->second->setAlignment(align_);
+  }
+}
+
+void DecoderFactory::setDesiredBytePerPixel(unsigned int byte_per_pixel) {
+  byte_per_pixel_ = byte_per_pixel;
+  DecodersMap::const_iterator it = decoders_map_.begin(), itEnd = decoders_map_.end();
+  for (; it != itEnd; ++it) {
+    it->second->setDesiredBytePerPixel(byte_per_pixel_);
   }
 }
 

@@ -14,6 +14,7 @@ x64/
 build/
 [Bb]in/
 [Oo]bj/
+test/Generated/
 
 obj_emu/
 obj_arm_gnueabi/
@@ -45,6 +46,7 @@ obj_arm_gnueabi/
 *.pidb
 *.log
 *.scc
+*.vcxproj.filters
 
 # Visual C++ cache files
 ipch/

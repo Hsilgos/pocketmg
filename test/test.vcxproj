@@ -1,0 +1,565 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{516F190F-4E3B-4350-9BF8-C3348A2218EC}</ProjectGuid>
+    <RootNamespace>test</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../pocketmanga/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;UNIT_TEST_SUPPORT;_CONSOLE;NOUNCRYPT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4131; 4100;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>zlibd.lib;turbojpeg-static.lib;libpng.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../pocketmanga/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;UNIT_TEST_SUPPORT;_CONSOLE;NOUNCRYPT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>zlib.lib;turbojpeg-static.lib;libpng.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\pocketmanga\src\bmpDecoder.cpp" />
+    <ClCompile Include="..\pocketmanga\src\imgDecoder.cpp" />
+    <ClCompile Include="..\pocketmanga\src\mirror.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\1bpp_no_palette_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\1bpp_pixeldata_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\24bpp_pixeldata_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\32bpp_pixeldata_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\4bpp_no_palette_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\4bpp_pixeldata_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\555_pixeldata_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\8bpp_colorsimportant_large_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\8bpp_colorsimportant_negative_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\8bpp_colorsused_large_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\8bpp_colorsused_negative_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\8bpp_no_palette_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\8bpp_pixeldata_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\bitdepth_large_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\bitdepth_odd_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\bitdepth_zero_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\colormasks_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\colormasks_missing_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\compression_bad_rle4_for_8bpp_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\compression_bad_rle8_for_4bpp_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\compression_unknown_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\fileinfoheader_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\height_zero_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\infoheadersize_large_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\infoheadersize_small_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\infoheadersize_zero_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\infoheader_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\infoheader_missing_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\magicnumber_bad_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\magicnumber_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\offbits_large_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\offbits_negative_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\offbits_zero_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\palette_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\palette_missing_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\palette_too_big_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\pixeldata_missing_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\rle4_absolute_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\rle4_delta_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\rle4_no_end_of_line_marker_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\rle4_runlength_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\rle8_absolute_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\rle8_deltaleavesimage_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\rle8_delta_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\rle8_no_end_of_line_marker_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\rle8_runlength_cropped_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\width_negative_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\width_times_height_overflow_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\corrupt\width_zero_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\32bpp_0x0_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\32bpp_0x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\32bpp_320x0_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\8bpp_pixels_not_in_palette_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\filesize_bad_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\filesize_zero_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\pels_per_meter_x_large_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\pels_per_meter_x_negative_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\pels_per_meter_x_zero_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\pels_per_meter_y_large_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\pels_per_meter_y_negative_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\pels_per_meter_y_zero_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\pixeldata_rle8_toomuch_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\pixeldata_toomuch_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\planes_large_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\planes_zero_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\reserved1_bad_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\reserved2_bad_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\rle4_height_negative_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\rle4_no_end_of_bitmap_marker_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\rle8_height_negative_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\questionable\rle8_no_end_of_bitmap_marker_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1555_199x203_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1555_199x203_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1555_199x203_topdown_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_1x1_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_1x1_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_320x240_color_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_320x240_color_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_320x240_overlappingcolor_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_320x240_overlappingcolor_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_320x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_321x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_321x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_322x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_322x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_323x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_323x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_324x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_324x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_325x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_325x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_326x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_326x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_327x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_327x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_328x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_328x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_329x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_329x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_330x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_330x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_331x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_331x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_332x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_332x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_333x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_333x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_334x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_334x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_335x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_335x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\1bpp_topdown_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\24bpp_1x1_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\24bpp_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\24bpp_321x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\24bpp_322x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\24bpp_323x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\24bpp_imagesize_zero_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\24bpp_topdown_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\32bpp_101110_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\32bpp_1x1_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\32bpp_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\32bpp_888_optimalpalette_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\32bpp_optimalpalette_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\32bpp_topdown_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4444_199x203_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4444_199x203_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4444_199x203_topdown_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\444_199x203_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\444_199x203_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\444_199x203_topdown_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_1x1_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_1x1_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_320x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_321x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_321x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_322x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_322x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_323x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_323x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_324x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_324x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_325x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_325x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_326x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_326x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_327x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_327x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\4bpp_topdown_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\555_1x1_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\555_1x1_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\555_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\555_320x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\555_321x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\555_321x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\565_1x1_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\565_1x1_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\565_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\565_320x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\565_320x240_topdown_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\565_321x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\565_321x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\565_321x240_topdown_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\565_322x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\565_322x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\565_322x240_topdown_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_1x1_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_1x1_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_1x64000_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_1x64000_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_320x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_321x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_321x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_322x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_322x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_323x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_323x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_colorsimportant_two_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_colorsimportant_two_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_colorsused_zero_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_colorsused_zero_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\8bpp_topdown_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle4_absolute_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle4_absolute_320x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle4_alternate_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle4_alternate_320x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle4_delta_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle4_delta_320x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle4_encoded_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle4_encoded_320x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle8_64000x1_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle8_64000x1_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle8_absolute_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle8_absolute_320x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle8_blank_160x120_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle8_blank_160x120_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle8_delta_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle8_delta_320x240_tmpl_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle8_encoded_320x240_bmp.cpp" />
+    <ClCompile Include="Generated\bmp\valid\rle8_encoded_320x240_tmpl_bmp.cpp" />
+    <ClCompile Include="globalTest.cpp" />
+    <ClCompile Include="..\pocketmanga\src\image.cpp" />
+    <ClCompile Include="report.cpp" />
+    <ClCompile Include="testBmp.cpp" />
+    <ClCompile Include="testJpg_jpg.cpp" />
+    <ClCompile Include="testUtils.cpp" />
+    <ClCompile Include="..\pocketmanga\src\book.cpp" />
+    <ClCompile Include="..\pocketmanga\src\byteArray.cpp" />
+    <ClCompile Include="..\pocketmanga\src\color.cpp" />
+    <ClCompile Include="..\pocketmanga\src\defines.cpp" />
+    <ClCompile Include="..\pocketmanga\src\filemanager.cpp" />
+    <ClCompile Include="..\pocketmanga\src\filemanager_win32.cpp" />
+    <ClCompile Include="..\pocketmanga\src\filepath.cpp" />
+    <ClCompile Include="..\pocketmanga\src\iArchive.cpp" />
+    <ClCompile Include="..\pocketmanga\src\imgDecoderFactory.cpp" />
+    <ClCompile Include="..\pocketmanga\src\ioapi.c" />
+    <ClCompile Include="..\pocketmanga\src\jpegDecoder.cpp" />
+    <ClCompile Include="..\pocketmanga\src\pngDecoder.cpp" />
+    <ClCompile Include="..\pocketmanga\src\rotate.cpp" />
+    <ClCompile Include="..\pocketmanga\src\scale.cpp" />
+    <ClCompile Include="..\pocketmanga\src\unzip.c" />
+    <ClCompile Include="..\pocketmanga\src\zipArchive.cpp" />
+    <ClCompile Include="tesRect.cpp" />
+    <ClCompile Include="testBook.cpp" />
+    <ClCompile Include="testColor.cpp" />
+    <ClCompile Include="testFileList.cpp" />
+    <ClCompile Include="testFilePath.cpp" />
+    <ClCompile Include="testRotate.cpp" />
+    <ClCompile Include="testScale.cpp" />
+    <ClCompile Include="testArchive.cpp" />
+    <ClCompile Include="testBenchmark.cpp" />
+    <ClCompile Include="testFileSystem.cpp" />
+    <ClCompile Include="testFormatter.cpp" />
+    <ClCompile Include="testImageDecoder.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\pocketmanga\src\mirror.h" />
+    <ClInclude Include="..\pocketmanga\src\test_support.h" />
+    <ClInclude Include="clone.h" />
+    <ClInclude Include="Generated\bmp\corrupt\1bpp_no_palette_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\1bpp_pixeldata_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\24bpp_pixeldata_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\32bpp_pixeldata_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\4bpp_no_palette_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\4bpp_pixeldata_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\555_pixeldata_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\8bpp_colorsimportant_large_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\8bpp_colorsimportant_negative_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\8bpp_colorsused_large_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\8bpp_colorsused_negative_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\8bpp_no_palette_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\8bpp_pixeldata_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\bitdepth_large_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\bitdepth_odd_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\bitdepth_zero_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\colormasks_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\colormasks_missing_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\compression_bad_rle4_for_8bpp_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\compression_bad_rle8_for_4bpp_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\compression_unknown_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\fileinfoheader_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\height_zero_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\infoheadersize_large_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\infoheadersize_small_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\infoheadersize_zero_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\infoheader_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\infoheader_missing_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\magicnumber_bad_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\magicnumber_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\offbits_large_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\offbits_negative_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\offbits_zero_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\palette_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\palette_missing_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\palette_too_big_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\pixeldata_missing_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\rle4_absolute_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\rle4_delta_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\rle4_no_end_of_line_marker_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\rle4_runlength_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\rle8_absolute_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\rle8_deltaleavesimage_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\rle8_delta_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\rle8_no_end_of_line_marker_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\rle8_runlength_cropped_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\width_negative_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\width_times_height_overflow_bmp.h" />
+    <ClInclude Include="Generated\bmp\corrupt\width_zero_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\32bpp_0x0_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\32bpp_0x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\32bpp_320x0_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\8bpp_pixels_not_in_palette_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\filesize_bad_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\filesize_zero_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\pels_per_meter_x_large_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\pels_per_meter_x_negative_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\pels_per_meter_x_zero_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\pels_per_meter_y_large_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\pels_per_meter_y_negative_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\pels_per_meter_y_zero_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\pixeldata_rle8_toomuch_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\pixeldata_toomuch_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\planes_large_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\planes_zero_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\reserved1_bad_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\reserved2_bad_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\rle4_height_negative_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\rle4_no_end_of_bitmap_marker_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\rle8_height_negative_bmp.h" />
+    <ClInclude Include="Generated\bmp\questionable\rle8_no_end_of_bitmap_marker_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1555_199x203_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1555_199x203_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1555_199x203_topdown_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_1x1_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_1x1_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_320x240_color_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_320x240_color_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_320x240_overlappingcolor_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_320x240_overlappingcolor_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_320x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_321x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_321x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_322x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_322x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_323x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_323x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_324x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_324x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_325x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_325x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_326x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_326x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_327x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_327x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_328x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_328x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_329x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_329x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_330x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_330x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_331x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_331x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_332x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_332x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_333x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_333x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_334x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_334x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_335x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_335x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\1bpp_topdown_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\24bpp_1x1_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\24bpp_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\24bpp_321x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\24bpp_322x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\24bpp_323x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\24bpp_imagesize_zero_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\24bpp_topdown_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\32bpp_101110_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\32bpp_1x1_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\32bpp_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\32bpp_888_optimalpalette_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\32bpp_optimalpalette_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\32bpp_topdown_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4444_199x203_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4444_199x203_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4444_199x203_topdown_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\444_199x203_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\444_199x203_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\444_199x203_topdown_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_1x1_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_1x1_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_320x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_321x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_321x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_322x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_322x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_323x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_323x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_324x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_324x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_325x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_325x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_326x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_326x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_327x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_327x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\4bpp_topdown_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\555_1x1_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\555_1x1_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\555_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\555_320x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\555_321x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\555_321x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\565_1x1_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\565_1x1_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\565_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\565_320x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\565_320x240_topdown_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\565_321x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\565_321x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\565_321x240_topdown_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\565_322x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\565_322x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\565_322x240_topdown_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_1x1_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_1x1_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_1x64000_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_1x64000_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_320x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_321x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_321x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_322x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_322x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_323x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_323x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_colorsimportant_two_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_colorsimportant_two_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_colorsused_zero_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_colorsused_zero_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\8bpp_topdown_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle4_absolute_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle4_absolute_320x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle4_alternate_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle4_alternate_320x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle4_delta_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle4_delta_320x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle4_encoded_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle4_encoded_320x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle8_64000x1_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle8_64000x1_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle8_absolute_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle8_absolute_320x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle8_blank_160x120_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle8_blank_160x120_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle8_delta_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle8_delta_320x240_tmpl_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle8_encoded_320x240_bmp.h" />
+    <ClInclude Include="Generated\bmp\valid\rle8_encoded_320x240_tmpl_bmp.h" />
+    <ClInclude Include="globalTest.h" />
+    <ClInclude Include="report.h" />
+    <ClInclude Include="singleton.h" />
+    <ClInclude Include="smartDelete.h" />
+    <ClInclude Include="testJpg_jpg.h" />
+    <ClInclude Include="testUtils.h" />
+    <ClInclude Include="timeInfo.h" />
+    <ClInclude Include="..\pocketmanga\src\defines.h" />
+    <ClInclude Include="..\pocketmanga\src\filepath.h" />
+    <ClInclude Include="..\pocketmanga\src\scale.h" />
+    <ClInclude Include="testArchive.h" />
+    <ClInclude Include="testBenchmark.h" />
+    <ClInclude Include="testFileSystem.h" />
+    <ClInclude Include="testFormatter.h" />
+    <ClInclude Include="testImageDecoder.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

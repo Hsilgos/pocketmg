@@ -102,7 +102,9 @@
     <ClCompile Include="src\filemanager_win32.cpp" />
     <ClCompile Include="src\filepath.cpp" />
     <ClCompile Include="src\iArchive.cpp" />
+    <ClCompile Include="src\imgDecoder.cpp" />
     <ClCompile Include="src\ioapi.c" />
+    <ClCompile Include="src\mirror.cpp" />
     <ClCompile Include="src\unzip.c" />
     <ClCompile Include="src\zipArchive.cpp" />
     <ClCompile Include="src\bmpDecoder.cpp" />
@@ -128,8 +130,11 @@
     <ClInclude Include="src\forbid_copy_assign.h" />
     <ClInclude Include="src\iArchive.h" />
     <ClInclude Include="src\iViewStrategy.h" />
+    <ClInclude Include="src\mirror.h" />
     <ClInclude Include="src\singleton.h" />
     <ClInclude Include="src\static_assert.h" />
+    <ClInclude Include="src\test_support.h" />
+    <ClInclude Include="src\win32\scoped_handle.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="src\ioapi.h" />
     <ClInclude Include="src\unzip.h" />

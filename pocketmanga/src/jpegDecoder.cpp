@@ -106,7 +106,8 @@ class JpegDecoder : public IDecoder {
       decoded.create(
         desc_.output_width,
         desc_.output_height,
-        static_cast<unsigned short>(desc_.num_components));
+        static_cast<unsigned short>(desc_.num_components),
+        getAlignment());
 
       unsigned char* dest = decoded.data();
 
@@ -116,12 +117,15 @@ class JpegDecoder : public IDecoder {
       //const bool color = desc_.output_components > 1;
 
       int height = desc_.output_height;
-      const int width = desc_.output_width;
-      const int step  = width * desc_.num_components;
+      const int step  = decoded.scanline(false);
+
+      const int not_aligned = step % getAlignment();
+      const int align_tail = not_aligned ? (getAlignment() - not_aligned) : 0;
 
       for (; height--; dest += step) {
         jpeg_read_scanlines(&desc_, pJpegBuffer, 1);
         memcpy(dest, pJpegBuffer[0], step);
+        dest += align_tail;
       }
 
       jpeg_finish_decompress(&desc_);
