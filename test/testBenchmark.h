@@ -9,7 +9,7 @@
 namespace test {
 class IBenchmarkOutput {
 public:
-  PATTERN_DEFINE_CLONE(IBenchmarkOutput);
+  PATTERN_DEFINE_CLONE(IBenchmarkOutput)
 
   virtual ~IBenchmarkOutput();
 
@@ -21,7 +21,7 @@ class Printout : public IBenchmarkOutput {
   //const std::string name_;
   boost::format format_;
 
-  PATTERN_IMPL_CLONE(Printout);
+  PATTERN_IMPL_CLONE(Printout)
 
   virtual void started(int count);
   virtual void finished(boost::int64_t milliseconds);
@@ -39,7 +39,7 @@ public:
 class TestBenchmark {
 public:
   TestBenchmark(const char* name, int count);
-  TestBenchmark(IBenchmarkOutput& output, int count);
+  TestBenchmark(IBenchmarkOutput const& output, int count);
   ~TestBenchmark();
   void resetTimer();
   bool isDone();
@@ -49,7 +49,7 @@ private:
   TestBenchmark(const TestBenchmark&);
   TestBenchmark& operator =(const TestBenchmark&);
 
-  void init(IBenchmarkOutput& output, int count);
+  void init(IBenchmarkOutput const& output, int count);
   struct Private;
   Private* private_;
 };

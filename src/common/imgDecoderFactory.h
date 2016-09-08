@@ -1,5 +1,6 @@
 #pragma once
 
+#include "decodeMode.h"
 #include "defines.h"
 #include "singleton.h"
 
@@ -27,7 +28,8 @@ public:
   bool decode(const std::string& ext, const tools::ByteArray& data, img::Image& image) const;
 
   void setAlignment(size_t align);
-  void setDesiredBytePerPixel(unsigned int byte_per_pixel);
+
+  void setDecodeMode(DecodeMode mode);
 
 private:
   typedef std::map<std::string, IDecoder*> DecodersMap;
@@ -37,7 +39,7 @@ private:
   DecodersList decoders_list_;
 
   size_t align_;
-  unsigned int byte_per_pixel_;
+  DecodeMode decode_mode_;
 };
 
 

@@ -26,6 +26,8 @@ inline size_t dataSize(img::Image::SizeType width,
                        size_t align) {
   return static_cast<size_t>(height) * calcScanline(width, depth, align, true);
 }
+
+const size_t MaximumImageSize = 1024 * 1024 * 1024; // 1 gigabyte
 }
 
 namespace img {
@@ -66,6 +68,12 @@ Image::~Image() {
 }
 
 void Image::create(SizeType width, SizeType height, unsigned short depth, size_t align) {
+  if (depth != 1 && depth != 3 && depth != 4)
+      throw std::invalid_argument("Depth must be 1, 3 or 4");
+
+  if (height > MaximumImageSize / depth || width > MaximumImageSize / depth || height * depth > MaximumImageSize / width)
+      throw std::bad_alloc();
+
   const size_t new_size = ::dataSize(width, height, depth, align);
   if (0 == new_size)
     return;
@@ -283,6 +291,64 @@ bool rgba2rgb(const Image& src, Image& dst) {
   }
 
   return true;
+}
+
+bool rgb2rgba(const Image& src, Image& dst) {
+    if (src.empty())
+      return false;
+
+    const unsigned int bpp_src = src.depth();
+    const unsigned int bpp_dst = 4;
+    if (bpp_src != 3)
+      return false;
+
+    const Image::SizeType scanline_with_align = src.scanline(true);
+    const Image::SizeType scanline = src.scanline(false);
+    const Image::SizeType height = src.height();
+    const unsigned char* src_begin = src.data();
+
+    dst.create(src.width(), src.height(), bpp_dst, src.alignment());
+
+    const Image::SizeType dst_line_with_align = dst.scanline(true);
+    unsigned char* dst_begin = dst.data();
+
+    for (Image::SizeType h = 0; h < height; ++h, src_begin += scanline_with_align, dst_begin += dst_line_with_align) {
+      const unsigned char* line_src = src_begin;
+      unsigned char* line_dst = dst_begin;
+      for (Image::SizeType s = 0; s < scanline; s += bpp_src, line_src += bpp_src, line_dst += bpp_dst)
+        color::RgbaRef rgba(line_dst, color::RgbConstRef(line_src));
+    }
+
+    return true;
+}
+
+bool grey2rgba(const Image& src, Image& dst) {
+    if (src.empty())
+      return false;
+
+    const unsigned int bpp_src = src.depth();
+    const unsigned int bpp_dst = 4;
+    if (bpp_src != 1)
+      return false;
+
+    const Image::SizeType scanline_with_align = src.scanline(true);
+    const Image::SizeType scanline = src.scanline(false);
+    const Image::SizeType height = src.height();
+    const unsigned char* src_begin = src.data();
+
+    dst.create(src.width(), src.height(), bpp_dst, src.alignment());
+
+    const Image::SizeType dst_line_with_align = dst.scanline(true);
+    unsigned char* dst_begin = dst.data();
+
+    for (Image::SizeType h = 0; h < height; ++h, src_begin += scanline_with_align, dst_begin += dst_line_with_align) {
+      const unsigned char* line_src = src_begin;
+      unsigned char* line_dst = dst_begin;
+      for (Image::SizeType s = 0; s < scanline; s += bpp_src, line_src += bpp_src, line_dst += bpp_dst)
+        color::RgbaRef rgba(line_dst, color::GrayConstRef(line_src));
+    }
+
+    return true;
 }
 
 bool copyRect(const img::Image& src, img::Image& dst, const utils::Rect& rect_to_copy) {

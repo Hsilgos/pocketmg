@@ -1,0 +1,409 @@
+# Added just to make sure that libs and binaries will go to known location
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+
+####################################################################################
+#                              Argument parser                                     #
+####################################################################################
+# Parses arguments from argument list and places them in varibles
+# Usage:
+#   TOOLS_PARSE_ARGUMENT_GROUPS(
+#       NAME                # Future name of argument list group
+#       GROUPS_VAR_NAME     # List of allowed arguments
+#       [ARGN]              # Arguments to parse
+#       )
+# Example:
+#######################
+# set(ALLOWED_OPTIONS OPT1 OPT2 OPT3)
+# TOOLS_PARSE_ARGUMENT_GROUPS(MY_GROUP_NAME ALLOWED_OPTIONS
+#       OPT1 var1 var2
+#       OPT2 ) # there is no OPT3
+#
+# if (MY_GROUP_NAME_OPT1_FOUND)
+#   message("List of OPT1: " ${MY_GROUP_NAME_OPT1})
+# endif()
+#
+# if (MY_GROUP_NAME_OPT2_FOUND)
+#   message("Option OPT2 was found")
+# endif()
+#
+# if (NOT MY_GROUP_NAME_OPT3_FOUND)
+#   message("Option OPT3 was NOT found")
+# endif()
+#######################
+# Also it supports option only for platform, for example
+# OPT1_WIN option with it's arguments will be available only for WIN32 operation system
+
+macro(TOOLS_PARSE_ARGUMENT_GROUPS NAME GROUPS_VAR_NAME)
+    # Clear variables
+    foreach(_groupNameIterator ${${GROUPS_VAR_NAME}})
+        unset(${NAME}_${_groupNameIterator})
+        unset(${NAME}_${_groupNameIterator}_FOUND)
+        unset(${NAME}_${_groupNameIterator}_OTHER)
+        unset(${NAME}_${_groupNameIterator}_OTHER_FOUND)
+    endforeach()
+
+    string(REPLACE ";" "|" _groupsRegex "${${GROUPS_VAR_NAME}}")
+    foreach(_argumentIterator ${ARGN})
+        set(_groupNameFound FALSE)
+        list(FIND ${GROUPS_VAR_NAME} "${_argumentIterator}" _ipagIdx)
+        if(NOT _ipagIdx EQUAL -1)
+            set(_groupName "${_argumentIterator}")
+            set(_groupNameOther)
+            set(_groupNameFound TRUE)
+        else()
+            if("x${_argumentIterator}" MATCHES "^x(${_groupsRegex})_[a-zA-Z0-9_]+$")
+                string(REGEX MATCH "^(${_groupsRegex})" _groupNameIterator "${_argumentIterator}")
+                string(REGEX REPLACE "^${_groupNameIterator}_" "" _ipagPlatformVarName "${_argumentIterator}")
+                if ((DEFINED __${_ipagPlatformVarName}__ AND __${_ipagPlatformVarName}__) OR
+                    (DEFINED ${_ipagPlatformVarName} AND ${_ipagPlatformVarName}))
+                    set(_groupName ${_groupNameIterator})
+                    set(_groupNameOther)
+                else()
+                    set(_groupName)
+                    set(_groupNameOther ${_groupNameIterator})
+                endif()
+                set(_groupNameFound TRUE)
+            endif()
+        endif()
+        if(_groupNameFound)
+            set(${NAME}_${_groupName}_FOUND TRUE)
+            set(${NAME}_${_groupName}_FOUND TRUE PARENT_SCOPE)
+        elseif(_groupName)
+            list(APPEND ${NAME}_${_groupName} "${_argumentIterator}")
+            set(${NAME}_${_groupName} "${${NAME}_${_groupName}}" PARENT_SCOPE)
+        elseif(_groupNameOther)
+            list(APPEND ${NAME}_${_groupNameOther}_OTHER "${_argumentIterator}")
+            set(${NAME}_${_groupNameOther}_OTHER "${${NAME}_${_groupNameOther}_OTHER}" PARENT_SCOPE)
+        endif()
+    endforeach()
+endmacro(TOOLS_PARSE_ARGUMENT_GROUPS)
+
+
+####################################################################################
+#                           Projects workaround                                    #
+####################################################################################
+# Describe your project with this macroses
+#
+# Usage:
+# TOOLS_BEGIN_PROJECT (
+#       NAME                                 # Name of project
+#       CUI_APP|LIBRARY                      # Choose LIBRARY for static or shared library and CUI_APP for console application
+#       [SHARED]                             # Use it only with LIBRARY option, provide it if you want shared library otherwise static will be built
+#       [DEPENDS] depend1 depend1            # Dependencies description project will be linked to them
+#       [EXTERNAL_DEPENDS] depend1 depend2   # External dpendency which was described with TOOLS_DESCRIBE_EXTERNAL earlier
+#       [INCLUDE_DIRS] directory1 directory2 # Additional include directories
+#       [SOLUTION_FOLDER]                    # Folder in solution where project will be (in Visual Studio for example)
+#       [RESOURCES]                          # List of resources to be copied into binary directory
+#   )
+#
+# Add sources to project:
+# TOOLS_SOURCES (
+#       path/to/source1
+#       other/path/to/source2
+#   )
+# Each source file will be added to apropriate folder in solution
+#
+# Complete project description with:
+# TOOLS_END_PROJECT()
+
+set(TOOLS_ALLOWED_OPTION_NAMES CUI_APP LIBRARY HEADER_LIBRARY SHARED DEPENDS EXTERNAL_DEPENDS INCLUDE_DIRS SOLUTION_FOLDER RESOURCES)
+
+macro(TOOLS_BEGIN_PROJECT NAME)
+    project(${NAME})
+    message(STATUS "Project ${NAME} is adding")
+
+    TOOLS_PARSE_ARGUMENT_GROUPS(${NAME}_OPTIONS TOOLS_ALLOWED_OPTION_NAMES ${ARGN})
+endmacro(TOOLS_BEGIN_PROJECT)
+
+# Adding of sources
+# 1. macro builds groups using subdirectories
+# 2. name sources with different postfix for different OSes:
+#   Linux - for linux (not MacOS)
+#   Win - for windows
+#   Macos - for MacOS
+#   Posix - for linux and MacOS
+
+macro(TOOLS_ADD_FILE_TO_SOURCE GROUP_INDEX FILE_PATH)
+    if ("${FILE_PATH}" MATCHES "^.*Win.(cpp|h)$")
+        if (WIN32)
+           list(APPEND ${PROJECT_NAME}_SOURCE_GROUP_${GROUP_INDEX} "${FILE_PATH}")
+           list(APPEND ${PROJECT_NAME}_SOURCES "${FILE_PATH}")
+        endif()
+    elseif ("${FILE_PATH}" MATCHES "^.*Macos.(cpp|h)$")
+        if (APPLE)
+           list(APPEND ${PROJECT_NAME}_SOURCE_GROUP_${GROUP_INDEX} "${FILE_PATH}")
+           list(APPEND ${PROJECT_NAME}_SOURCES "${FILE_PATH}")
+        endif()
+    elseif ("${FILE_PATH}" MATCHES "^.*Linux.(cpp|h)$")
+        if (UNIX AND NOT APPLE)
+           list(APPEND ${PROJECT_NAME}_SOURCE_GROUP_${GROUP_INDEX} "${FILE_PATH}")
+           list(APPEND ${PROJECT_NAME}_SOURCES "${FILE_PATH}")
+        endif()
+    elseif ("${FILE_PATH}" MATCHES "^.*Posix.(cpp|h)$")
+        if (UNIX)
+           list(APPEND ${PROJECT_NAME}_SOURCE_GROUP_${GROUP_INDEX} "${FILE_PATH}")
+           list(APPEND ${PROJECT_NAME}_SOURCES "${FILE_PATH}")
+        endif()
+    else ()
+        list(APPEND ${PROJECT_NAME}_SOURCE_GROUP_${GROUP_INDEX} "${FILE_PATH}")
+        list(APPEND ${PROJECT_NAME}_SOURCES "${FILE_PATH}")
+    endif ()
+    set (${PROJECT_NAME}_SOURCE_GROUP_${GROUP_INDEX} ${${PROJECT_NAME}_SOURCE_GROUP_${GROUP_INDEX}} PARENT_SCOPE)
+    set (${PROJECT_NAME}_SOURCES ${${PROJECT_NAME}_SOURCES} PARENT_SCOPE)
+endmacro(TOOLS_ADD_FILE_TO_SOURCE)
+
+macro(TOOLS_SOURCES)
+    # set(${PROJECT_NAME}_SOURCE_GROUP_LIST)
+    set(_TOOLS_filepath_previous)
+    foreach(_infr_filepath ${ARGN})
+        if (_TOOLS_filepath_previous)
+            string(TOLOWER ${_infr_filepath} _infr_filepath_tolower)
+            string(TOLOWER ${_TOOLS_filepath_previous} _TOOLS_filepath_previous_tolower)
+            if (${_TOOLS_filepath_previous_tolower} STRGREATER ${_infr_filepath_tolower})
+                message(FATAL_ERROR
+                    "Please respect alphabetical order, " ${_infr_filepath} " is met after " ${_TOOLS_filepath_previous})
+            endif()
+        endif()
+        set(_TOOLS_filepath_previous ${_infr_filepath})
+
+        if (${_infr_filepath} MATCHES "^[^\\/]*$")
+            # it's just source file without subdir
+            TOOLS_ADD_FILE_TO_SOURCE("ROOT" ${_infr_filepath})
+        else()
+            # there are subdirectories, so we will create group
+            string(REGEX REPLACE "^(.*)\\/[^\\/]*\\.(cpp|h)$" "\\1" _infr_filepath_group ${_infr_filepath})
+
+            list(FIND ${PROJECT_NAME}_SOURCE_GROUP_LIST ${_infr_filepath_group} _infr_group_pos)
+            if (${_infr_group_pos} EQUAL -1)
+                # add new group
+                list(APPEND ${PROJECT_NAME}_SOURCE_GROUP_LIST ${_infr_filepath_group})
+                list(FIND ${PROJECT_NAME}_SOURCE_GROUP_LIST ${_infr_filepath_group} _infr_group_pos)
+                if (${_infr_group_pos} EQUAL -1)
+                    message(FATAL_ERROR "Element should be in list after adding: " ${_infr_filepath_group})
+                endif()
+            endif()
+            TOOLS_ADD_FILE_TO_SOURCE(${_infr_group_pos} ${_infr_filepath})
+        endif()
+    endforeach()
+
+    set (${PROJECT_NAME}_SOURCE_GROUP_ROOT ${${PROJECT_NAME}_SOURCE_GROUP_ROOT} PARENT_SCOPE)
+    set(_infra_group_index 0)
+    foreach(_infra_src_goup ${${PROJECT_NAME}_SOURCE_GROUP_LIST})
+        set (${PROJECT_NAME}_SOURCE_GROUP_${_infra_group_index} ${${PROJECT_NAME}_SOURCE_GROUP_${_infra_group_index}} PARENT_SCOPE)
+        MATH(EXPR _infra_group_index "${_infra_group_index} + 1")
+    endforeach()
+
+    set(${PROJECT_NAME}_SOURCE_GROUP_LIST ${${PROJECT_NAME}_SOURCE_GROUP_LIST} PARENT_SCOPE)
+    set(${PROJECT_NAME}_SOURCES ${${PROJECT_NAME}_SOURCES} PARENT_SCOPE)
+
+endmacro(TOOLS_SOURCES)
+
+MARK_AS_ADVANCED(CMAKE_USE_FOLDERS)
+MACRO(CMAKE_SET_TARGET_FOLDER tgt folder)
+    IF(CMAKE_USE_FOLDERS)
+        SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
+        IF(MSVC)
+            IF(NOT ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} LESS 2.8)
+                SET_PROPERTY(TARGET "${tgt}" PROPERTY FOLDER "${folder}")
+            ENDIF()
+        ENDIF()
+        ELSE()
+            SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS OFF)
+    ENDIF()
+ENDMACRO(CMAKE_SET_TARGET_FOLDER)
+
+function(CREATE_SOURCE_GROUP GROUP_NAME GROUP_SRC_LIST)
+    list(LENGTH GROUP_SRC_LIST _infra_src_count)
+    if (NOT ${_infra_src_count} EQUAL 0)
+        string(REPLACE "/" "\\" _infra_name "${GROUP_NAME}")
+        source_group("${_infra_name}" FILES ${GROUP_SRC_LIST})
+    endif()
+endfunction(CREATE_SOURCE_GROUP)
+
+macro(TOOLS_END_PROJECT)
+    # Build source tree
+    CREATE_SOURCE_GROUP("" "${${PROJECT_NAME}_SOURCE_GROUP_ROOT}")
+    set(_infra_group_index 0)
+    foreach(_infra_src_goup ${${PROJECT_NAME}_SOURCE_GROUP_LIST})
+        CREATE_SOURCE_GROUP("${_infra_src_goup}" "${${PROJECT_NAME}_SOURCE_GROUP_${_infra_group_index}}")
+        MATH(EXPR _infra_group_index ${_infra_group_index}+1)
+    endforeach()
+
+    # Create project
+    if(${PROJECT_NAME}_OPTIONS_LIBRARY_FOUND)
+
+        if(${PROJECT_NAME}_OPTIONS_SHARED_FOUND)
+            set(infr_ipeLibType SHARED)
+        else()
+            set(infr_ipeLibType STATIC)
+        endif()
+
+        add_library(${PROJECT_NAME} ${infr_ipeLibType} ${${PROJECT_NAME}_SOURCES})
+    elseif(${PROJECT_NAME}_OPTIONS_CUI_APP_FOUND)
+        add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
+    elseif(${PROJECT_NAME}_OPTIONS_HEADER_LIBRARY_FOUND)
+        if(MSVC_IDE)
+            add_custom_target(${PROJECT_NAME} echo "${PROJECT_NAME} stub" SOURCES ${${PROJECT_NAME}_SOURCES})
+        endif()
+    else()
+        message(FATAL_ERROR "Unknown project type")
+    endif()
+
+    foreach(__additional_target ${${PROJECT_NAME}_${ADDITIONAL_TARGETS}})
+        add_dependencies(${PROJECT_NAME} ${__additional_target})
+    endforeach()
+
+    # Recources will be copied into binary directory
+    if(${PROJECT_NAME}_OPTIONS_RESOURCES_FOUND)
+        foreach (_intra_res_to_copy ${${PROJECT_NAME}_OPTIONS_RESOURCES})
+            ADD_CUSTOM_COMMAND(
+                TARGET
+                    ${PROJECT_NAME}
+                POST_BUILD
+                COMMAND
+                    ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/${_intra_res_to_copy}"
+                                                       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/${_intra_res_to_copy}")
+        endforeach()
+    endif()
+
+    # Add internal dependecies
+    if(${PROJECT_NAME}_OPTIONS_DEPENDS_FOUND)
+        target_link_libraries(${PROJECT_NAME} ${${PROJECT_NAME}_OPTIONS_DEPENDS})
+    endif()
+
+    # Add external dependencies
+    if (${PROJECT_NAME}_OPTIONS_EXTERNAL_DEPENDS_FOUND)
+        foreach(_infra_external_dependcy ${${PROJECT_NAME}_OPTIONS_EXTERNAL_DEPENDS})
+            TOOLS_APPEND_EXTERNAL(${PROJECT_NAME} ${_infra_external_dependcy})
+        endforeach()
+    endif()
+
+    # Put project to folder in solution
+    if(${PROJECT_NAME}_OPTIONS_SOLUTION_FOLDER_FOUND)
+        CMAKE_SET_TARGET_FOLDER(${PROJECT_NAME} ${${PROJECT_NAME}_OPTIONS_SOLUTION_FOLDER})
+    endif()
+endmacro(TOOLS_END_PROJECT)
+
+
+####################################################################################
+#                           External dependencies                                  #
+####################################################################################
+# Macroses for adding and description of external dependencies
+#
+# Describe external dependency in root's CMakeLists as follow:
+# TOOLS_DESCRIBE_EXTERNAL(
+#       NAME                                # Name of external dependency
+#       [INCLUDE_DIRS] [directories]        # Optional include directories
+#       [LINK_LIBRARIES] [libraries]        # Optional libraries to link to
+#       [COPY_FILES] [files]                # Optional file list to copy into bin directory.
+#                                           # Accepts 'optimized' and 'debug' keywords to separate debug and release artifacts
+#   )
+#
+# Add external dependency to project with option EXTERNAL_DEPENDS for example:
+#
+#TOOLS_PROJECT(MyProject CUI_APP
+#       EXTERNAL_DEPENDS my_dependency)
+#
+
+set(TOOLS_ALLOWED_EXTERNAL_DEPENDENCY_OPTION_NAMES INCLUDE_DIRS LINK_LIBRARIES COPY_FILES)
+set(TOOLS_ALLOWED_CMAKE_CONFIG_OPTIONS general optimized debug)
+
+function(TOOLS_DESCRIBE_EXTERNAL NAME)
+    set(EXTERNAL_DEPENDENCY_${NAME}_FOUND TRUE)
+    set(EXTERNAL_DEPENDENCY_${NAME}_FOUND TRUE PARENT_SCOPE)
+
+    TOOLS_PARSE_ARGUMENT_GROUPS(EXTERNAL_DEPENDENCY_${NAME} TOOLS_ALLOWED_EXTERNAL_DEPENDENCY_OPTION_NAMES ${ARGN})
+
+    message(STATUS "External dependency: " ${NAME})
+    message(STATUS " Dependency includes: " ${EXTERNAL_DEPENDENCY_${NAME}_INCLUDE_DIRS})
+    message(STATUS " Dependency links: " ${EXTERNAL_DEPENDENCY_${NAME}_LINK_LIBRARIES})
+endfunction(TOOLS_DESCRIBE_EXTERNAL)
+
+macro(TOOLS_APPEND_EXTERNAL PROJECT_NAME EXTERNAL_NAME)
+    if (NOT EXTERNAL_DEPENDENCY_${EXTERNAL_NAME}_FOUND)
+        message(FATAL_ERROR "You haven't described external dependency: ${EXTERNAL_NAME}")
+    endif()
+
+    if (EXTERNAL_DEPENDENCY_${EXTERNAL_NAME}_INCLUDE_DIRS_FOUND)
+        include_directories(${EXTERNAL_DEPENDENCY_${EXTERNAL_NAME}_INCLUDE_DIRS})
+    endif()
+
+    if (EXTERNAL_DEPENDENCY_${EXTERNAL_NAME}_LIBRARY_DIRS_FOUND)
+        # target_link_libraries(${PROJECT_EXTERNAL_NAME} ${${PROJECT_NAME}_OPTIONS_DEPENDS})
+    endif()
+
+    if (EXTERNAL_DEPENDENCY_${EXTERNAL_NAME}_LINK_LIBRARIES_FOUND)
+        target_link_libraries(${PROJECT_NAME} ${EXTERNAL_DEPENDENCY_${EXTERNAL_NAME}_LINK_LIBRARIES})
+    endif()
+
+    if (EXTERNAL_DEPENDENCY_${EXTERNAL_NAME}_COPY_FILES_FOUND)
+        TOOLS_PARSE_ARGUMENT_GROUPS(EXTERNAL_DEPENDENCY_${EXTERNAL_NAME}_COPY_FILES TOOLS_ALLOWED_CMAKE_CONFIG_OPTIONS general ${EXTERNAL_DEPENDENCY_${EXTERNAL_NAME}_COPY_FILES})
+
+        if (${EXTERNAL_DEPENDENCY_${EXTERNAL_NAME}_COPY_FILES_general_FOUND})
+            foreach(_file_to_copy ${EXTERNAL_DEPENDENCY_${EXTERNAL_NAME}_COPY_FILES_general})
+                add_custom_command(TARGET ${PROJECT_NAME}
+                    POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_file_to_copy}" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/."
+                )
+            endforeach()
+        endif()
+
+        if (${EXTERNAL_DEPENDENCY_${EXTERNAL_NAME}_COPY_FILES_debug_FOUND})
+            foreach(_file_to_copy ${EXTERNAL_DEPENDENCY_${EXTERNAL_NAME}_COPY_FILES_debug})
+                add_custom_command(TARGET ${PROJECT_NAME}
+                    POST_BUILD
+                    COMMAND
+                        ${CMAKE_COMMAND} -E
+                        $<$<CONFIG:debug>:copy_if_different>
+                        $<$<NOT:$<CONFIG:Debug>>:echo> $<$<NOT:$<CONFIG:Debug>>:"Skipping step for this configuration">
+                        "$<$<CONFIG:debug>:${_file_to_copy}>" $<$<CONFIG:debug>:"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/.">
+                )
+            endforeach()
+        endif()
+
+        if (${EXTERNAL_DEPENDENCY_${EXTERNAL_NAME}_COPY_FILES_optimized_FOUND})
+            foreach(_file_to_copy ${EXTERNAL_DEPENDENCY_${EXTERNAL_NAME}_COPY_FILES_optimized})
+                add_custom_command(TARGET ${PROJECT_NAME}
+                    POST_BUILD
+                        COMMAND
+                            ${CMAKE_COMMAND} -E
+                            $<$<NOT:$<CONFIG:Debug>>:copy_if_different>
+                            $<$<CONFIG:debug>:echo> $<$<CONFIG:debug>:"Skipping step for this configuration">
+                            "$<$<NOT:$<CONFIG:Debug>>:${_file_to_copy}>" "$<$<NOT:$<CONFIG:Debug>>:${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/.>"
+                )
+            endforeach()
+        endif()
+    endif()
+endmacro(TOOLS_APPEND_EXTERNAL)
+
+
+macro(TOOLS_RESOURCE_TO_CODE OUTPUT_DIRECTORY)
+    set(index 0)
+    while(TARGET FAKE_TARGET_${PROJECT_NAME}_${index})
+        MATH(EXPR index "${index}+1")
+    endwhile()
+
+    foreach(_file_to_generate ${ARGN})
+        set(FAKE_TARGET FAKE_TARGET_${PROJECT_NAME}_${index})
+        add_custom_target(${FAKE_TARGET}
+            python "${CMAKE_SOURCE_DIR}/res/res2code.py" -i "${_file_to_generate}" -d "${CMAKE_CURRENT_BINARY_DIR}/Generated/${OUTPUT_DIRECTORY}"
+        )
+
+        list(APPEND ${PROJECT_NAME}_${ADDITIONAL_TARGETS} "${FAKE_TARGET}")
+
+        get_filename_component(_filename_generated ${_file_to_generate} NAME)
+        string(REPLACE "-" "_" _filename_generated ${_filename_generated})
+        string(REPLACE "." "_" _filename_generated ${_filename_generated})
+        set(_filepath_generated_cpp "${CMAKE_CURRENT_BINARY_DIR}/Generated/${OUTPUT_DIRECTORY}/${_filename_generated}.cpp")
+        set(_filepath_generated_h "${CMAKE_CURRENT_BINARY_DIR}/Generated/${OUTPUT_DIRECTORY}/${_filename_generated}.h")
+        set_source_files_properties("${_filepath_generated_cpp}" PROPERTIES GENERATED TRUE)
+        set_source_files_properties("${_filepath_generated_h}" PROPERTIES GENERATED TRUE)
+        TOOLS_SOURCES("${_filepath_generated_cpp}" "${_filepath_generated_h}")
+
+        MATH(EXPR index "${index}+1")
+    endforeach()
+    include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+endmacro(TOOLS_RESOURCE_TO_CODE)

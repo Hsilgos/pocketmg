@@ -104,6 +104,8 @@ Image::SizeType correctScanline(Image::SizeType scanline, size_t align);
 bool toGray(const Image& src, Image& dst);
 bool toBgr(const Image& src, Image& dst);
 bool rgba2rgb(const Image& src, Image& dst);
+bool rgb2rgba(const Image& src, Image& dst);
+bool grey2rgba(const Image& src, Image& dst);
 
 bool copyRect(const img::Image& src, img::Image& dst, const utils::Rect& rect_to_copy);
 void copy(const img::Image& src, img::Image& dst);

@@ -5,9 +5,11 @@
 #include "mirror.h"
 #include "testBenchmark.h"
 #include "imgDecoderFactory.h"
-#include "win32/scoped_handle.h"
 
+#ifdef WIN32
+#include "win32/scoped_handle.h"
 #include <Windows.h>
+#endif
 #include <iomanip>
 
 // 1 bit per pixel
@@ -106,15 +108,15 @@
 #include "Generated/bmp/valid/565_320x240_bmp.h"
 #include "Generated/bmp/valid/565_320x240_tmpl_bmp.h"
 #include "Generated/bmp/valid/565_320x240_topdown_bmp.h"
-#include "Generated/bmp/valid/565_320x240_topdown_tmpl_bmp.h"
+// #include "Generated/bmp/valid/565_320x240_topdown_tmpl_bmp.h"
 #include "Generated/bmp/valid/565_321x240_bmp.h"
 #include "Generated/bmp/valid/565_321x240_tmpl_bmp.h"
 #include "Generated/bmp/valid/565_321x240_topdown_bmp.h"
-#include "Generated/bmp/valid/565_321x240_topdown_tmpl_bmp.h"
+// #include "Generated/bmp/valid/565_321x240_topdown_tmpl_bmp.h"
 #include "Generated/bmp/valid/565_322x240_bmp.h"
 #include "Generated/bmp/valid/565_322x240_tmpl_bmp.h"
 #include "Generated/bmp/valid/565_322x240_topdown_bmp.h"
-#include "Generated/bmp/valid/565_322x240_topdown_tmpl_bmp.h"
+// #include "Generated/bmp/valid/565_322x240_topdown_tmpl_bmp.h"
 #include "Generated/bmp/valid/1555_199x203_bmp.h"
 #include "Generated/bmp/valid/1555_199x203_tmpl_bmp.h"
 #include "Generated/bmp/valid/1555_199x203_topdown_bmp.h"

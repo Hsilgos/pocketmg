@@ -141,7 +141,6 @@ public:
 
   // All about current image
   img::Image currentImage() const;
-  PathToFile currentPath() const;
   bool hasCurrentImage() const;
   IBookCache* currentCache() const;
 

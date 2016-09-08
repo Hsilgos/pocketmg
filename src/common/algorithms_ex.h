@@ -6,6 +6,7 @@
 #include <vector>
 #include <deque>
 #include <list>
+#include <istream>
 
 namespace utils {
 template<class Collect, class Type>

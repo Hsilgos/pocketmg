@@ -7,7 +7,7 @@
 
 namespace {
 template<class InputIterator, class T>
-T accumulate(InputIterator first, InputIterator last, T init) {
+T accumulate2(InputIterator first, InputIterator last, T init) {
   while (first != last)
     init = init + *first++;  // or: init=binary_op(init,*first++) for the binary_op version
   return init;
@@ -89,7 +89,7 @@ void Report::printTable(std::ostream& out) {
     first_column_size = std::max(first_column_size, it->size());
 
 
-  const size_t head_sep_len = accumulate(widths.begin(), widths.end(), 0) + widths.size() + 1;
+  const size_t head_sep_len = accumulate2(widths.begin(), widths.end(), 0) + widths.size() + 1;
   const std::string head_indent(first_column_size + 1, ' ');
   const std::string head_row_sep(head_sep_len, '-');
 

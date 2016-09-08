@@ -1,0 +1,55 @@
+TOOLS_BEGIN_PROJECT(common LIBRARY)
+
+TOOLS_SOURCES(
+	algorithms_ex.h
+	book.cpp
+	book.h
+	byteArray.cpp
+	byteArray.h
+	cacheScaler.cpp
+	cacheScaler.h
+	color.cpp
+	color.h
+	debugUtils.h
+	decodeMode.h
+	defines.cpp
+	defines.h
+	factory.h
+	filemanager.cpp
+	filemanager.h
+	filemanager_linux.cpp
+	filemanager_win32.cpp
+	filepath.cpp
+	filepath.h
+	forbid_copy_assign.h
+	iArchive.cpp
+	iArchive.h
+	iDecoder.h
+	image.cpp
+	image.h
+	imgDecoder.cpp
+	imgDecoder.h
+	imgDecoderFactory.cpp
+	imgDecoderFactory.h
+	ioapi.c
+	ioapi.h
+	jpegDecoder.cpp
+	mirror.cpp
+	mirror.h
+	primitives.cpp
+	primitives.h
+	rotate.cpp
+	rotate.h
+	scale.cpp
+	scale.h
+	singleton.h
+	static_assert.h
+	test_support.h
+	unzip.c
+	unzip.h
+	zipArchive.cpp
+	zipArchive.h
+)
+
+
+TOOLS_END_PROJECT()

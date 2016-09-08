@@ -10,41 +10,51 @@
 #include "static_assert.h"
 
 #include <cassert>
+#include <cmath>
+#include <exception>
 #include <iostream>
+
+#if 1
+namespace std {
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+typedef int int32_t;
+} //namespace std
+#endif
 
 namespace {
 #pragma pack(push,2)
 
 struct BitmapFileHeader {
-  unsigned short type;
-  unsigned long size;
-  unsigned short reserved1;
-  unsigned short reserved2;
-  unsigned long offBits;
+  std::uint16_t type;
+  std::uint32_t size;
+  std::uint16_t reserved1;
+  std::uint16_t reserved2;
+  std::uint32_t offBits;
 };
 
 #pragma pack(pop)
 
 
 struct BitmapInfoHeader {
-  unsigned long size;
-  long width;
-  long height;
-  unsigned short planes;
-  unsigned short bitCount;
-  unsigned long compression;
-  unsigned long sizeImage;
-  long xPelsPerMeter;
-  long yPelsPerMeter;
-  unsigned long clrUsed;
-  unsigned long clrImportant;
+  std::uint32_t size;
+  std::int32_t width;
+  std::int32_t height;
+  std::uint16_t planes;
+  std::uint16_t bitCount;
+  std::uint32_t compression;
+  std::uint32_t sizeImage;
+  std::int32_t xPelsPerMeter;
+  std::int32_t yPelsPerMeter;
+  std::uint32_t clrUsed;
+  std::uint32_t clrImportant;
 };
 
 struct BitmapInfoHeaderV3Unique {
-  unsigned long mask_red;
-  unsigned long mask_green;
-  unsigned long mask_blue;
-  unsigned long mask_alpha;
+  std::uint32_t mask_red;
+  std::uint32_t mask_green;
+  std::uint32_t mask_blue;
+  std::uint32_t mask_alpha;
 };
 
 struct BitmapInfoHeaderV3 {
@@ -53,9 +63,9 @@ struct BitmapInfoHeaderV3 {
 };
 
 struct CIEXYZ {
-  long ciexyz_x;
-  long ciexyz_y;
-  long ciexyz_z;
+  std::int32_t ciexyz_x;
+  std::int32_t ciexyz_y;
+  std::int32_t ciexyz_z;
 };
 
 struct CIEXYZTRIPLE {
@@ -65,11 +75,11 @@ struct CIEXYZTRIPLE {
 };
 
 struct BitmapInfoHeaderV4Unique {
-  unsigned long type;
+  std::uint32_t type;
   CIEXYZTRIPLE endpoints;
-  unsigned long gamma_red;
-  unsigned long gamma_green;
-  unsigned long gamma_blue;
+  std::uint32_t gamma_red;
+  std::uint32_t gamma_green;
+  std::uint32_t gamma_blue;
 };
 
 struct BitmapInfoHeaderV4 {
@@ -79,10 +89,10 @@ struct BitmapInfoHeaderV4 {
 };
 
 struct BitmapInfoHeaderV5Unique {
-  unsigned long intent;
-  unsigned long profile_data;
-  unsigned long profile_size;
-  unsigned long reserved;
+  std::uint32_t intent;
+  std::uint32_t profile_data;
+  std::uint32_t profile_size;
+  std::uint32_t reserved;
 };
 
 struct BitmapInfoHeaderV5 {
@@ -96,7 +106,7 @@ static const unsigned short BmpType = 0x4d42; // 'MB'
 
 class PalleteError : public std::exception {
 public:
-  PalleteError() : std::exception("") {}
+  PalleteError() : std::exception() {}
 };
 
 struct Palette {
@@ -109,14 +119,13 @@ struct Palette {
       return &data[real_idx];
 
     throw PalleteError();
-    //return 0;
   }
 
   Palette(const unsigned char* data, unsigned int size)
     : data(data), size(size) {}
 
 private:
-  FORBID_ASSIGN(Palette);
+  FORBID_ASSIGN(Palette)
 };
 
 enum Compreesion {
@@ -137,7 +146,7 @@ public:
   };
 
   HeaderParser(const tools::ByteArray& encoded)
-    : encoded_(encoded), parsed_successfully_(false), file_header_(nullptr), header_version_(Undefined), file_info_basic_header_(nullptr), palette_begin_(0), palette_size_(0) {
+    : encoded_(encoded), parsed_successfully_(false), file_header_(NULL), header_version_(Undefined), file_info_basic_header_(NULL), palette_begin_(0), palette_size_(0) {
     STATIC_ASSERT((sizeof(BitmapFileHeader) == 14), Header_size_mismatch);
     STATIC_ASSERT((sizeof(BitmapInfoHeader) == 40), Info_size_mismatch);
     STATIC_ASSERT((sizeof(BitmapInfoHeaderV3) == 56), Info_size_mismatch_version_3);
@@ -230,7 +239,7 @@ public:
     return file_info_basic_header_->v1.bitCount;
   }
 
-  unsigned long compression() const {
+  std::uint32_t compression() const {
     return file_info_basic_header_->v1.compression;
   }
 
@@ -238,7 +247,7 @@ public:
     return header_version_;
   }
 
-  unsigned short mask_impl(unsigned long BitmapInfoHeaderV3Unique::*field) const {
+  unsigned short mask_impl(std::uint32_t BitmapInfoHeaderV3Unique::*field) const {
     return header_version() >= V3
         ? static_cast<unsigned short>(file_info_basic_header_->v3.*field)
         : 0;
@@ -265,7 +274,7 @@ private:
   HeaderParser& operator =(const HeaderParser&);
 
   HeaderVersion parse_version(const tools::ByteArray& encoded) {
-    unsigned long header_size = 0;
+    std::uint32_t header_size = 0;
     if (!fromByteArray(encoded, sizeof(BitmapFileHeader), header_size))
       return Undefined;
 
@@ -318,7 +327,7 @@ private:
 
 class DestinationIsFull : public std::exception {
 public:
-  DestinationIsFull() : std::exception("") {}
+  DestinationIsFull() : std::exception() {}
 };
 
 namespace {
@@ -374,8 +383,7 @@ public:
     if (IsReversed) {
       destination_iterator_ -= delta_offset_total;
       destination_line_begin_ -= delta_offset_lines;
-    }
-    else {
+    } else {
       destination_iterator_ += delta_offset_total;
       destination_line_begin_ += delta_offset_lines;
     }
@@ -400,6 +408,7 @@ private:
     if (it < destination_line_begin_ || it >= destination_end_)
       throw DestinationIsFull();
   }
+
   DestinationIterator (const DestinationIterator&);
   DestinationIterator& operator = (const DestinationIterator&);
 
@@ -530,17 +539,17 @@ enum DecryptAlgorythm {
 struct LoadImageData {
   LoadImageData(const utils::Size& size_in,
                 const unsigned char* src_begin_in,
-                unsigned long data_size_in,
+                std::uint32_t data_size_in,
                 const Palette& pallete_in,
                 const bool is_reversed_in,
-                unsigned int dst_byte_per_pixel_in,
+                img::DecodeMode decode_mode,
                 size_t align_in)
       : decrypt_algorythm(DAUnknown),
         size(size_in),
         src_begin(src_begin_in),
         data_size(data_size_in),
         pallete(pallete_in),
-        dst_byte_per_pixel(dst_byte_per_pixel_in),
+        decode_mode_(decode_mode),
         align(align_in),
         is_reversed(is_reversed_in),
         mask_red(0),
@@ -552,9 +561,9 @@ struct LoadImageData {
   DecryptAlgorythm decrypt_algorythm;
   utils::Size size;
   const unsigned char* src_begin;
-  unsigned long data_size;
+  std::uint32_t data_size;
   Palette pallete;
-  unsigned int dst_byte_per_pixel;
+  img::DecodeMode decode_mode_;
   const size_t align;
   const bool is_reversed;
 
@@ -856,7 +865,7 @@ struct RLEBase {
 
     SourceIterator<1> src_it(data.src_begin, data.data_size, 0);
 
-    typedef RleLoader<DstBytePerPixel, IsReversed> RleLoader;
+    typedef RleLoader<DstBytePerPixel, IsReversed> RleLoaderType;
 
     while (!src_it.isEnd()) {
       const unsigned char current_byte = *src_it++;
@@ -864,7 +873,7 @@ struct RLEBase {
         return false;
 
       if (current_byte > 0) {
-        if (!RleLoader::Encoded(current_byte, src_it, dst_it, data.pallete))
+        if (!RleLoaderType::Encoded(current_byte, src_it, dst_it, data.pallete))
           return false;
       } else {
         unsigned char command_byte = *src_it++;
@@ -886,7 +895,7 @@ struct RLEBase {
           }
           break;
         default:
-          if (!RleLoader::Absolute(command_byte, src_it, dst_it, data.pallete))
+          if (!RleLoaderType::Absolute(command_byte, src_it, dst_it, data.pallete))
             return false;
           break;
         }
@@ -995,29 +1004,29 @@ struct RLE4 : public RLEBase<Rle4Loader, DstBytePerPixel, IsReversed> {
 };
 
 typedef bool (*LoadFunction)(img::Image& decoded, const LoadImageData& data);
-const unsigned int MaxDestinationBytePerPixel = 5;
+const unsigned int MaxDestinationDecodeMode = img::DecodeAsIs;
 const unsigned int MaxSourceBytePerPixel = 5;
 const unsigned int BoolValuesCount = 2;
 
 struct AlgorithmTable {
   AlgorithmTable() {
-    for (int i = 0; i < MaxDestinationBytePerPixel; ++i)
+    for (int i = 0; i < MaxDestinationDecodeMode; ++i)
       for (int j = 0; j < BoolValuesCount; ++j)
         table[i][j] = 0;
   }
-  LoadFunction table[MaxDestinationBytePerPixel][BoolValuesCount];
+  LoadFunction table[MaxDestinationDecodeMode][BoolValuesCount];
 };
 
 template<template<int DstBytePerPixel, bool IsReversed> class Algorithm>
 AlgorithmTable FillAlgorithmTable() {
   AlgorithmTable result;
 
-  result.table[1][0] = &Algorithm<1, false>::load;
-  result.table[1][1] = &Algorithm<1, true>::load;
-  result.table[3][0] = &Algorithm<3, false>::load;
-  result.table[3][1] = &Algorithm<3, true>::load;
-  result.table[4][0] = &Algorithm<4, false>::load;
-  result.table[4][1] = &Algorithm<4, true>::load;
+  result.table[img::DecodeIntoGray][0] = &Algorithm<1, false>::load;
+  result.table[img::DecodeIntoGray][1] = &Algorithm<1, true>::load;
+  result.table[img::DecodeIntoRgb][0] = &Algorithm<3, false>::load;
+  result.table[img::DecodeIntoRgb][1] = &Algorithm<3, true>::load;
+  result.table[img::DecodeIntoRgba][0] = &Algorithm<4, false>::load;
+  result.table[img::DecodeIntoRgba][1] = &Algorithm<4, true>::load;
 
   return result;
 }
@@ -1043,7 +1052,7 @@ LoadFunction GetLoadFunctionFor(const LoadImageData& data) {
   static const AllAlgorythms all_algorythms;
   if (data.decrypt_algorythm >= DAMono && data.decrypt_algorythm < DAUnknown)
     return all_algorythms.algorythms[data.decrypt_algorythm]
-        .table[data.dst_byte_per_pixel][data.is_reversed ? 1 : 0];
+        .table[data.decode_mode_][data.is_reversed ? 1 : 0];
 
   return NULL;
 }
@@ -1070,15 +1079,14 @@ public:
     const unsigned char* data_begin = header.data_begin();
     const unsigned int data_size = header.data_size();
     const unsigned int image_size_in_byte = header.image_size_in_byte();
-    LoadImageData data(image_size, data_begin, image_size_in_byte, palette, is_reversed, getDesiredBytePerPixel(), getAlignment());
+    LoadImageData data(image_size, data_begin, image_size_in_byte, palette, is_reversed, getDecodeMode(), getAlignment());
     if (data_size != image_size_in_byte)
       return data;
 
-    unsigned int dst_byte_per_pixel_best = 0;
+    img::DecodeMode decode_mode_best = img::DecodeIntoRgb;
     switch (header.bit_count()) {
     case 1:
       data.decrypt_algorythm = DAMono;
-      dst_byte_per_pixel_best = 3;
       break;
     case 4:
       if (header.compression() == NoCompression) {
@@ -1086,7 +1094,6 @@ public:
       } else {
         data.decrypt_algorythm = DA16ColorsRLE4;
       }
-      dst_byte_per_pixel_best = 3;
 
       break;
     case 8:
@@ -1095,7 +1102,6 @@ public:
       } else {
         data.decrypt_algorythm = DA256ColorsRLE8;
       }
-      dst_byte_per_pixel_best = 3;
 
       break;
     case 16: {
@@ -1121,11 +1127,9 @@ public:
       }
 
       if (0 != data.mask_alpha) {
-        dst_byte_per_pixel_best = 4;
+        decode_mode_best = img::DecodeIntoRgba;
         data.decrypt_algorythm = DA16BitsWithAlpha;
-      }
-      else {
-        dst_byte_per_pixel_best = 3;
+      } else {
         data.decrypt_algorythm = DA16BitsNoAlpha;
       }
 
@@ -1134,7 +1138,6 @@ public:
 
     case 24:
       data.decrypt_algorythm = DA24Bits;
-      dst_byte_per_pixel_best = 3;
       break;
 
     case 32:
@@ -1143,15 +1146,15 @@ public:
       } else {
         data.decrypt_algorythm = DA32Bits;
       }
-      dst_byte_per_pixel_best = 4;
+      decode_mode_best = img::DecodeIntoRgba;
       break;
 
     default:
       return data;
     }
 
-    if (0 == data.dst_byte_per_pixel)
-      data.dst_byte_per_pixel = dst_byte_per_pixel_best;
+    if (img::DecodeAsIs == data.decode_mode_)
+      data.decode_mode_ = decode_mode_best;
 
     return data;
   }

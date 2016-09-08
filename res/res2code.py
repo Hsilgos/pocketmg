@@ -125,7 +125,7 @@ if __name__ == "__main__":
   output_cpp = args.output + ".cpp"
 
   do_generate = False
-  input_timestamp = os.path.getmtime(input_filename)
+  input_timestamp = os.path.getmtime(args.input)
   try:
     output_timestamp_h = os.path.getmtime(output_h)
     output_timestamp_cpp = os.path.getmtime(output_cpp)

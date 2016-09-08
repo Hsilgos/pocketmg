@@ -6,7 +6,7 @@
 #include "imgDecoder.h"
 
 namespace img {
-DecoderFactory::DecoderFactory() : align_(1), byte_per_pixel_(0) {
+DecoderFactory::DecoderFactory() : align_(1), decode_mode_(DecodeAsIs) {
 }
 
 void DecoderFactory::registerDecoder(img::IDecoder* decoder) {
@@ -19,7 +19,7 @@ void DecoderFactory::registerDecoder(img::IDecoder* decoder) {
 
     decoders_list_.push_back(decoder);
     decoder->setAlignment(align_);
-    decoder->setDesiredBytePerPixel(byte_per_pixel_);
+    decoder->setDecodeMode(decode_mode_);
   }
 }
 
@@ -31,11 +31,11 @@ void DecoderFactory::setAlignment(size_t align) {
   }
 }
 
-void DecoderFactory::setDesiredBytePerPixel(unsigned int byte_per_pixel) {
-  byte_per_pixel_ = byte_per_pixel;
+void DecoderFactory::setDecodeMode(DecodeMode mode) {
+  decode_mode_ = mode;
   DecodersMap::const_iterator it = decoders_map_.begin(), itEnd = decoders_map_.end();
   for (; it != itEnd; ++it) {
-    it->second->setDesiredBytePerPixel(byte_per_pixel_);
+    it->second->setDecodeMode(decode_mode_);
   }
 }
 

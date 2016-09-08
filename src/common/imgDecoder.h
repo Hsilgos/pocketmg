@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 
+#include "decodeMode.h"
+
 namespace tools {
 class ByteArray;
 }
@@ -19,12 +21,13 @@ public:
   virtual bool decode(const tools::ByteArray& encoded, img::Image& decoded) = 0;
 
   void setAlignment(size_t align);
-  void setDesiredBytePerPixel(unsigned int byte_per_pixel);
   size_t getAlignment() const;
-  unsigned int getDesiredBytePerPixel() const;
+
+  void setDecodeMode(DecodeMode mode);
+  DecodeMode getDecodeMode() const;
 
 private:
   size_t align_;
-  unsigned int byte_per_pixel_;
+  DecodeMode decode_mode_;
 };
 }

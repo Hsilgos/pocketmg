@@ -1,22 +1,22 @@
 // pocketmanga.cpp : Defines the entry point for the console application.
 //
 
-#include <Windows.h>
 #include <iostream>
+#include <memory>
 #include <functional>
 
-#include "src/filepath.h"
-#include "src/filemanager.h"
-#include "src/image.h"
-#include "src/book.h"
-#include "src/mirror.h"
-#include "src/scale.h"
-#include "src/rotate.h"
-#include "src/defines.h"
-#include "src/cacheScaler.h"
-#include "src/win32/scoped_handle.h"
-#include "src/imgDecoderFactory.h"
+#include "common/filepath.h"
+#include "common/filemanager.h"
+#include "common/image.h"
+#include "common/book.h"
+#include "common/mirror.h"
+#include "common/scale.h"
+#include "common/rotate.h"
+#include "common/defines.h"
+#include "common/cacheScaler.h"
+#include "common/imgDecoderFactory.h"
 
+#if 0
 HINSTANCE hInst;                                                                // current instance
 const wchar_t szTitle[] = L"PocketManga";                                       // The title bar text
 const wchar_t szWindowClass[] = L"PocketMangaWindow";                   // the main window class name
@@ -61,7 +61,7 @@ BOOL InitInstance(HINSTANCE hInstance) {
   return TRUE;
 }
 
-manga::Book book_;
+
 img::Image current_image_;
 ScopedHandle<HBITMAP> bitmap_;
 
@@ -166,6 +166,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 int main() {
   //book_.setRoot(fs::FilePath("i:\\tmp", false));
   img::DecoderFactory::getInstance().setAlignment(sizeof(DWORD));
+  //img::DecoderFactory::getInstance().setDesiredBytePerPixel(1);
   book_.setRoot(fs::FilePath("e:/pocketbook/pocketmanga/test/resources", false));
   //manga::CacheScaler* scaler = new manga::CacheScaler(600, 800);
   //book_.setCachePrototype(scaler);
@@ -187,102 +188,112 @@ int main() {
 
   return (int)msg.wParam;
 }
+#else
 
-/*#include <opencv2/opencv.hpp>
+#include     <stdio.h>
+#include     <stdlib.h>
+#include     <string.h>
+#include     <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xos.h>
 
-   cv::Mat to_cv(const img::Image &img) {
-   img::Image rotated = img::rotate(img, img::Angle_90);
+inline void DoDestryImage(XImage* image)
+{
+    XDestroyImage(image);
+}
 
-   cv::Mat mat1;
-   mat1.create(rotated.height(), rotated.width(), CV_MAKETYPE(CV_8U, rotated.depth()));
-   memcpy(mat1.data, rotated.data(), rotated.height() * rotated.width() * rotated.depth());
+std::unique_ptr<XImage, void(*)(XImage*)> CreateTrueColorImage(img::Image& image, Display *display, Visual *visual)
+{
+    char* data = reinterpret_cast<char*>(malloc(dataSize(image)));
+    memcpy(data, image.data(), dataSize(image));
 
-   return mat1;
-   }
+    XImage* ptr = XCreateImage(display, visual, 24, ZPixmap, 0, data, image.width(), image.height(), 32, image.scanline(true));
 
-   cv::Mat to_cv(manga::CacheScaler::Cache &cache) {
-   if( cache.representation == manga::CacheScaler::Parts3 ) {
-    img::Image dst;
-    utils::Rect bounds = cache.bounds;
+    return std::unique_ptr<XImage, void(*)(XImage*)>(ptr, DoDestryImage);
+}
 
-    if(1 == cache.currentShowing)
-      bounds.x = (cache.image.width() - bounds.width) / 2;
-    else if(2 == cache.currentShowing)
-      bounds.x = cache.image.width() - bounds.width;
+img::Image new_image;
+img::Image current_image;
+std::unique_ptr<XImage, void(*)(XImage*)> current_ximage(nullptr, DoDestryImage);
+manga::Book book;
 
-    copyRect(cache.image, dst, bounds);
+void UpdateCurrentImage(Display *display)
+{
+    current_image = book.currentImage();
+    if (current_image.depth() == 4)
+    {
+        new_image = current_image;
+    }
+    else if (current_image.depth() == 3)
+    {
+        img::rgb2rgba(current_image, new_image);
+    }
+    else if (current_image.depth() == 1)
+    {
+        img::grey2rgba(current_image, new_image);
+    }
+    img::mirror(new_image, new_image, img::UpsideDown);
+    current_ximage = CreateTrueColorImage(new_image, display, DefaultVisual(display, 0));
+}
 
-    cache.currentShowing++;
+void processEvent(Display *display, Window window)
+{
+    static char *tir="This is red";
+    static char *tig="This is green";
+    static char *tib="This is blue";
+    XEvent ev;
+    XNextEvent(display, &ev);
+    switch(ev.type)
+    {
+    case Expose:
+        XPutImage(display, window, DefaultGC(display, 0), current_ximage.get(), 0, 0, 0, 0, current_image.width(), current_image.height());
+        XSetForeground(display, DefaultGC(display, 0), 0x00ff0000); // red
+        XDrawString(display, window, DefaultGC(display, 0), 0, current_image.height() + 20, book.bookmark().currentFile.filePath.getFileName().c_str(), book.bookmark().currentFile.filePath.getFileName().size());
+        break;
+    case KeyPress:
+        KeySym const key_sum = XLookupKeysym(&ev.xkey, 0);
+        if (key_sum == XK_Right)//XK_Right  - 114
+            book.incrementPosition();
+        else if (key_sum == XK_Left)//XK_Left
+            book.decrementPosition();
 
-    return to_cv(dst);
-   } else {
-    return to_cv(cache.image);
-   }
-   }
-   /*int main() {
-   manga::Book book;
+        UpdateCurrentImage(display);
+        XWindowAttributes attributes;
+        XGetWindowAttributes(display, window, &attributes);
+        XClearArea(display, window, 0, 0, attributes.width, attributes.height, false);
+        XPutImage(display, window, DefaultGC(display, 0), current_ximage.get(), 0, 0, 0, 0, current_image.width(), current_image.height());
 
-   book.setRoot(fs::FilePath("i:\\tmp", false));
-   manga::CacheScaler* scaler = new manga::CacheScaler(600, 800);
-   book.setCachePrototype(scaler);
+        XDrawString(display, window, DefaultGC(display, 0), 0, current_image.height() + 20, book.bookmark().currentFile.filePath.getFileName().c_str(), book.bookmark().currentFile.filePath.getFileName().size());
+    }
+}
 
-   img::Image img;
+int main(int argc, char **argv)
+{
+    img::DecoderFactory::getInstance().setDecodeMode(img::DecodeIntoRgba);
 
-   img::Image img2;
-   img2.enableMinimumReallocations(true);
+    book.setRoot(fs::FilePath("/home/hsilgos/Dropbox/Projects/pocketmanga/test/resources/valid", false));
+    book.incrementPosition();
 
-   img::Image img3;
-   img3.enableMinimumReallocations(true);
+    current_image = book.currentImage();
 
-   while (book.incrementPosition()) {
-    //img = book.currentImage();
-    //toBgr(img, img);
-    //img.copyTo(img2);
-    //cv::Mat cv = to_cv(img);
-    //toGray(img, img);
+    //int width=512, height=512;
+    Display *display=XOpenDisplay(NULL);
+    Visual *visual=DefaultVisual(display, 0);
+    Window window=XCreateSimpleWindow(display, RootWindow(display, 0), 0, 0, 800, 600, 1, 0, 0);
+    if(visual->c_class!=TrueColor)
+    {
+        fprintf(stderr, "Cannot handle non true color visual ...\n");
+        exit(1);
+    }
 
-    //img::copyRect(img, img, utils::Rect(0, 0, 400, 400));
+    UpdateCurrentImage(display);
 
-    //img = img::scale(img, img::HighScaling, 600, 0);
+    XSelectInput(display, window, ButtonPressMask|ExposureMask|KeyPressMask);
+    XMapWindow(display, window);
+    while(1)
+    {
+        processEvent(display, window);
+    }
+}
 
-    //img = img::rotate(img, img::Angle_90);
-
-    //cv::imshow("ololo1", to_cv(img));
-    /*cv::imshow("ololo1", to_cv(scaler->scaledGrey()));
-
-       book.preload();
-
-       if( scaler->scaledGrey().representation == manga::CacheScaler::Parts3) {
-       cv::waitKey(2000);
-       cv::imshow("ololo1", to_cv(scaler->scaledGrey()));
-       cv::waitKey(3000);
-       cv::imshow("ololo1", to_cv(scaler->scaledGrey()));
-       }*/
-//cv::Mat to_cv(img2)
-//cv::imshow("ololo2", mat2);
-//cv::imshow("ololo2", mat2);
-//cv::imshow("ololo2", mat2);
-
-/*cv::waitKey(3000);*/
-
-
-/*}
-
-
-   return 0;
-
-
-   /* fs::IFileManager *mgr = fs::IFileManager::create();
-   std::vector<fs::FilePath> list = mgr->getFileList("i:\\books\\Prison School\\Том 01", fs::IFileManager::Directory, true);
-
-   fs::sort(list, fs::FirstWordThenNumbers);
-   //fs::sort(list, fs::JustNumbers);
-
-   std::vector<fs::FilePath>::iterator it = list.begin(), itEnd = list.end();
-   for ( ; it != itEnd; ++it )
-   {
-   std::cout << it->getPath() << std::endl;
-   }
-
-   return 0;*/
-//}
+#endif

@@ -1,5 +1,4 @@
 #include "testUtils.h"
-//#include "strdef.h"
 
 #include <iostream>
 
@@ -8,6 +7,8 @@
 # include <crtdbg.h>
 # include <sstream>
 #endif
+
+#include "defines.h"
 
 namespace utils {
 #ifdef WIN32

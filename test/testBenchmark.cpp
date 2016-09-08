@@ -58,7 +58,7 @@ public:
 #else
 
 namespace {
-class HighTime {}
+class HighTime {};
 }
 
 #endif
@@ -117,7 +117,7 @@ struct TestBenchmark::Private {
   std::auto_ptr<IBenchmarkOutput> output;
 };
 
-void TestBenchmark::init(IBenchmarkOutput& output, int count) {
+void TestBenchmark::init(IBenchmarkOutput const& output, int count) {
   private_ = new Private;
 
   private_->hightTiming = initHighTiming();
@@ -134,10 +134,11 @@ void TestBenchmark::resetTimer() {
 }
 
 TestBenchmark::TestBenchmark(const char* name, int count) {
-  init(Printout(name), count);
+  Printout printout(name);
+  init(printout, count);
 }
 
-TestBenchmark::TestBenchmark(IBenchmarkOutput& output, int count) {
+TestBenchmark::TestBenchmark(IBenchmarkOutput const& output, int count) {
   init(output, count);
 }
 

@@ -27,7 +27,7 @@ struct MemPngSrc {
 
 private:
   MemPngSrc(const MemPngSrc&);
-  MemPngSrc operator=(const MemPngSrc&);
+  MemPngSrc operator = (const MemPngSrc&);
 };
 
 void ReadDataFromMemory(png_structp png_ptr, png_bytep outBytes, png_size_t byteCountToRead) {
@@ -37,8 +37,8 @@ void ReadDataFromMemory(png_structp png_ptr, png_bytep outBytes, png_size_t byte
 
   // using spark::InputStream
   // -> replace with your own data source interface
-  const tools::ByteArray& array    = static_cast<MemPngSrc*>(io_ptr)->array;
-  tools::ByteArray::SizeType& seek   = static_cast<MemPngSrc*>(io_ptr)->seek;
+  const tools::ByteArray& array = static_cast<MemPngSrc*>(io_ptr)->array;
+  tools::ByteArray::SizeType& seek = static_cast<MemPngSrc*>(io_ptr)->seek;
   tools::ByteArray::SizeType still_in_array = array.getLength() - seek;
 
   if (still_in_array < byteCountToRead)
@@ -168,10 +168,12 @@ class PngDecoder : public IDecoder {
 
       const unsigned int scanline = decoded.scanline(true);
 
-      png.row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * height);
-      unsigned char* data = decoded.data();
-      for (unsigned int y = 0; y < height; ++y)
-        png.row_pointers[y] = &(data[y * scanline]);
+      png.row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * height);
+      unsigned char* data = decoded.data() + (height - 1) * scanline;
+      for (unsigned int y = 0; y < height; ++y) {
+        png.row_pointers[y] = data;
+        data -= scanline;
+      }
 
       png_read_image(png.png_ptr, png.row_pointers);
       png_read_end(png.png_ptr, NULL);

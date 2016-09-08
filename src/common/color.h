@@ -284,7 +284,7 @@ struct Color3Tmpl : public ColorBase<Color1, Color2, Color3, NoChannel, Channel[
 
   template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
   ThisType operator =(const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType>& other) {
-    apply(other);
+    BaseType::apply(other);
     return *this;
   }
 };
@@ -338,7 +338,7 @@ struct Color3RefTmpl : public ColorBase<Color1, Color2, Color3, NoChannel, Chann
   template<int OtherColor1, int OtherColor2, int OtherColor3, int OtherColor4, class OtherChannelsType>
   ThisType operator =(const ColorBase<OtherColor1, OtherColor2, OtherColor3, OtherColor4, OtherChannelsType>& other) {
     Color3Tmpl<OtherColor1, OtherColor2, OtherColor3> copy = other;
-    apply(copy);
+    BaseType::apply(copy);
 
     return *this;
   }
