@@ -2,7 +2,7 @@
 
 #include "byteArray.h"
 #include "filepath.h"
-#include "imgDecoderFactory.h"
+#include "common/decoders/imgDecoderFactory.h"
 #include "defines.h"
 
 #include <stdexcept>

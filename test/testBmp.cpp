@@ -1,225 +1,18 @@
+#include <fstream>
+
 #include <boost/test/unit_test.hpp>
 
 #include "byteArray.h"
 #include "image.h"
 #include "mirror.h"
 #include "testBenchmark.h"
-#include "imgDecoderFactory.h"
+#include "common/decoders/imgDecoderFactory.h"
 
 #ifdef WIN32
 #include "win32/scoped_handle.h"
 #include <Windows.h>
 #endif
 #include <iomanip>
-
-// 1 bit per pixel
-#include "Generated/bmp/valid/1bpp_1x1_bmp.h"
-#include "Generated/bmp/valid/1bpp_1x1_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_320x240_bmp.h"
-#include "Generated/bmp/valid/1bpp_320x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_320x240_color_bmp.h"
-#include "Generated/bmp/valid/1bpp_320x240_color_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_320x240_overlappingcolor_bmp.h"
-#include "Generated/bmp/valid/1bpp_320x240_overlappingcolor_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_321x240_bmp.h"
-#include "Generated/bmp/valid/1bpp_321x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_322x240_bmp.h"
-#include "Generated/bmp/valid/1bpp_322x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_323x240_bmp.h"
-#include "Generated/bmp/valid/1bpp_323x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_324x240_bmp.h"
-#include "Generated/bmp/valid/1bpp_324x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_325x240_bmp.h"
-#include "Generated/bmp/valid/1bpp_325x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_326x240_bmp.h"
-#include "Generated/bmp/valid/1bpp_326x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_327x240_bmp.h"
-#include "Generated/bmp/valid/1bpp_327x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_328x240_bmp.h"
-#include "Generated/bmp/valid/1bpp_328x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_329x240_bmp.h"
-#include "Generated/bmp/valid/1bpp_329x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_330x240_bmp.h"
-#include "Generated/bmp/valid/1bpp_330x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_331x240_bmp.h"
-#include "Generated/bmp/valid/1bpp_331x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_332x240_bmp.h"
-#include "Generated/bmp/valid/1bpp_332x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_333x240_bmp.h"
-#include "Generated/bmp/valid/1bpp_333x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_334x240_bmp.h"
-#include "Generated/bmp/valid/1bpp_334x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_335x240_bmp.h"
-#include "Generated/bmp/valid/1bpp_335x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/1bpp_topdown_320x240_bmp.h"
-
-// 4 bit per pixel
-#include "Generated/bmp/valid/4bpp_1x1_bmp.h"
-#include "Generated/bmp/valid/4bpp_1x1_tmpl_bmp.h"
-#include "Generated/bmp/valid/4bpp_320x240_bmp.h"
-#include "Generated/bmp/valid/4bpp_320x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/4bpp_321x240_bmp.h"
-#include "Generated/bmp/valid/4bpp_321x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/4bpp_322x240_bmp.h"
-#include "Generated/bmp/valid/4bpp_322x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/4bpp_323x240_bmp.h"
-#include "Generated/bmp/valid/4bpp_323x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/4bpp_324x240_bmp.h"
-#include "Generated/bmp/valid/4bpp_324x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/4bpp_325x240_bmp.h"
-#include "Generated/bmp/valid/4bpp_325x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/4bpp_326x240_bmp.h"
-#include "Generated/bmp/valid/4bpp_326x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/4bpp_327x240_bmp.h"
-#include "Generated/bmp/valid/4bpp_327x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/4bpp_topdown_320x240_bmp.h"
-
-// 8 bit per pixel
-#include "Generated/bmp/valid/8bpp_1x1_bmp.h"
-#include "Generated/bmp/valid/8bpp_1x1_tmpl_bmp.h"
-#include "Generated/bmp/valid/8bpp_1x64000_bmp.h"
-#include "Generated/bmp/valid/8bpp_1x64000_tmpl_bmp.h"
-#include "Generated/bmp/valid/8bpp_320x240_bmp.h"
-#include "Generated/bmp/valid/8bpp_320x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/8bpp_321x240_bmp.h"
-#include "Generated/bmp/valid/8bpp_321x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/8bpp_322x240_bmp.h"
-#include "Generated/bmp/valid/8bpp_322x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/8bpp_323x240_bmp.h"
-#include "Generated/bmp/valid/8bpp_323x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/8bpp_colorsimportant_two_bmp.h"
-#include "Generated/bmp/valid/8bpp_colorsimportant_two_tmpl_bmp.h"
-#include "Generated/bmp/valid/8bpp_colorsused_zero_bmp.h"
-#include "Generated/bmp/valid/8bpp_colorsused_zero_tmpl_bmp.h"
-#include "Generated/bmp/valid/8bpp_topdown_320x240_bmp.h"
-
-// 16 bit per pixel
-#include "Generated/bmp/valid/444_199x203_bmp.h"
-#include "Generated/bmp/valid/444_199x203_tmpl_bmp.h"
-#include "Generated/bmp/valid/444_199x203_topdown_bmp.h"
-#include "Generated/bmp/valid/555_1x1_bmp.h"
-#include "Generated/bmp/valid/555_1x1_tmpl_bmp.h"
-#include "Generated/bmp/valid/555_320x240_bmp.h"
-#include "Generated/bmp/valid/555_320x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/555_321x240_bmp.h"
-#include "Generated/bmp/valid/555_321x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/565_1x1_bmp.h"
-#include "Generated/bmp/valid/565_1x1_tmpl_bmp.h"
-#include "Generated/bmp/valid/565_320x240_bmp.h"
-#include "Generated/bmp/valid/565_320x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/565_320x240_topdown_bmp.h"
-// #include "Generated/bmp/valid/565_320x240_topdown_tmpl_bmp.h"
-#include "Generated/bmp/valid/565_321x240_bmp.h"
-#include "Generated/bmp/valid/565_321x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/565_321x240_topdown_bmp.h"
-// #include "Generated/bmp/valid/565_321x240_topdown_tmpl_bmp.h"
-#include "Generated/bmp/valid/565_322x240_bmp.h"
-#include "Generated/bmp/valid/565_322x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/565_322x240_topdown_bmp.h"
-// #include "Generated/bmp/valid/565_322x240_topdown_tmpl_bmp.h"
-#include "Generated/bmp/valid/1555_199x203_bmp.h"
-#include "Generated/bmp/valid/1555_199x203_tmpl_bmp.h"
-#include "Generated/bmp/valid/1555_199x203_topdown_bmp.h"
-#include "Generated/bmp/valid/4444_199x203_bmp.h"
-#include "Generated/bmp/valid/4444_199x203_tmpl_bmp.h"
-#include "Generated/bmp/valid/4444_199x203_topdown_bmp.h"
-
-// rle4
-#include "Generated/bmp/valid/rle4_absolute_320x240_bmp.h"
-#include "Generated/bmp/valid/rle4_absolute_320x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/rle4_alternate_320x240_bmp.h"
-#include "Generated/bmp/valid/rle4_alternate_320x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/rle4_delta_320x240_bmp.h"
-#include "Generated/bmp/valid/rle4_delta_320x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/rle4_encoded_320x240_bmp.h"
-#include "Generated/bmp/valid/rle4_encoded_320x240_tmpl_bmp.h"
-
-// rle8
-#include "Generated/bmp/valid/rle8_64000x1_bmp.h"
-#include "Generated/bmp/valid/rle8_64000x1_tmpl_bmp.h"
-#include "Generated/bmp/valid/rle8_absolute_320x240_bmp.h"
-#include "Generated/bmp/valid/rle8_absolute_320x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/rle8_blank_160x120_bmp.h"
-#include "Generated/bmp/valid/rle8_blank_160x120_tmpl_bmp.h"
-#include "Generated/bmp/valid/rle8_delta_320x240_bmp.h"
-#include "Generated/bmp/valid/rle8_delta_320x240_tmpl_bmp.h"
-#include "Generated/bmp/valid/rle8_encoded_320x240_bmp.h"
-#include "Generated/bmp/valid/rle8_encoded_320x240_tmpl_bmp.h"
-
-// corrupted
-#include "Generated/bmp/corrupt/1bpp_no_palette_bmp.h"
-#include "Generated/bmp/corrupt/1bpp_pixeldata_cropped_bmp.h"
-#include "Generated/bmp/corrupt/4bpp_no_palette_bmp.h"
-#include "Generated/bmp/corrupt/4bpp_pixeldata_cropped_bmp.h"
-#include "Generated/bmp/corrupt/8bpp_colorsimportant_large_bmp.h"
-#include "Generated/bmp/corrupt/8bpp_colorsimportant_negative_bmp.h"
-#include "Generated/bmp/corrupt/8bpp_colorsused_large_bmp.h"
-#include "Generated/bmp/corrupt/8bpp_colorsused_negative_bmp.h"
-#include "Generated/bmp/corrupt/8bpp_no_palette_bmp.h"
-#include "Generated/bmp/corrupt/8bpp_pixeldata_cropped_bmp.h"
-#include "Generated/bmp/corrupt/24bpp_pixeldata_cropped_bmp.h"
-#include "Generated/bmp/corrupt/32bpp_pixeldata_cropped_bmp.h"
-#include "Generated/bmp/corrupt/555_pixeldata_cropped_bmp.h"
-#include "Generated/bmp/corrupt/bitdepth_large_bmp.h"
-#include "Generated/bmp/corrupt/bitdepth_odd_bmp.h"
-#include "Generated/bmp/corrupt/bitdepth_zero_bmp.h"
-#include "Generated/bmp/corrupt/colormasks_cropped_bmp.h"
-#include "Generated/bmp/corrupt/colormasks_missing_bmp.h"
-#include "Generated/bmp/corrupt/compression_bad_rle4_for_8bpp_bmp.h"
-#include "Generated/bmp/corrupt/compression_bad_rle8_for_4bpp_bmp.h"
-#include "Generated/bmp/corrupt/compression_unknown_bmp.h"
-#include "Generated/bmp/corrupt/fileinfoheader_cropped_bmp.h"
-#include "Generated/bmp/corrupt/height_zero_bmp.h"
-#include "Generated/bmp/corrupt/infoheader_cropped_bmp.h"
-#include "Generated/bmp/corrupt/infoheader_missing_bmp.h"
-#include "Generated/bmp/corrupt/infoheadersize_large_bmp.h"
-#include "Generated/bmp/corrupt/infoheadersize_small_bmp.h"
-#include "Generated/bmp/corrupt/infoheadersize_zero_bmp.h"
-#include "Generated/bmp/corrupt/magicnumber_bad_bmp.h"
-#include "Generated/bmp/corrupt/magicnumber_cropped_bmp.h"
-#include "Generated/bmp/corrupt/offbits_large_bmp.h"
-#include "Generated/bmp/corrupt/offbits_negative_bmp.h"
-#include "Generated/bmp/corrupt/offbits_zero_bmp.h"
-#include "Generated/bmp/corrupt/palette_cropped_bmp.h"
-#include "Generated/bmp/corrupt/palette_missing_bmp.h"
-#include "Generated/bmp/corrupt/palette_too_big_bmp.h"
-#include "Generated/bmp/corrupt/pixeldata_missing_bmp.h"
-#include "Generated/bmp/corrupt/rle4_absolute_cropped_bmp.h"
-#include "Generated/bmp/corrupt/rle4_delta_cropped_bmp.h"
-#include "Generated/bmp/corrupt/rle4_no_end_of_line_marker_bmp.h"
-#include "Generated/bmp/corrupt/rle4_runlength_cropped_bmp.h"
-#include "Generated/bmp/corrupt/rle8_absolute_cropped_bmp.h"
-#include "Generated/bmp/corrupt/rle8_delta_cropped_bmp.h"
-#include "Generated/bmp/corrupt/rle8_deltaleavesimage_bmp.h"
-#include "Generated/bmp/corrupt/rle8_no_end_of_line_marker_bmp.h"
-#include "Generated/bmp/corrupt/rle8_runlength_cropped_bmp.h"
-#include "Generated/bmp/corrupt/width_negative_bmp.h"
-#include "Generated/bmp/corrupt/width_times_height_overflow_bmp.h"
-#include "Generated/bmp/corrupt/width_zero_bmp.h"
-
-// Questionable
-#include "Generated/bmp/questionable/8bpp_pixels_not_in_palette_bmp.h"
-#include "Generated/bmp/questionable/32bpp_0x0_bmp.h"
-#include "Generated/bmp/questionable/32bpp_0x240_bmp.h"
-#include "Generated/bmp/questionable/32bpp_320x0_bmp.h"
-#include "Generated/bmp/questionable/filesize_bad_bmp.h"
-#include "Generated/bmp/questionable/filesize_zero_bmp.h"
-#include "Generated/bmp/questionable/pels_per_meter_x_large_bmp.h"
-#include "Generated/bmp/questionable/pels_per_meter_x_negative_bmp.h"
-#include "Generated/bmp/questionable/pels_per_meter_x_zero_bmp.h"
-#include "Generated/bmp/questionable/pels_per_meter_y_large_bmp.h"
-#include "Generated/bmp/questionable/pels_per_meter_y_negative_bmp.h"
-#include "Generated/bmp/questionable/pels_per_meter_y_zero_bmp.h"
-#include "Generated/bmp/questionable/pixeldata_rle8_toomuch_bmp.h"
-#include "Generated/bmp/questionable/pixeldata_toomuch_bmp.h"
-#include "Generated/bmp/questionable/planes_large_bmp.h"
-#include "Generated/bmp/questionable/planes_zero_bmp.h"
-#include "Generated/bmp/questionable/reserved1_bad_bmp.h"
-#include "Generated/bmp/questionable/reserved2_bad_bmp.h"
-#include "Generated/bmp/questionable/rle4_height_negative_bmp.h"
-#include "Generated/bmp/questionable/rle4_no_end_of_bitmap_marker_bmp.h"
-#include "Generated/bmp/questionable/rle8_height_negative_bmp.h"
-#include "Generated/bmp/questionable/rle8_no_end_of_bitmap_marker_bmp.h"
 
 namespace {
 class BmpFixture {
@@ -261,10 +54,30 @@ protected:
     const img::Image loaded_image = img::Image::loadFrom("bmp", byte_array);
     compareBitmaps(original_image, loaded_image);
   }
+
+  void compareBitmaps(const std::string& original_file_path, const std::string& compare_with_path) {
+      std::ifstream original_file("test_data/bmp/" + original_file_path, std::ios::binary);
+      BOOST_REQUIRE(original_file);
+      tools::ByteArray original_array;
+      original_file >> original_array;
+
+      std::ifstream compare_file("test_data/bmp/" + compare_with_path, std::ios::binary);
+      BOOST_REQUIRE(compare_file);
+      tools::ByteArray compare_array;
+      compare_file >> compare_array;
+      compareBitmaps(original_array, compare_array);
+  }
 };
 
 class BmpFixtureCorrupt {
 public:
+  void checkNotLoaded(const std::string& file_path) {
+      std::ifstream file("test_data/bmp/" + file_path, std::ios::binary);
+      BOOST_REQUIRE(file);
+      tools::ByteArray array;
+      file >> array;
+      checkNotLoaded(array);
+  }
   void checkNotLoaded(const tools::ByteArray& byte_array) {
     const img::Image loaded_image = img::Image::loadFrom("bmp", byte_array);
     BOOST_CHECK(loaded_image.empty());
@@ -277,534 +90,472 @@ namespace test {
 BOOST_FIXTURE_TEST_SUITE(TestBmpValid, BmpFixture)
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_1x1) {
-  compareBitmaps(Get_1bpp_1x1_Tmpl_Bmp_Array(),
-                 Get_1bpp_1x1_Bmp_Array());
+  compareBitmaps("valid/1bpp-1x1.bmp", "valid/1bpp-1x1-tmpl.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_320x240) {
-  compareBitmaps(Get_1bpp_320x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_320x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-320x240-tmpl.bmp", "valid/1bpp-320x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_320x240_Color) {
-  compareBitmaps(Get_1bpp_320x240_Color_Tmpl_Bmp_Array(),
-                 Get_1bpp_320x240_Color_Bmp_Array());
+  compareBitmaps("valid/1bpp-320x240-color-tmpl.bmp", "valid/1bpp-320x240-color.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_320x240_Overlappingcolor) {
-  compareBitmaps(Get_1bpp_320x240_Overlappingcolor_Tmpl_Bmp_Array(),
-                 Get_1bpp_320x240_Overlappingcolor_Bmp_Array());
+  compareBitmaps("valid/1bpp-320x240-overlappingcolor-tmpl.bmp", "valid/1bpp-320x240-overlappingcolor.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_321x240) {
-  compareBitmaps(Get_1bpp_321x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_321x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-321x240-tmpl.bmp", "valid/1bpp-321x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_322x240) {
-  compareBitmaps(Get_1bpp_322x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_322x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-322x240-tmpl.bmp", "valid/1bpp-322x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_323x240) {
-  compareBitmaps(Get_1bpp_323x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_323x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-323x240-tmpl.bmp", "valid/1bpp-323x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_324x240) {
-  compareBitmaps(Get_1bpp_324x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_324x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-324x240-tmpl.bmp", "valid/1bpp-324x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_325x240) {
-  compareBitmaps(Get_1bpp_325x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_325x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-325x240-tmpl.bmp", "valid/1bpp-325x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_326x240) {
-  compareBitmaps(Get_1bpp_326x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_326x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-326x240-tmpl.bmp", "valid/1bpp-326x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_327x240) {
-  compareBitmaps(Get_1bpp_327x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_327x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-327x240-tmpl.bmp", "valid/1bpp-327x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_328x240) {
-  compareBitmaps(Get_1bpp_328x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_328x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-328x240-tmpl.bmp", "valid/1bpp-328x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_329x240) {
-  compareBitmaps(Get_1bpp_329x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_329x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-329x240-tmpl.bmp", "valid/1bpp-329x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_330x240) {
-  compareBitmaps(Get_1bpp_330x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_330x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-330x240-tmpl.bmp", "valid/1bpp-330x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_331x240) {
-  compareBitmaps(Get_1bpp_331x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_331x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-331x240-tmpl.bmp", "valid/1bpp-331x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_332x240) {
-  compareBitmaps(Get_1bpp_332x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_332x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-332x240-tmpl.bmp", "valid/1bpp-332x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_333x240) {
-  compareBitmaps(Get_1bpp_333x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_333x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-333x240-tmpl.bmp", "valid/1bpp-333x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_334x240) {
-  compareBitmaps(Get_1bpp_334x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_334x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-334x240-tmpl.bmp", "valid/1bpp-334x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_335x240) {
-  compareBitmaps(Get_1bpp_335x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_335x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-335x240-tmpl.bmp", "valid/1bpp-335x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_Topdown_320x240) {
-  compareBitmaps(Get_1bpp_320x240_Tmpl_Bmp_Array(),
-                 Get_1bpp_Topdown_320x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-320x240-tmpl.bmp", "valid/1bpp-topdown-320x240.bmp");
 }
 
 // 4 bit per pixel
 BOOST_AUTO_TEST_CASE(Bmp4bpp_1x1) {
-  compareBitmaps(Get_4bpp_1x1_Tmpl_Bmp_Array(),
-                 Get_4bpp_1x1_Bmp_Array());
+  compareBitmaps("valid/4bpp-1x1-tmpl.bmp", "valid/4bpp-1x1.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp4bpp_320x240) {
-  compareBitmaps(Get_4bpp_320x240_Tmpl_Bmp_Array(),
-                 Get_4bpp_320x240_Bmp_Array());
+  compareBitmaps("valid/4bpp-320x240-tmpl.bmp", "valid/4bpp-320x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp4bpp_321x240) {
-  compareBitmaps(Get_4bpp_321x240_Tmpl_Bmp_Array(),
-                 Get_4bpp_321x240_Bmp_Array());
+  compareBitmaps("valid/4bpp-321x240-tmpl.bmp", "valid/4bpp-321x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp4bpp_322x240) {
-  compareBitmaps(Get_4bpp_322x240_Tmpl_Bmp_Array(),
-                 Get_4bpp_322x240_Bmp_Array());
+  compareBitmaps("valid/4bpp-322x240-tmpl.bmp", "valid/4bpp-322x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp4bpp_323x240) {
-  compareBitmaps(Get_4bpp_323x240_Tmpl_Bmp_Array(),
-                 Get_4bpp_323x240_Bmp_Array());
+    compareBitmaps("valid/4bpp-323x240-tmpl.bmp", "valid/4bpp-323x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp4bpp_324x240) {
-  compareBitmaps(Get_4bpp_324x240_Tmpl_Bmp_Array(),
-                 Get_4bpp_324x240_Bmp_Array());
+  compareBitmaps("valid/4bpp-324x240-tmpl.bmp", "valid/4bpp-324x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp4bpp_325x240) {
-  compareBitmaps(Get_4bpp_325x240_Tmpl_Bmp_Array(),
-                 Get_4bpp_325x240_Bmp_Array());
+  compareBitmaps("valid/4bpp-325x240-tmpl.bmp", "valid/4bpp-325x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp4bpp_326x240) {
-  compareBitmaps(Get_4bpp_326x240_Tmpl_Bmp_Array(),
-                 Get_4bpp_326x240_Bmp_Array());
+  compareBitmaps("valid/4bpp-326x240-tmpl.bmp", "valid/4bpp-326x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp4bpp_327x240) {
-  compareBitmaps(Get_4bpp_327x240_Tmpl_Bmp_Array(),
-                 Get_4bpp_327x240_Bmp_Array());
+  compareBitmaps("valid/4bpp-327x240-tmpl.bmp", "valid/4bpp-327x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp4bpp_Topdown_320x240) {
-  compareBitmaps(Get_4bpp_320x240_Tmpl_Bmp_Array(),
-                 Get_4bpp_Topdown_320x240_Bmp_Array());
+  compareBitmaps("valid/4bpp-320x240-tmpl.bmp", "valid/4bpp-topdown-320x240.bmp");
 }
 
 // 8 bit per pixel
 BOOST_AUTO_TEST_CASE(Bmp8bpp_1x1) {
-  compareBitmaps(Get_8bpp_1x1_Tmpl_Bmp_Array(),
-                 Get_8bpp_1x1_Bmp_Array());
+  compareBitmaps("valid/8bpp-1x1-tmpl.bmp", "valid/8bpp-1x1.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp8bpp_1x64000) {
-  compareBitmaps(Get_8bpp_1x64000_Tmpl_Bmp_Array(),
-                 Get_8bpp_1x64000_Bmp_Array());
+  compareBitmaps("valid/8bpp-1x64000-tmpl.bmp", "valid/8bpp-1x64000.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp8bpp_320x240) {
-  compareBitmaps(Get_8bpp_320x240_Tmpl_Bmp_Array(),
-                 Get_8bpp_320x240_Bmp_Array());
+  compareBitmaps("valid/8bpp-320x240-tmpl.bmp", "valid/8bpp-320x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp8bpp_321x240) {
-  compareBitmaps(Get_8bpp_321x240_Tmpl_Bmp_Array(),
-                 Get_8bpp_321x240_Bmp_Array());
+  compareBitmaps("valid/8bpp-321x240-tmpl.bmp", "valid/8bpp-321x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp8bpp_322x240) {
-  compareBitmaps(Get_8bpp_322x240_Tmpl_Bmp_Array(),
-                 Get_8bpp_322x240_Bmp_Array());
+  compareBitmaps("valid/8bpp-322x240-tmpl.bmp", "valid/8bpp-322x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp8bpp_323x240) {
-  compareBitmaps(Get_8bpp_323x240_Tmpl_Bmp_Array(),
-                 Get_8bpp_323x240_Bmp_Array());
+  compareBitmaps("valid/8bpp-323x240-tmpl.bmp", "valid/8bpp-323x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp8bpp_Colorsimportant_320x240) {
-  compareBitmaps(Get_8bpp_Colorsimportant_Two_Tmpl_Bmp_Array(),
-                 Get_8bpp_Colorsimportant_Two_Bmp_Array());
+  compareBitmaps("valid/8bpp-colorsimportant-two-tmpl.bmp", "valid/8bpp-colorsimportant-two.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp8bpp_Colorused_320x240) {
-  compareBitmaps(Get_8bpp_Colorsused_Zero_Tmpl_Bmp_Array(),
-                 Get_8bpp_Colorsused_Zero_Bmp_Array());
+  compareBitmaps("valid/8bpp-colorsused-zero-tmpl.bmp", "valid/8bpp-colorsused-zero.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp8bpp_Topdown_320x240) {
-  compareBitmaps(Get_8bpp_320x240_Tmpl_Bmp_Array(),
-                 Get_8bpp_Topdown_320x240_Bmp_Array());
+  compareBitmaps("valid/8bpp-320x240-tmpl.bmp", "valid/8bpp-topdown-320x240.bmp");
 }
 
 // 16 bit per pixel
 BOOST_AUTO_TEST_CASE(Bmp16bpp_444_199x203) {
-  compareBitmaps(Get_444_199x203_Tmpl_Bmp_Array(),
-                 Get_444_199x203_Bmp_Array());
+  compareBitmaps("valid/444-199x203-tmpl.bmp", "valid/444-199x203.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp16bpp_444_199x203_Topdown) {
-  compareBitmaps(Get_444_199x203_Tmpl_Bmp_Array(),
-                 Get_444_199x203_Topdown_Bmp_Array());
+  compareBitmaps("valid/444-199x203-tmpl.bmp", "valid/444-199x203-topdown.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp16bpp_555_1x1) {
-  compareBitmaps(Get_555_1x1_Tmpl_Bmp_Array(),
-                 Get_555_1x1_Bmp_Array());
+  compareBitmaps("valid/555-1x1-tmpl.bmp", "valid/555-1x1.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp16bpp_555_320x240) {
-  compareBitmaps(Get_555_320x240_Tmpl_Bmp_Array(),
-                 Get_555_320x240_Bmp_Array());
+  compareBitmaps("valid/555-320x240-tmpl.bmp", "valid/555-320x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp16bpp_555_321x240) {
-  compareBitmaps(Get_555_321x240_Tmpl_Bmp_Array(),
-                 Get_555_321x240_Bmp_Array());
+  compareBitmaps("valid/555-321x240-tmpl.bmp", "valid/555-321x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp16bpp_565_1x1) {
-  compareBitmaps(Get_565_1x1_Tmpl_Bmp_Array(),
-                 Get_565_1x1_Bmp_Array());
+  compareBitmaps("valid/565-1x1-tmpl.bmp", "valid/565-1x1.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp16bpp_565_320x240) {
-  compareBitmaps(Get_565_320x240_Tmpl_Bmp_Array(),
-                 Get_565_320x240_Bmp_Array());
+  compareBitmaps("valid/565-320x240-tmpl.bmp", "valid/565-320x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp16bpp_565_320x240_Topdown) {
-  compareBitmaps(Get_565_320x240_Tmpl_Bmp_Array(),
-                 Get_565_320x240_Topdown_Bmp_Array());
+  compareBitmaps("valid/565-320x240-tmpl.bmp", "valid/565-320x240-topdown.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp16bpp_565_321x240) {
-  compareBitmaps(Get_565_321x240_Tmpl_Bmp_Array(),
-                 Get_565_321x240_Bmp_Array());
+  compareBitmaps("valid/565-321x240-tmpl.bmp", "valid/565-321x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp16bpp_565_321x240_Topdown) {
-  compareBitmaps(Get_565_321x240_Tmpl_Bmp_Array(),
-                 Get_565_321x240_Topdown_Bmp_Array());
+  compareBitmaps("valid/565-321x240-tmpl.bmp", "valid/565-321x240-topdown.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp16bpp_565_322x240) {
-  compareBitmaps(Get_565_322x240_Tmpl_Bmp_Array(),
-                 Get_565_322x240_Bmp_Array());
+  compareBitmaps("valid/565-322x240-tmpl.bmp", "valid/565-322x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp16bpp_565_322x240_Topdown) {
-  compareBitmaps(Get_565_322x240_Tmpl_Bmp_Array(),
-                 Get_565_322x240_Topdown_Bmp_Array());
+  compareBitmaps("valid/565-322x240-tmpl.bmp", "valid/565-322x240-topdown.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp16bpp_1555_199x203) {
-  compareBitmaps(Get_1555_199x203_Tmpl_Bmp_Array(),
-                 Get_1555_199x203_Bmp_Array());
+  compareBitmaps("valid/1555-199x203-tmpl.bmp", "valid/1555-199x203.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp16bpp_1555_199x203_Topdown) {
-  compareBitmaps(Get_1555_199x203_Tmpl_Bmp_Array(),
-                 Get_1555_199x203_Topdown_Bmp_Array());
+  compareBitmaps("valid/1555-199x203-tmpl.bmp", "valid/1555-199x203-topdown.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp16bpp_4444_199x203) {
-  compareBitmaps(Get_4444_199x203_Tmpl_Bmp_Array(),
-                 Get_4444_199x203_Bmp_Array());
+  compareBitmaps("valid/4444-199x203-tmpl.bmp", "valid/4444-199x203.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp16bpp_4444_199x203_Topdown) {
-  compareBitmaps(Get_4444_199x203_Tmpl_Bmp_Array(),
-                 Get_4444_199x203_Topdown_Bmp_Array());
+  compareBitmaps("valid/4444-199x203-tmpl.bmp", "valid/4444-199x203-topdown.bmp");
 }
 
 // rle4
 BOOST_AUTO_TEST_CASE(BmpRle4_Absolute_320x240) {
-  compareBitmaps(Get_Rle4_Absolute_320x240_Tmpl_Bmp_Array(),
-                 Get_Rle4_Absolute_320x240_Bmp_Array());
+  compareBitmaps("valid/rle4-absolute-320x240-tmpl.bmp", "valid/rle4-absolute-320x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle4_Alternate_320x240) {
-  compareBitmaps(Get_Rle4_Alternate_320x240_Tmpl_Bmp_Array(),
-                 Get_Rle4_Alternate_320x240_Bmp_Array());
+  compareBitmaps("valid/rle4-alternate-320x240-tmpl.bmp", "valid/rle4-alternate-320x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle4_Delta_320x240) {
-  compareBitmaps(Get_Rle4_Delta_320x240_Tmpl_Bmp_Array(),
-                 Get_Rle4_Delta_320x240_Bmp_Array());
+  compareBitmaps("valid/rle4-delta-320x240-tmpl.bmp", "valid/rle4-delta-320x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle4_Encoded_320x240) {
-  compareBitmaps(Get_Rle4_Encoded_320x240_Tmpl_Bmp_Array(),
-                 Get_Rle4_Encoded_320x240_Bmp_Array());
+  compareBitmaps("valid/rle4-encoded-320x240-tmpl.bmp", "valid/rle4-encoded-320x240.bmp");
 }
 
 // rle8
-BOOST_AUTO_TEST_CASE(BmpRle8_64000x1) {
+/*BOOST_AUTO_TEST_CASE(BmpRle8_64000x1) {
   img::Image original_image = img::Image::loadFrom("bmp", Get_Rle8_64000x1_Tmpl_Bmp_Array());
   img::Image loaded_image = img::Image::loadFrom("bmp", Get_Rle8_64000x1_Bmp_Array());
 
   img::rgba2rgb(original_image, original_image);
   compareBitmaps(original_image, loaded_image);
-}
+}*/
 
 BOOST_AUTO_TEST_CASE(BmpRle8_Absolute_320x240) {
-  compareBitmaps(Get_Rle8_Absolute_320x240_Tmpl_Bmp_Array(),
-                 Get_Rle8_Absolute_320x240_Bmp_Array());
+  compareBitmaps("valid/rle8-absolute-320x240-tmpl.bmp", "valid/rle8-absolute-320x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle8_Blank_160x120) {
-  compareBitmaps(Get_Rle8_Blank_160x120_Tmpl_Bmp_Array(),
-                 Get_Rle8_Blank_160x120_Bmp_Array());
+  compareBitmaps("valid/rle8-blank-160x120-tmpl.bmp", "valid/rle8-blank-160x120.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle8_Delta_320x240) {
-  compareBitmaps(Get_Rle8_Delta_320x240_Tmpl_Bmp_Array(),
-                 Get_Rle8_Delta_320x240_Bmp_Array());
+  compareBitmaps("valid/rle8-delta-320x240-tmpl.bmp", "valid/rle8-delta-320x240.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle8_Encoded_320x240) {
-  compareBitmaps(Get_Rle8_Encoded_320x240_Tmpl_Bmp_Array(),
-                 Get_Rle8_Encoded_320x240_Bmp_Array());
+  compareBitmaps("valid/rle8-encoded-320x240-tmpl.bmp", "valid/rle8-encoded-320x240.bmp");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
 } // namespace test
 
 namespace test {
-// --log_level=test_suite --run_test=TestBmpValid
+
+// --log_level=test_suite --run_test=TestBmpCorrupt
 BOOST_FIXTURE_TEST_SUITE(TestBmpCorrupt, BmpFixtureCorrupt)
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_No_Palette) {
-  checkNotLoaded(Get_1bpp_No_Palette_Bmp_Array());
+  checkNotLoaded("corrupt/1bpp-no-palette.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp1bpp_Pixeldata_Cropped) {
-  checkNotLoaded(Get_1bpp_Pixeldata_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/1bpp-pixeldata-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp4bpp_No_Palette) {
-  checkNotLoaded(Get_4bpp_No_Palette_Bmp_Array());
+  checkNotLoaded("corrupt/4bpp-no-palette.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp4bpp_Pixeldata_Cropped) {
-  checkNotLoaded(Get_4bpp_Pixeldata_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/4bpp-pixeldata-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp8bpp_Colorsimportant_Large) {
-  checkNotLoaded(Get_8bpp_Colorsimportant_Large_Bmp_Array());
+  checkNotLoaded("corrupt/8bpp-colorsimportant-large.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp8bpp_Colorsimportant_Negative) {
-  checkNotLoaded(Get_8bpp_Colorsimportant_Negative_Bmp_Array());
+  checkNotLoaded("corrupt/8bpp-colorsimportant-negative.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp8bpp_Colorsused_Large) {
-  checkNotLoaded(Get_8bpp_Colorsused_Large_Bmp_Array());
+  checkNotLoaded("corrupt/8bpp-colorsused-large.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp8bpp_Colorsused_Negative) {
-  checkNotLoaded(Get_8bpp_Colorsused_Negative_Bmp_Array());
+  checkNotLoaded("corrupt/8bpp-colorsused-negative.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp8bpp_No_Palette) {
-  checkNotLoaded(Get_8bpp_No_Palette_Bmp_Array());
+  checkNotLoaded("corrupt/8bpp-no-palette.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp8bpp_Pixeldata_Cropped) {
-  checkNotLoaded(Get_8bpp_Pixeldata_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/8bpp-pixeldata-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp24bpp_Pixeldata_Cropped) {
-  checkNotLoaded(Get_24bpp_Pixeldata_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/24bpp-pixeldata-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp32bpp_Pixeldata_Cropped) {
-  checkNotLoaded(Get_32bpp_Pixeldata_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/32bpp-pixeldata-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp555_Pixeldata_Cropped) {
-  checkNotLoaded(Get_555_Pixeldata_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/555-pixeldata-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpBitdepth_Large) {
-  checkNotLoaded(Get_Bitdepth_Large_Bmp_Array());
+  checkNotLoaded("corrupt/bitdepth-large.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpBitdepth_Odd) {
-  checkNotLoaded(Get_Bitdepth_Odd_Bmp_Array());
+  checkNotLoaded("corrupt/bitdepth-odd.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpBitdepth_Zero) {
-  checkNotLoaded(Get_Bitdepth_Zero_Bmp_Array());
+  checkNotLoaded("corrupt/bitdepth-zero.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpColormasks_Cropped) {
-  checkNotLoaded(Get_Colormasks_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/colormasks-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpColormasks_Missing) {
-  checkNotLoaded(Get_Colormasks_Missing_Bmp_Array());
+  checkNotLoaded("corrupt/colormasks-missing.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpCompression_Bad_Rle4_For_8bpp) {
-  checkNotLoaded(Get_Compression_Bad_Rle4_For_8bpp_Bmp_Array());
+  checkNotLoaded("corrupt/compression-bad-rle4-for-8bpp.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpCompression_Bad_Rle8_For_4bpp) {
-  checkNotLoaded(Get_Compression_Bad_Rle8_For_4bpp_Bmp_Array());
+  checkNotLoaded("corrupt/compression-bad-rle8-for-4bpp.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpCompression_Unknown) {
-  checkNotLoaded(Get_Compression_Unknown_Bmp_Array());
+  checkNotLoaded("corrupt/compression-unknown.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpFileinfoheader_Cropped) {
-  checkNotLoaded(Get_Fileinfoheader_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/fileinfoheader-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpHeight_Zero) {
-  checkNotLoaded(Get_Height_Zero_Bmp_Array());
+  checkNotLoaded("corrupt/height-zero.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpInfoheader_Cropped) {
-  checkNotLoaded(Get_Infoheader_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/infoheader-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpInfoheader_Missing) {
-  checkNotLoaded(Get_Infoheader_Missing_Bmp_Array());
+  checkNotLoaded("corrupt/infoheader-missing.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpInfoheadersize_Large) {
-  checkNotLoaded(Get_Infoheadersize_Large_Bmp_Array());
+  checkNotLoaded("corrupt/infoheadersize-large.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpInfoheadersize_Small) {
-  checkNotLoaded(Get_Infoheadersize_Small_Bmp_Array());
+  checkNotLoaded("corrupt/infoheadersize-small.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpInfoheadersize_Zero) {
-  checkNotLoaded(Get_Infoheadersize_Zero_Bmp_Array());
+  checkNotLoaded("corrupt/infoheadersize-zero.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpMagicnumber_Bad) {
-  checkNotLoaded(Get_Magicnumber_Bad_Bmp_Array());
+  checkNotLoaded("corrupt/magicnumber-bad.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpMagicnumber_Cropped) {
-  checkNotLoaded(Get_Magicnumber_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/magicnumber-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpOffbits_Large) {
-  checkNotLoaded(Get_Offbits_Large_Bmp_Array());
+  checkNotLoaded("corrupt/offbits-large.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpOffbits_Negative) {
-  checkNotLoaded(Get_Offbits_Negative_Bmp_Array());
+  checkNotLoaded("corrupt/offbits-negative.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpOffbits_Zero) {
-  checkNotLoaded(Get_Offbits_Zero_Bmp_Array());
+  checkNotLoaded("corrupt/offbits-zero.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpPalette_Cropped) {
-  checkNotLoaded(Get_Palette_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/palette-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpPalette_Missing) {
-  checkNotLoaded(Get_Palette_Missing_Bmp_Array());
+  checkNotLoaded("corrupt/palette-missing.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpPalette_Too_Big) {
-  checkNotLoaded(Get_Palette_Too_Big_Bmp_Array());
+  checkNotLoaded("corrupt/palette-too-big.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpPixeldata_Missing) {
-  checkNotLoaded(Get_Pixeldata_Missing_Bmp_Array());
+  checkNotLoaded("corrupt/pixeldata-missing.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle4_Absolute_Cropped) {
-  checkNotLoaded(Get_Rle4_Absolute_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/rle4-absolute-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle4_Delta_Cropped) {
-  checkNotLoaded(Get_Rle4_Delta_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/rle4-delta-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle4_No_End_Of_Line_Marker) {
-  checkNotLoaded(Get_Rle4_No_End_Of_Line_Marker_Bmp_Array());
+  checkNotLoaded("corrupt/rle4-no-end-of-line-marker.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle4_Runlength_Cropped) {
-  checkNotLoaded(Get_Rle4_Runlength_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/rle4-runlength-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle8_Absolute_Cropped) {
-  checkNotLoaded(Get_Rle8_Absolute_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/rle8-absolute-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle8_Delta_Cropped) {
-  checkNotLoaded(Get_Rle8_Delta_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/rle8-delta-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle8_Deltaleavesimage) {
-  checkNotLoaded(Get_Rle8_Deltaleavesimage_Bmp_Array());
+  checkNotLoaded("corrupt/rle8-deltaleavesimage.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle8_No_End_Of_Line_Marker) {
-  checkNotLoaded(Get_Rle8_No_End_Of_Line_Marker_Bmp_Array());
+  checkNotLoaded("corrupt/rle8-no-end-of-line-marker.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle8_Runlength_Cropped) {
-  checkNotLoaded(Get_Rle8_Runlength_Cropped_Bmp_Array());
+  checkNotLoaded("corrupt/rle8-runlength-cropped.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpWidth_Negative) {
-  checkNotLoaded(Get_Width_Negative_Bmp_Array());
+  checkNotLoaded("corrupt/width-negative.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpWidth_Times_Height_Overflow) {
-  checkNotLoaded(Get_Width_Times_Height_Overflow_Bmp_Array());
+  checkNotLoaded("corrupt/width-times-height-overflow.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpWidth_Zero) {
-  checkNotLoaded(Get_Width_Zero_Bmp_Array());
+  checkNotLoaded("corrupt/width-zero.bmp");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -815,111 +566,92 @@ namespace test {
 BOOST_FIXTURE_TEST_SUITE(TestBmpQuestionable, BmpFixture)
 
 BOOST_FIXTURE_TEST_CASE(Bmp8bpp_pixels_not_in_palette, BmpFixtureCorrupt) {
-  checkNotLoaded(Get_8bpp_Pixels_Not_In_Palette_Bmp_Array());
+  checkNotLoaded("questionable/8bpp-pixels-not-in-palette.bmp");
 }
 
 BOOST_FIXTURE_TEST_CASE(Bmp32bpp_0x0, BmpFixtureCorrupt) {
-  checkNotLoaded(Get_32bpp_0x0_Bmp_Array());
+  checkNotLoaded("questionable/32bpp-0x0.bmp");
 }
 
 BOOST_FIXTURE_TEST_CASE(Bmp32bpp_0x240, BmpFixtureCorrupt) {
-  checkNotLoaded(Get_32bpp_0x240_Bmp_Array());
+  checkNotLoaded("questionable/32bpp-0x240.bmp");
 }
 
 BOOST_FIXTURE_TEST_CASE(Bmp32bpp_320x0, BmpFixtureCorrupt) {
-  checkNotLoaded(Get_32bpp_320x0_Bmp_Array());
+  checkNotLoaded("questionable/32bpp-320x0.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp_Filesize_Bad) {
-  compareBitmaps(Get_Filesize_Bad_Bmp_Array(),
-                 Get_1bpp_320x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-320x240.bmp", "questionable/filesize-bad.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(Bmp_Filesize_Zero) {
-  compareBitmaps(Get_Filesize_Zero_Bmp_Array(),
-                 Get_1bpp_320x240_Bmp_Array());
+  compareBitmaps("valid/1bpp-320x240.bmp", "questionable/filesize-zero.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpPelsPerMeterXLarge) {
-  compareBitmaps(Get_Pels_Per_Meter_X_Large_Bmp_Array(),
-                 Get_8bpp_320x240_Tmpl_Bmp_Array());
+  compareBitmaps("valid/8bpp-320x240-tmpl.bmp", "questionable/pels-per-meter-x-large.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpPelsPerMeterXNegative) {
-  compareBitmaps(Get_Pels_Per_Meter_X_Negative_Bmp_Array(),
-                 Get_8bpp_320x240_Tmpl_Bmp_Array());
+  compareBitmaps("valid/8bpp-320x240-tmpl.bmp", "questionable/pels-per-meter-x-negative.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpPelsPerMeterXZero) {
-  compareBitmaps(Get_Pels_Per_Meter_X_Zero_Bmp_Array(),
-                 Get_8bpp_320x240_Tmpl_Bmp_Array());
+  compareBitmaps("valid/8bpp-320x240-tmpl.bmp", "questionable/pels-per-meter-x-zero.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpPelsPerMeterYLarge) {
-  compareBitmaps(Get_Pels_Per_Meter_Y_Large_Bmp_Array(),
-                 Get_8bpp_320x240_Tmpl_Bmp_Array());
+  compareBitmaps("valid/8bpp-320x240-tmpl.bmp", "questionable/pels-per-meter-y-large.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpPelsPerMeterYNegative) {
-  compareBitmaps(Get_Pels_Per_Meter_Y_Negative_Bmp_Array(),
-                 Get_8bpp_320x240_Tmpl_Bmp_Array());
+  compareBitmaps("valid/8bpp-320x240-tmpl.bmp", "questionable/pels-per-meter-y-negative.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpPelsPerMeterYZero) {
-  compareBitmaps(Get_Pels_Per_Meter_Y_Zero_Bmp_Array(),
-                 Get_8bpp_320x240_Tmpl_Bmp_Array());
+  compareBitmaps("valid/8bpp-320x240-tmpl.bmp", "questionable/pels-per-meter-y-zero.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpPixeldataRle8Toomuch) {
-  compareBitmaps(Get_Pixeldata_Rle8_Toomuch_Bmp_Array(),
-                 Get_8bpp_320x240_Tmpl_Bmp_Array());
+  compareBitmaps("valid/8bpp-320x240-tmpl.bmp", "questionable/pixeldata-rle8-toomuch.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpPixeldataToomuch) {
-  compareBitmaps(Get_Pixeldata_Toomuch_Bmp_Array(),
-                 Get_1bpp_320x240_Tmpl_Bmp_Array());
+  compareBitmaps("valid/1bpp-320x240-tmpl.bmp", "questionable/pixeldata-toomuch.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpPlanesLarge) {
-  compareBitmaps(Get_Planes_Large_Bmp_Array(),
-                 Get_1bpp_320x240_Tmpl_Bmp_Array());
+  compareBitmaps("valid/1bpp-320x240-tmpl.bmp", "questionable/planes-large.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpPlanesZero) {
-  compareBitmaps(Get_Planes_Zero_Bmp_Array(),
-                 Get_1bpp_320x240_Tmpl_Bmp_Array());
+  compareBitmaps("valid/1bpp-320x240-tmpl.bmp", "questionable/planes-zero.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpReversed1Bad) {
-  compareBitmaps(Get_Reserved1_Bad_Bmp_Array(),
-                 Get_1bpp_320x240_Tmpl_Bmp_Array());
+  compareBitmaps("valid/1bpp-320x240-tmpl.bmp", "questionable/reserved1-bad.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpReversed2Bad) {
-  compareBitmaps(Get_Reserved2_Bad_Bmp_Array(),
-                 Get_1bpp_320x240_Tmpl_Bmp_Array());
+  compareBitmaps("valid/1bpp-320x240-tmpl.bmp", "questionable/reserved2-bad.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle4HeightNegative) {
-  compareBitmaps(Get_Rle4_Height_Negative_Bmp_Array(),
-                 Get_8bpp_320x240_Tmpl_Bmp_Array());
+  compareBitmaps("valid/8bpp-320x240-tmpl.bmp", "questionable/rle4-height-negative.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle4NoEndOfBitmap) {
-  compareBitmaps(Get_Rle4_No_End_Of_Bitmap_Marker_Bmp_Array(),
-                 Get_8bpp_320x240_Tmpl_Bmp_Array());
+  compareBitmaps("valid/8bpp-320x240-tmpl.bmp", "questionable/rle4-no-end-of-bitmap-marker.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle8HeightNegative) {
-  compareBitmaps(Get_Rle8_Height_Negative_Bmp_Array(),
-                 Get_8bpp_320x240_Tmpl_Bmp_Array());
+  compareBitmaps("valid/8bpp-320x240-tmpl.bmp", "questionable/rle8-height-negative.bmp");
 }
 
 BOOST_AUTO_TEST_CASE(BmpRle8NoEndOfBitmap) {
-  compareBitmaps(Get_Rle8_No_End_Of_Bitmap_Marker_Bmp_Array(),
-                 Get_8bpp_320x240_Tmpl_Bmp_Array());
+  compareBitmaps("valid/8bpp-320x240-tmpl.bmp", "questionable/rle8-no-end-of-bitmap-marker.bmp");
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()
 } // namespace test

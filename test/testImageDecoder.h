@@ -1,6 +1,6 @@
 #pragma once
 
-#include "imgDecoder.h"
+#include "common/decoders/imgDecoder.h"
 
 namespace test {
 class TestImageDecoder: public img::IDecoder {

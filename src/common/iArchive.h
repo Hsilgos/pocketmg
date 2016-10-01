@@ -22,22 +22,40 @@ public:
   static void unregisterArchiver(const std::string& pref_ext);
 };
 
-#define AUTO_REGISTER_ARCHIVER(pref_ext, archive_class)                  \
-  namespace                         \
-  {                           \
-  archive::IArchive* TOKEN_JOIN(create_archiver, __LINE__) ()            \
-  {                          \
-    return new archive_class;                  \
-  }                          \
-                            \
-  struct TOKEN_JOIN (FactoryRegistrar, __LINE__)               \
-  {                          \
-    TOKEN_JOIN(FactoryRegistrar, __LINE__) ()               \
-    {                         \
-      archive::IArchive::registerArchiver(pref_ext, TOKEN_JOIN(create_archiver, __LINE__));   \
-    }                         \
-  };                          \
-  static TOKEN_JOIN(FactoryRegistrar, __LINE__) TOKEN_JOIN(__global_factory_registrar__, __LINE__);  \
+#define AUTO_REGISTER_ARCHIVER(pref_ext, archive_class)                                             \
+  namespace                                                                                         \
+  {                                                                                                 \
+  archive::IArchive* TOKEN_JOIN(create_archiver, __LINE__) ()                                       \
+  {                                                                                                 \
+    return new archive_class;                                                                       \
+  }                                                                                                 \
+                                                                                                    \
+  struct TOKEN_JOIN (FactoryRegistrar, __LINE__)                                                    \
+  {                                                                                                 \
+    TOKEN_JOIN(FactoryRegistrar, __LINE__) ()                                                       \
+    {                                                                                               \
+      archive::IArchive::registerArchiver(pref_ext, TOKEN_JOIN(create_archiver, __LINE__));         \
+    }                                                                                               \
+  };                                                                                                \
+  static TOKEN_JOIN(FactoryRegistrar, __LINE__) TOKEN_JOIN(__global_factory_registrar__, __LINE__); \
+  }
+
+#define AUTO_REGISTER_ARCHIVER1(pref_ext, archive_class, arg1)                                      \
+  namespace                                                                                         \
+  {                                                                                                 \
+  archive::IArchive* TOKEN_JOIN(create_archiver, __LINE__) ()                                       \
+  {                                                                                                 \
+    return new archive_class(arg1);                                                                       \
+  }                                                                                                 \
+                                                                                                    \
+  struct TOKEN_JOIN (FactoryRegistrar, __LINE__)                                                    \
+  {                                                                                                 \
+    TOKEN_JOIN(FactoryRegistrar, __LINE__) ()                                                       \
+    {                                                                                               \
+      archive::IArchive::registerArchiver(pref_ext, TOKEN_JOIN(create_archiver, __LINE__));         \
+    }                                                                                               \
+  };                                                                                                \
+  static TOKEN_JOIN(FactoryRegistrar, __LINE__) TOKEN_JOIN(__global_factory_registrar__, __LINE__); \
   }
 
 IArchive* recognize(const fs::FilePath& path);

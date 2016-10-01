@@ -1,6 +1,6 @@
 #include "testImageDecoder.h"
 
-#include "imgDecoderFactory.h"
+#include "common/decoders/imgDecoderFactory.h"
 #include "byteArray.h"
 #include "image.h"
 

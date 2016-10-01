@@ -1,16 +1,42 @@
-TOOLS_BEGIN_PROJECT(test CUI_APP
+TOOLS_BEGIN_PROJECT(unit_tests CUI_APP
     DEPENDS
         common
+        seven_zip
     EXTERNAL_DEPENDS
         X11
         png
         jpeg
-        boost_system)
+        zip
+        boost_system
+        dl
+        pthread)
 
 TOOLS_SOURCES(
-    ../../src/common/bmpDecoder.cpp
-    ../../src/common/jpegDecoder.cpp
-    ../../src/common/pngDecoder.cpp
+    ../src/common/archives/7zArchive.cpp
+    ../src/common/archives/7zArchive.h
+    ../src/common/archives/ioapi.c
+    ../src/common/archives/ioapi.h
+    ../src/common/archives/unzip.c
+    ../src/common/archives/unzip.h
+    ../src/common/archives/zipArchive.cpp
+    ../src/common/archives/zipArchive.h
+    ../src/common/decoders/bmpDecoder.cpp
+    ../src/common/decoders/jpegDecoder.cpp
+    ../src/common/decoders/pngDecoder.cpp
+    ${SEVEN_ZIP_STATIC}/CPP/7zip/Archive/7z/7zRegister.cpp
+    ${SEVEN_ZIP_STATIC}/CPP/7zip/Archive/Bz2Handler.cpp
+    ${SEVEN_ZIP_STATIC}/CPP/7zip/Archive/Cab/CabRegister.cpp
+    ${SEVEN_ZIP_STATIC}/CPP/7zip/Archive/GzHandler.cpp
+    ${SEVEN_ZIP_STATIC}/CPP/7zip/Archive/LzmaHandler.cpp
+    ${SEVEN_ZIP_STATIC}/CPP/7zip/Archive/PpmdHandler.cpp
+    ${SEVEN_ZIP_STATIC}/CPP/7zip/Archive/Rar/Rar5Handler.cpp
+    ${SEVEN_ZIP_STATIC}/CPP/7zip/Archive/Rar/RarHandler.cpp
+    ${SEVEN_ZIP_STATIC}/CPP/7zip/Archive/SplitHandler.cpp
+    ${SEVEN_ZIP_STATIC}/CPP/7zip/Archive/Tar/TarRegister.cpp
+    ${SEVEN_ZIP_STATIC}/CPP/7zip/Archive/XzHandler.cpp
+    ${SEVEN_ZIP_STATIC}/CPP/7zip/Archive/ZHandler.cpp
+    ${SEVEN_ZIP_STATIC}/CPP/7zip/Archive/Zip/ZipRegister.cpp
+    ${SEVEN_ZIP_STATIC}/CPP/Common/CRC.cpp
     clone.h
     globalTest.cpp
     globalTest.h
@@ -21,6 +47,7 @@ TOOLS_SOURCES(
     tesRect.cpp
     testArchive.cpp
     testArchive.h
+    testArchiver.cpp
     testBenchmark.cpp
     testBenchmark.h
     testBmp.cpp
@@ -44,13 +71,6 @@ TOOLS_SOURCES(
     timeInfo.h
 )
 
-file(GLOB VALID_BMP "resources/valid/*.bmp")
-TOOLS_RESOURCE_TO_CODE(bmp/valid ${VALID_BMP})
-
-file(GLOB CORRUPT_BMP "resources/corrupt/*.bmp")
-TOOLS_RESOURCE_TO_CODE(bmp/corrupt ${CORRUPT_BMP})
-
-file(GLOB QUESTIONABLE_BMP "resources/questionable/*.bmp")
-TOOLS_RESOURCE_TO_CODE(bmp/questionable ${QUESTIONABLE_BMP})
+TOOLS_TEST_DATA("test_data")
 
 TOOLS_END_PROJECT()

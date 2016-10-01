@@ -159,7 +159,7 @@ TestFileSystem::Dir* TestFileSystem::findDirByPath(const fs::FilePath& path) {
     file_path.removeLastEntry();
 
   if (0 == file_path.getLevel())
-    return false;
+    return NULL;
 
   Dir* curr_dir = &root_;
 

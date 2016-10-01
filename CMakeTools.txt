@@ -407,3 +407,10 @@ macro(TOOLS_RESOURCE_TO_CODE OUTPUT_DIRECTORY)
     endforeach()
     include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 endmacro(TOOLS_RESOURCE_TO_CODE)
+
+
+macro(TOOLS_TEST_DATA)
+  foreach(_file_to_copy ${ARGN})
+    file(COPY "${_file_to_copy}" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  endforeach()
+endmacro(TOOLS_TEST_DATA)

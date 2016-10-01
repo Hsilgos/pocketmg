@@ -545,12 +545,7 @@ bool Book::goToBookmark(const Bookmark& bookmark) {
 }
 
 Bookmark Book::bookmark() const {
-  Bookmark result;
-
-  result.rootDir = explorer_.getRoot();
-  result.currentFile = explorer_.getCurrentPos();
-
-  return result;
+  return current_.bookmark;
 }
 
 void Book::ImageData::swap(ImageData& other) {
